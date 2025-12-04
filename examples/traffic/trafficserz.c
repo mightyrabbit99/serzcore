@@ -1,0 +1,76 @@
+#include "trafficserz.h"
+
+#include "serzcore_utils.h"
+
+SZFDECL_STATIC(null_s, p, dst) {
+  szcy(cdef_SZ_o, 3, 0, dst);
+  return 0;
+szcfail:
+  return 1;
+}
+
+SZFDECL_STATIC(car_s, p, dst) {
+  szcyy(cdef_SZ_o, sizeof(p->brand), p->brand, dst);
+  szcyy(cdef_SZ_o, sizeof(p->plate), p->plate, dst);
+  szcyy(cdef_SZ_o, sizeof(p->passengers), &p->passengers, dst);
+  szcmlcyy(cdef_SZ_o, sizeof(*p->secret), p->secret, dst);
+  return 0;
+szcfail:
+  return 1;
+}
+
+SZFDECL_STATIC(ship_s, p, dst) {
+  szcyy(cdef_SZ_o, sizeof(p->name), p->name, dst);
+  szcyy(cdef_SZ_o, sizeof(p->tonnage), &p->tonnage, dst);
+  return 0;
+szcfail:
+  return 1;
+}
+
+static szc_ff_t get_vehicle_dgf(vetyp_t typ) {
+  switch (typ) {
+    case vetyp_null:
+      return SZFNAME(null_s);
+    case vetyp_car:
+      return SZFNAME(car_s);
+    case vetyp_ship:
+      return SZFNAME(ship_s);
+    default:
+      return NULL;
+  }
+}
+
+SZFDECL_STATIC(traffic_s, p, dst) {
+  int i;
+  for (i = 0;;) {
+    szcrealc((void **)&p->vehicle_arr, sizeof(struct vehicle_s) * (i + 1));
+    szcyy(cdef_SZ_o, sizeof(vetyp_t), &p->vehicle_arr[i].typ, dst);
+    szc_ff_t ff = get_vehicle_dgf(p->vehicle_arr[i].typ);
+    if (ff == NULL) goto szcfail;
+    szclvrcrse(uint8_t, ff, &p->vehicle_arr[i].v, dst);
+    if (p->vehicle_arr[i++].typ == vetyp_null) break;
+  }
+  if (szc_get_mode() == szcmode_read) p->num_of_vehicles = i;
+  if (i == 0) szcdelete(p->vehicle_arr);
+
+  return 0;
+szcfail:
+  szcdelete(p->vehicle_arr);
+  return 1;
+}
+
+ssize_t traffic_deserialize(struct traffic_s *p, uint8_t *data, size_t datasz) {
+  size_t ll;
+  SZFREAD(traffic_s, ll, p, data, datasz);
+  return ll;
+szcfail:
+  return -1;
+}
+
+ssize_t traffic_serialize(struct traffic_s *p, uint8_t *buf, size_t bufsz) {
+  size_t ll;
+  SZFWRITE(traffic_s, ll, p, buf, bufsz);
+  return ll;
+szcfail:
+  return -1;
+}
