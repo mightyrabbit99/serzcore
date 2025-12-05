@@ -7,6 +7,8 @@
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
 #define MAX(a, b) (((a) > (b)) ? (a) : (b))
 #define MAZ_SZ (~(size_t)0)
+#define zz8(x) ((x) == 0 ? 8 : (x))
+#define zy8(x) (x % 8)
 
 // clang-format off
 const uint8_t byte_rev_table[256] = {
@@ -51,14 +53,14 @@ static inline uint8_t bb_mask(uint8_t target, char p1, char p2, char off1) {
   if (off1 >= 8) return (uint8_t)0;
   if (p1 < 0 || p2 < 0 || p1 >= p2) return (uint8_t)0;
   uint16_t a = (1 << (8 - p1)) - (1 << (8 - p2));
-  return off1 > 0 ? (target & a) >> off1 : (target & a) << off1;
+  return off1 > 0 ? (target & a) >> off1 : (target & a) << (-off1);
 }
 
 static inline uint8_t bb_mask2(uint8_t target, char p1, char p2, char off1) {
   if (off1 >= 8) return (uint8_t)0;
   if (p1 < 0 || p2 < 0 || p1 >= p2) return (uint8_t)0;
   uint16_t a = (1 << p2) - (1 << p1);
-  return off1 > 0 ? (target & a) << off1 : (target & a) >> off1;
+  return off1 > 0 ? (target & a) << off1 : (target & a) >> (-off1);
 }
 
 static inline void _szcpy(uint8_t typ, uint8_t *dst, uint8_t *src, size_t count, uint8_t pos_bb) {
@@ -93,17 +95,17 @@ static inline void _szcpy(uint8_t typ, uint8_t *dst, uint8_t *src, size_t count,
       }
       break;
     case cdef_SZ_b2:
+      cnt2 -= (pos_ba == 0 ? 1 : 0);
       dst[0] &= bb_mask2(255, bb_left, 8, 0);
-      dst[0] |= bb_mask2(bb_rev8(src[cnt2]), 0, pos_ba, pos_ba - bb_left);
-
       for (i = 0; i <= cnt2; i++) {
+        dst[i] |= bb_mask2(bb_rev8(src[cnt2 - i]), 0, zz8(pos_ba), zy8(ba_left) - pos_bb);
         if (i == cnt2 && pos_ba - bb_left < 0) break;
         dst[i + 1] = 0;
-        dst[i + 1] |= bb_mask2(bb_rev8(src[cnt2 - i]), 0, pos_ba - bb_left, 8 - (pos_ba - bb_left));     // spillover
+        dst[i + 1] |= bb_mask2(bb_rev8(src[cnt2 - i]), 0, zz8(pos_ba) - zz8(bb_left), 8 - (zz8(pos_ba) - zz8(bb_left)));  // spillover
         if (i == cnt2) break;
-        dst[i + 1] |= bb_mask(bb_rev8(src[cnt2 - i - 1]), 0, 8 - (pos_ba - bb_left), pos_ba - bb_left);  // spillover
-        dst[i] |= bb_mask(bb_rev8(src[cnt2 - i - 1]), 0, bb_left - pos_ba, 8 - (bb_left - pos_ba));      // not enough
-        dst[i + 1] |= bb_mask(bb_rev8(src[cnt2 - i - 1]), bb_left - pos_ba, 8, pos_ba - bb_left);        // not enough
+        dst[i + 1] |= bb_mask(bb_rev8(src[cnt2 - i - 1]), 0, 8 - (zz8(pos_ba) - zz8(bb_left)), zz8(pos_ba) - zz8(bb_left));  // spillover
+        dst[i] |= bb_mask(bb_rev8(src[cnt2 - i - 1]), 0, zz8(bb_left) - zz8(pos_ba), 8 - (zz8(bb_left) - zz8(pos_ba)));      // not enough
+        dst[i + 1] |= bb_mask(bb_rev8(src[cnt2 - i - 1]), zz8(bb_left) - zz8(pos_ba), 8, zz8(pos_ba) - zz8(bb_left));        // not enough
       }
       break;
     default:
