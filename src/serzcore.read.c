@@ -57,13 +57,24 @@ void szc_destruct_r(struct szc_dgs_s *d) { free(d); }
 
 static inline void _szcpy(uint8_t typ, uint8_t *dst, uint8_t *src, size_t count, uint8_t pos_bb);
 
-static inline int szcyy_bb_r(size_t count, uint8_t *target, struct szc_dgs_s *d) {
+static inline int szcyy_b_r(size_t count, uint8_t *target, struct szc_dgs_s *d) {
   struct szc_dgsr_s *dd = (struct szc_dgsr_s *)d;
   size_t start = dd->bitlen >> 3;
   size_t end = start + (count >> 3) + (count % 8 == 0 ? 0 : 1);
   if (end > dd->maxlen) return 1;
 
-  _szcpy(cdef_SZ_b, target, dd->val + start, count, dd->bitlen - (start << 3));
+  _szcpy(cdef_SZ_b, target, dd->val + start, count, dd->bitlen % 8);
+  dd->bitlen += count;
+  return 0;
+}
+
+static inline int szcyy_b2_r(size_t count, uint8_t *target, struct szc_dgs_s *d) {
+  struct szc_dgsr_s *dd = (struct szc_dgsr_s *)d;
+  size_t start = dd->bitlen >> 3;
+  size_t end = start + (count >> 3) + (count % 8 == 0 ? 0 : 1);
+  if (end > dd->maxlen) return 1;
+
+  _szcpy(cdef_SZ_b2, target, dd->val + start, count, dd->bitlen % 8);
   dd->bitlen += count;
   return 0;
 }
@@ -103,6 +114,7 @@ int szcy_r(uint8_t typ, size_t count, szcv_t target, struct szc_dgs_s *d) {
       dd->bitlen += count << 3;
       break;
     case cdef_SZ_b:
+    case cdef_SZ_b2:
       if (((dd->bitlen + count) >> 3) > dd->maxlen) return 1;
       dd->bitlen += count;
       break;
@@ -121,7 +133,9 @@ int szcyy_r(uint8_t typ, size_t count, uint8_t *target, struct szc_dgs_s *d) {
     case cdef_SZ_o2:
       return szcyy_o2_r(count, target, d);
     case cdef_SZ_b:
-      return szcyy_bb_r(count, target, d);
+      return szcyy_b_r(count, target, d);
+    case cdef_SZ_b2:
+      return szcyy_b2_r(count, target, d);
   }
   return 0;
 }

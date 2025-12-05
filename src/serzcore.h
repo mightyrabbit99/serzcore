@@ -13,7 +13,7 @@ enum szcmode_e {
   szcmode_write,
 };
 
-enum szc_dtyp_e { cdef_SZ_b = 1, cdef_SZ_o, cdef_SZ_o2 };
+enum szc_dtyp_e { cdef_SZ_o, cdef_SZ_o2, cdef_SZ_b, cdef_SZ_b2 };
 
 struct szc_dga_s;
 struct szc_dgs_s;
