@@ -110,7 +110,8 @@ int szcy_r(uint8_t typ, size_t count, szcv_t target, struct szc_dgs_s *d) {
   switch (typ) {
     case cdef_SZ_o:
     case cdef_SZ_o2:
-      if (((dd->bitlen >> 3) + count) > dd->maxlen) return 1;
+      if (((dd->bitlen >> 3) + (dd->bitlen % 8 == 0 ? 0 : 1) + count) > dd->maxlen) return 1;
+      dd->bitlen += dd->bitlen % 8 == 0 ? 0 : (8 - (dd->bitlen % 8));
       dd->bitlen += count << 3;
       break;
     case cdef_SZ_b:
