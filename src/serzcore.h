@@ -1,3 +1,10 @@
+/**
+ * Copyright (c) 2025 mightyrabbit99
+ *
+ * This library is free software; you can redistribute it and/or modify it
+ * under the terms of the MIT license. See `serzcore.c` for details.
+ */
+
 #ifndef SERZCORE_H
 #define SERZCORE_H
 
