@@ -32,7 +32,7 @@ struct szc_dgsr_s {
 int szc_get_mode_r(void) { return szcmode_read; }
 
 struct szc_dgs_s *szc_init_r(void) {
-  struct szc_dgsr_s *dd = (struct szc_dgsr_s *)malloc(sizeof(struct szc_dgsr_s));
+  struct szc_dgsr_s *dd = (struct szc_dgsr_s *)szc_malloc(sizeof(struct szc_dgsr_s));
   dd->bitlen = 0;
   dd->maxlen = 0;
   dd->dga1 = &szca_r;
@@ -75,7 +75,7 @@ void szc_set_val_r(struct szc_dgs_s *d, size_t len, uint8_t *val) {
   dd->val = val;
 }
 
-void szc_destruct_r(struct szc_dgs_s *d) { free(d); }
+void szc_destruct_r(struct szc_dgs_s *d) { szc_free(d); }
 
 static inline void _szcpy(uint8_t typ, uint8_t *dst, uint8_t *src, size_t count, uint8_t pos_bb);
 
@@ -168,7 +168,7 @@ int szcmlc_r(void **target, size_t sz) {
     *target = NULL;
     return 0;
   }
-  *target = (void *)malloc(sz);
+  *target = (void *)szc_malloc(sz);
   if (*target == NULL) return 1;
   memset(*target, 0, sz);
   return 0;
@@ -179,17 +179,17 @@ int szcrealc_r(void **target, size_t sz) {
     *target = NULL;
     return 0;
   }
-  *target = (void *)realloc(*target, sz);
+  *target = (void *)szc_realloc(*target, sz);
   if (*target == NULL) return 1;
   return 0;
 }
 
 void szcfree_r(void *target) {
-  if (target) free(target);
+  if (target) szc_free(target);
 }
 
 void szcfree2_r(void **target_p) {
-  if (*target_p) free(*target_p);
+  if (*target_p) szc_free(*target_p);
   *target_p = NULL;
 }
 

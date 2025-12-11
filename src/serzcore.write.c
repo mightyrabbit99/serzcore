@@ -30,10 +30,10 @@ struct szc_dgsw_s {
 int szc_get_mode_w(void) { return szcmode_write; }
 
 struct szc_dgs_s *szc_init_w(void) {
-  struct szc_dgsw_s *dd = (struct szc_dgsw_s *)malloc(sizeof(struct szc_dgsw_s));
+  struct szc_dgsw_s *dd = (struct szc_dgsw_s *)szc_malloc(sizeof(struct szc_dgsw_s));
   dd->bitlen = 0;
   dd->maxlen = MAZ_SZ;
-  dd->val = (uint8_t *)malloc(1);
+  dd->val = (uint8_t *)szc_malloc(1);
   dd->dga1 = &szca_w;
   return (struct szc_dgs_s *)dd;
 }
@@ -71,16 +71,16 @@ size_t szc_get_val_w(struct szc_dgs_s *d, size_t len, uint8_t *val_ptr) {
 void szc_set_val_w(struct szc_dgs_s *d, size_t len, uint8_t *val) {
   struct szc_dgsw_s *dd = (struct szc_dgsw_s *)d;
   dd->bitlen = len << 3;
-  uint8_t *val2 = (uint8_t *)malloc(sizeof(uint8_t) * len);
+  uint8_t *val2 = (uint8_t *)szc_malloc(sizeof(uint8_t) * len);
   memcpy(val2, val, len);
   dd->val = val2;
 }
 
 void szc_destruct_w(struct szc_dgs_s *d) {
   struct szc_dgsw_s *dd = (struct szc_dgsw_s *)d;
-  if (dd->val) free(dd->val);
+  if (dd->val) szc_free(dd->val);
   dd->val = NULL;
-  free(dd);
+  szc_free(dd);
 }
 
 static inline void _szcpy(uint8_t typ, uint8_t *dst, uint8_t *src, size_t count, uint8_t pos_bb);
@@ -91,7 +91,7 @@ static inline int szcyy_b_w(size_t count, uint8_t *target, struct szc_dgs_s *d) 
   size_t end = ((dd->bitlen + count) >> 3) + ((dd->bitlen + count) % 8 == 0 ? 0 : 1);
   if (end > dd->maxlen) return 1;
 
-  dd->val = realloc(dd->val, end);
+  dd->val = szc_realloc(dd->val, end);
   _szcpy(cdef_SZ_b, dd->val + start, target, count, dd->bitlen % 8);
   dd->bitlen += count;
   return 0;
@@ -103,7 +103,7 @@ static inline int szcyy_b2_w(size_t count, uint8_t *target, struct szc_dgs_s *d)
   size_t end = ((dd->bitlen + count) >> 3) + ((dd->bitlen + count) % 8 == 0 ? 0 : 1);
   if (end > dd->maxlen) return 1;
 
-  dd->val = realloc(dd->val, end);
+  dd->val = szc_realloc(dd->val, end);
   _szcpy(cdef_SZ_b2, dd->val + start, target, count, dd->bitlen % 8);
   dd->bitlen += count;
   return 0;
@@ -116,7 +116,7 @@ static inline int szcyy_o_w(size_t count, uint8_t *target, struct szc_dgs_s *d) 
   size_t end = start + count;
   if (end > dd->maxlen) return 1;
 
-  dd->val = realloc(dd->val, end);
+  dd->val = szc_realloc(dd->val, end);
   _szcpy(cdef_SZ_o, dd->val + start, target, count, 0);
   dd->bitlen += count << 3;
   return 0;
@@ -129,7 +129,7 @@ static inline int szcyy_o2_w(size_t count, uint8_t *target, struct szc_dgs_s *d)
   size_t end = start + count;
   if (end > dd->maxlen) return 1;
 
-  dd->val = realloc(dd->val, end);
+  dd->val = szc_realloc(dd->val, end);
   _szcpy(cdef_SZ_o2, dd->val + start, target, count, 0);
   dd->bitlen += count << 3;
   return 0;

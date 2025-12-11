@@ -64,6 +64,7 @@ void szcfree_w(void *target);
 void szcfree2_w(void **target_p);
 int szcyf_w(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d);
 int szcys_val_w(struct szc_dgs_s *target, struct szc_dgs_s *d);
+void szc_set_mem_functions(void *(*malloc_fn)(size_t), void *(*realloc_fn)(void *, size_t), void (*free_fn)(void *));
 
 ////
 

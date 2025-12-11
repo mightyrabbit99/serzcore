@@ -30,7 +30,11 @@
 #define MAX(a, b) (((a) > (b)) ? (a) : (b))
 #define MAZ_SZ (~(size_t)0)
 #define zz8(x) ((x) == 0 ? 8 : (x))
-#define zy8(x) (x % 8)
+#define zy8(x) ((x) % 8)
+
+static void *(*szc_malloc)(size_t) = malloc;
+static void *(*szc_realloc)(void *, size_t) = realloc;
+static void (*szc_free)(void *) = free;
 
 // clang-format off
 const uint8_t byte_rev_table[256] = {
@@ -134,6 +138,13 @@ static inline void _szcpy(uint8_t typ, uint8_t *dst, uint8_t *src, size_t count,
       break;
   }
 }
+
+void szc_set_mem_functions(void *(*malloc_fn)(size_t), void *(*realloc_fn)(void *, size_t), void (*free_fn)(void *)) {
+  szc_malloc = malloc_fn;
+  szc_realloc = realloc_fn;
+  szc_free = free_fn;
+}
+
 
 // clang-format off
 #include "serzcore.read.c"
