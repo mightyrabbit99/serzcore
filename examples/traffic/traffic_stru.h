@@ -47,11 +47,17 @@ struct ship_s {
   char name[10];
   char *manufacturer;
   int tonnage;
+  uint8_t *data;
+  size_t data_len;
 };
 
 inline static void ship_s_print(struct ship_s *ship, void (*f)(void *, const char *format, ...), void *arg) {
   f(arg, "ship name: %s\n", ship->name);
   f(arg, "ship manufacturer: %s\n", ship->manufacturer);
+  f(arg, "ship data_len: %ld\n", ship->data_len);
+  f(arg, "ship_data:");
+  for (size_t i = 0; i < ship->data_len; i++) f(arg, " %.2x", ship->data[i]);
+  f(arg, "\n");
   f(arg, "ship tonnage: %d\n", ship->tonnage);
 }
 
@@ -59,11 +65,15 @@ inline static int ship_s_filldummy(struct ship_s *ship) {
   strncpy(ship->name, "alice", sizeof(ship->name));
   ship->manufacturer = strdup("samsung");
   ship->tonnage = 101;
+  ship->data_len = 23;
+  ship->data = (uint8_t *)malloc(ship->data_len);
+  for (size_t i = 0; i < ship->data_len; i++) ship->data[i] = 0x21 + (uint8_t)i;
   return 0;
 }
 
 inline static void ship_s_destroy(struct ship_s *ship) {
   free(ship->manufacturer);
+  free(ship->data);
 }
 
 union vehicle_u {

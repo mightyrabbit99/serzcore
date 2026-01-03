@@ -58,7 +58,7 @@
     }                                                     \
   } while (0)
 #define szcy(typ, count, target, d) _szcy_exec(szcy, typ, count, target, d)
-#define szcyy(typ, count, target, d) _szcy_exec(szcyy, typ, count, (uint8_t *)target, d)
+#define szcyy(typ, count, target, d) _szcy_exec(szcyy, typ, count, (uint8_t *)(target), d)
 #define szcyf(f, target_ex, d) _szcy_exec(szcyf, f, target_ex, d)
 #define szcys_val(target, d) _szcy_exec(szcys_val, target, d)
 #define szcmlc(target, sz) _szcy_exec(szcmlc, target, sz)
@@ -66,22 +66,27 @@
 #define szcmemset(s, c, sz) szca__->szcmemset(s, c, sz)
 #define szcdelete(pt) szca__->szcfree(pt)
 #define szc_get_mode() szca__->szc_get_mode()
-#define szcmlcl(ptr, len)                            \
-  do {                                               \
-    szcmlc((void **)ptr, len);                       \
-    szc_cvector_push_back(*__dg_ptrs, (void **)ptr); \
+#define szcmlcl(ptr, len)                              \
+  do {                                                 \
+    szcmlc((void **)(ptr), len);                       \
+    szc_cvector_push_back(*__dg_ptrs, (void **)(ptr)); \
   } while (0)
 
-#define szcmlcyy(typ, len, ptr, dst)      \
-  do {                                    \
-    szcmlcl(&ptr, len);                   \
-    szcyy(typ, len, (uint8_t *)ptr, dst); \
+#define szcmlcyy(typ, len, ptr, dst)        \
+  do {                                      \
+    szcmlcl(&(ptr), len);                   \
+    szcyy(typ, len, (uint8_t *)(ptr), dst); \
   } while (0)
-#define szclvstr(typ, maxlen, ptr, dst)                               \
-  do {                                                                \
-    size_t tlv_len__ = ptr == NULL ? 0 : (strnlen(ptr, maxlen) + 1);  \
-    szcyy(cdef_SZ_o2, sizeof(tlv_len__), (uint8_t *)&tlv_len__, dst); \
-    szcmlcyy(typ, tlv_len__, ptr, dst);                               \
+#define szclvp(typ, len, ptr, dst)                          \
+  do {                                                      \
+    szcyy(cdef_SZ_o2, sizeof(len), (uint8_t *)&(len), dst); \
+    szcmlcyy(typ, len, ptr, dst);                           \
+  } while (0)
+#define szclvstr(typ, maxlen, ptr, dst)                                \
+  do {                                                                 \
+    size_t tlv_len__ = (ptr) == NULL ? 0 : (strnlen(ptr, maxlen) + 1); \
+    szcyy(cdef_SZ_o2, sizeof(tlv_len__), (uint8_t *)&tlv_len__, dst);  \
+    szcmlcyy(typ, tlv_len__, ptr, dst);                                \
   } while (0)
 #define szclvrcrse(tlv_len_t, ff, target, dst)                        \
   do {                                                                \
@@ -127,7 +132,7 @@
       szca_r.szc_destruct(d);                  \
       goto szcfail;                            \
     }                                          \
-    ll = szca_r.szc_get_len(d);                \
+    (ll) = szca_r.szc_get_len(d);              \
     szca_r.szc_destruct(d);                    \
   } while (0)
 #define SZFWRITE(struname, ll, p, buf, bufsz) \
@@ -137,7 +142,7 @@
       szca_w.szc_destruct(d);                 \
       goto szcfail;                           \
     }                                         \
-    ll = szca_w.szc_get_val(d, bufsz, buf);   \
+    (ll) = szca_w.szc_get_val(d, bufsz, buf); \
     szca_w.szc_destruct(d);                   \
   } while (0)
 
