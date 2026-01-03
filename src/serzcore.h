@@ -42,6 +42,7 @@ int szcy_r(uint8_t typ, size_t count, szcv_t target, struct szc_dgs_s *d);
 int szcyy_r(uint8_t typ, size_t count, uint8_t *target, struct szc_dgs_s *d);
 int szcmlc_r(void **target, size_t sz);
 int szcrealc_r(void **target, size_t sz);
+void *szcmemset_r(uint8_t *s, int c, size_t sz);
 void szcfree_r(void *target);
 void szcfree2_r(void **target_p);
 int szcyf_r(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d);
@@ -60,6 +61,7 @@ int szcy_w(uint8_t typ, size_t count, szcv_t target, struct szc_dgs_s *d);
 int szcyy_w(uint8_t typ, size_t count, uint8_t *target, struct szc_dgs_s *d);
 int szcmlc_w(void **target, size_t sz);
 int szcrealc_w(void **target, size_t sz);
+void *szcmemset_w(uint8_t *s, int c, size_t sz);
 void szcfree_w(void *target);
 void szcfree2_w(void **target_p);
 int szcyf_w(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d);
@@ -82,6 +84,7 @@ struct szc_dga_s {
   int (*szcyy)(uint8_t, size_t, uint8_t *, struct szc_dgs_s *);
   int (*szcmlc)(void **, size_t);
   int (*szcrealc)(void **, size_t);
+  void *(*szcmemset)(uint8_t *, int, size_t);
   void (*szcfree)(void *);
   void (*szcfree2)(void **);
   int (*szcyf)(szc_ff_t, _target_ex, struct szc_dgs_s *);
@@ -102,6 +105,7 @@ static struct szc_dga_s szca_r = (struct szc_dga_s){
     .szcyy = szcyy_r,
     .szcmlc = szcmlc_r,
     .szcrealc = szcrealc_r,
+    .szcmemset = szcmemset_r,
     .szcfree = szcfree_r,
     .szcfree2 = szcfree2_r,
     .szcyf = szcyf_r,
@@ -122,6 +126,7 @@ static struct szc_dga_s szca_w = (struct szc_dga_s){
     .szcyy = szcyy_w,
     .szcmlc = szcmlc_w,
     .szcrealc = szcrealc_w,
+    .szcmemset = szcmemset_w,
     .szcfree = szcfree_w,
     .szcfree2 = szcfree2_w,
     .szcyf = szcyf_w,

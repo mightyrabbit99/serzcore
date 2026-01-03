@@ -34,6 +34,7 @@ static void _testtemplate_writeread_1(size_t tlvt_nr, vetyp_t *tlvts) {
   printf("start data:\n");
   traffic_s_print(p, _fprintf, stdout);
   uint8_t buffer[200];
+  printf("serializing data...\n");
   ssize_t l = traffic_serialize(p, buffer, 200);
   if (l == -1) {
     lg("Write error!\n");
@@ -45,6 +46,7 @@ static void _testtemplate_writeread_1(size_t tlvt_nr, vetyp_t *tlvts) {
 
   // read
   struct traffic_s p2 = {0};
+  printf("deserializing data...\n");
   l = traffic_deserialize(&p2, buffer, l);
   if (l == -1) {
     lg("Read error!\n");

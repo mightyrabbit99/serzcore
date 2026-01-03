@@ -184,6 +184,10 @@ int szcrealc_r(void **target, size_t sz) {
   return 0;
 }
 
+void *szcmemset_r(uint8_t *s, int c, size_t sz) {
+  return memset(s, c, sz);
+}
+
 void szcfree_r(void *target) {
   if (target) szc_free(target);
 }

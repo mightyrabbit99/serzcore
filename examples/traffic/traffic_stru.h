@@ -45,21 +45,26 @@ inline static void car_s_destroy(struct car_s *car) {
 
 struct ship_s {
   char name[10];
+  char *manufacturer;
   int tonnage;
 };
 
 inline static void ship_s_print(struct ship_s *ship, void (*f)(void *, const char *format, ...), void *arg) {
   f(arg, "ship name: %s\n", ship->name);
+  f(arg, "ship manufacturer: %s\n", ship->manufacturer);
   f(arg, "ship tonnage: %d\n", ship->tonnage);
 }
 
 inline static int ship_s_filldummy(struct ship_s *ship) {
   strncpy(ship->name, "alice", sizeof(ship->name));
+  ship->manufacturer = strdup("samsung");
   ship->tonnage = 101;
   return 0;
 }
 
-inline static void ship_s_destroy(struct ship_s *ship) {}
+inline static void ship_s_destroy(struct ship_s *ship) {
+  free(ship->manufacturer);
+}
 
 union vehicle_u {
   struct null_s null;

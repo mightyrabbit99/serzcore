@@ -174,6 +174,8 @@ int szcmlc_w(void **target, size_t sz) { return 0; }
 
 int szcrealc_w(void **target, size_t sz) { return 0; }
 
+void *szcmemset_w(uint8_t *s, int c, size_t sz) { return s; }
+
 void szcfree_w(void *target) { return; }
 
 void szcfree2_w(void **target_p) { return; }

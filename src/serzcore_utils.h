@@ -63,6 +63,7 @@
 #define szcys_val(target, d) _szcy_exec(szcys_val, target, d)
 #define szcmlc(target, sz) _szcy_exec(szcmlc, target, sz)
 #define szcrealc(target, sz) _szcy_exec(szcrealc, target, sz)
+#define szcmemset(s, c, sz) szca__->szcmemset(s, c, sz)
 #define szcdelete(pt) szca__->szcfree(pt)
 #define szc_get_mode() szca__->szc_get_mode()
 #define szcmlcl(ptr, len)                            \
@@ -76,20 +77,25 @@
     szcmlcl(&ptr, len);                   \
     szcyy(typ, len, (uint8_t *)ptr, dst); \
   } while (0)
-
-#define szclvrcrse(tlv_len_t, ff, target, dst)                   \
-  do {                                                           \
-    struct szc_dgs_s *szc_tlvv__ = szca__->szc_init();           \
-    szcyf(ff, target, szc_tlvv__);                               \
-    tlv_len_t tlv_len = szca__->szc_get_len(szc_tlvv__);         \
-    szcyy(cdef_SZ_o, sizeof(tlv_len), (uint8_t *)&tlv_len, dst); \
-    szca__->szc_set_maxlen(szc_tlvv__, tlv_len);                 \
-    size_t l1 = szca__->szc_get_len(dst);                        \
-    szcys_val(szc_tlvv__, dst);                                  \
-    size_t l2 = szca__->szc_get_len(dst);                        \
-    szca__->szc_destruct(szc_tlvv__);                            \
-    szc_tlvv__ = NULL;                                           \
-    if (l2 - l1 != tlv_len) goto szcfail;                        \
+#define szclvstr(typ, maxlen, ptr, dst)                               \
+  do {                                                                \
+    size_t tlv_len__ = ptr == NULL ? 0 : (strnlen(ptr, maxlen) + 1);  \
+    szcyy(cdef_SZ_o2, sizeof(tlv_len__), (uint8_t *)&tlv_len__, dst); \
+    szcmlcyy(typ, tlv_len__, ptr, dst);                               \
+  } while (0)
+#define szclvrcrse(tlv_len_t, ff, target, dst)                        \
+  do {                                                                \
+    struct szc_dgs_s *szc_tlvv__ = szca__->szc_init();                \
+    szcyf(ff, target, szc_tlvv__);                                    \
+    tlv_len_t tlv_len__ = szca__->szc_get_len(szc_tlvv__);            \
+    szcyy(cdef_SZ_o2, sizeof(tlv_len__), (uint8_t *)&tlv_len__, dst); \
+    szca__->szc_set_maxlen(szc_tlvv__, tlv_len__);                    \
+    size_t l1 = szca__->szc_get_len(dst);                             \
+    szcys_val(szc_tlvv__, dst);                                       \
+    size_t l2 = szca__->szc_get_len(dst);                             \
+    szca__->szc_destruct(szc_tlvv__);                                 \
+    szc_tlvv__ = NULL;                                                \
+    if (l2 - l1 != tlv_len__) goto szcfail;                           \
   } while (0)
 
 #define SZFNAME(struname) SZC_CONCAT(__szcf, struname)

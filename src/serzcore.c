@@ -109,11 +109,15 @@ static inline void _szcpy(uint8_t typ, uint8_t *dst, uint8_t *src, size_t count,
       for (i = 0; i < cnt2; i++) {
         dst[i] &= bb_mask(255, 0, pos_bb, 0);
         dst[i] |= bb_mask(src[i], 0, bb_left, pos_bb);
-        dst[i + 1] = 0;
-        dst[i + 1] |= bb_mask(src[i], bb_left, 8, -bb_left);
+        if (bb_left < 8) {
+          dst[i + 1] = 0;
+          dst[i + 1] |= bb_mask(src[i], bb_left, 8, -bb_left);
+        }
       }
-      dst[i] &= bb_mask(255, 0, pos_bb, 0);
-      dst[i] |= bb_mask(src[i], 0, x1, pos_bb);
+      if (pos_bb > 0) {
+        dst[i] &= bb_mask(255, 0, pos_bb, 0);
+        dst[i] |= bb_mask(src[i], 0, x1, pos_bb);
+      }
 
       if (x2 > 0) {
         dst[i + 1] = 0;

@@ -21,6 +21,7 @@ szcfail:
 
 SZFDECL_STATIC(ship_s, p, dst) {
   szcyy(cdef_SZ_o, sizeof(p->name), p->name, dst);
+  szclvstr(cdef_SZ_o, 100, p->manufacturer, dst);
   szcyy(cdef_SZ_o, sizeof(p->tonnage), &p->tonnage, dst);
   return 0;
 szcfail:
@@ -44,6 +45,7 @@ SZFDECL_STATIC(traffic_s, p, dst) {
   int i;
   for (i = 0;;) {
     szcrealc((void **)&p->vehicle_arr, sizeof(struct vehicle_s) * (i + 1));
+    szcmemset((uint8_t *)&p->vehicle_arr[i], 0, sizeof(struct vehicle_s));
     szcyy(cdef_SZ_o, sizeof(vetyp_t), &p->vehicle_arr[i].typ, dst);
     szc_ff_t ff = get_vehicle_dgf(p->vehicle_arr[i].typ);
     if (ff == NULL) goto szcfail;
