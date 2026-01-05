@@ -135,6 +135,19 @@ static inline int szcyy_o2_w(size_t count, uint8_t *target, struct szc_dgs_s *d)
   return 0;
 }
 
+static inline int szcyy_o3_w(size_t count, uint8_t *target, struct szc_dgs_s *d) {
+  struct szc_dgsw_s *dd = (struct szc_dgsw_s *)d;
+  dd->bitlen += dd->bitlen % 8 == 0 ? 0 : (8 - (dd->bitlen % 8));
+  size_t start = dd->bitlen >> 3;
+  size_t end = start + count;
+  if (end > dd->maxlen) return 1;
+
+  dd->val = szc_realloc(dd->val, end);
+  _szcpy(cdef_SZ_o3, dd->val + start, target, count, 0);
+  dd->bitlen += count << 3;
+  return 0;
+}
+
 int szcy_w(uint8_t typ, size_t count, szcv_t target, struct szc_dgs_s *d) {
   if (count == 0) return 0;
   if (count > sizeof(szcv_t)) return 1;
@@ -143,6 +156,8 @@ int szcy_w(uint8_t typ, size_t count, szcv_t target, struct szc_dgs_s *d) {
       return szcyy_o_w(count, (uint8_t *)&target, d);
     case cdef_SZ_o2:
       return szcyy_o2_w(count, (uint8_t *)&target, d);
+    case cdef_SZ_o3:
+      return szcyy_o3_w(count, (uint8_t *)&target, d);
     case cdef_SZ_b:
       return szcyy_b_w(count, (uint8_t *)&target, d);
     case cdef_SZ_b2:
@@ -160,6 +175,8 @@ int szcyy_w(uint8_t typ, size_t count, uint8_t *target, struct szc_dgs_s *d) {
       return szcyy_o_w(count, target, d);
     case cdef_SZ_o2:
       return szcyy_o2_w(count, target, d);
+    case cdef_SZ_o3:
+      return szcyy_o3_w(count, target, d);
     case cdef_SZ_b:
       return szcyy_b_w(count, target, d);
     case cdef_SZ_b2:

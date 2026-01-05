@@ -105,6 +105,13 @@ static inline void _szcpy(uint8_t typ, uint8_t *dst, uint8_t *src, size_t count,
       for (i = 0; i < count; i++) dst[i] = src[count - i - 1];
 #endif
       break;
+    case cdef_SZ_o3:
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+      for (i = 0; i < count; i++) dst[i] = src[i];
+#else
+      for (i = 0; i < count; i++) dst[i] = src[count - i - 1];
+#endif
+      break;
     case cdef_SZ_b:
       for (i = 0; i < cnt2; i++) {
         dst[i] &= bb_mask(255, 0, pos_bb, 0);

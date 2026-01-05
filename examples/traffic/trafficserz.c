@@ -21,9 +21,9 @@ szcfail:
 
 SZFDECL_STATIC(ship_s, p, dst) {
   szcyy(cdef_SZ_o, sizeof(p->name), p->name, dst);
-  szclvstr(cdef_SZ_o, 100, p->manufacturer, dst);
+  szclvstr(cdef_SZ_o, cdef_SZ_o, 100, p->manufacturer, dst);
   szcyy(cdef_SZ_o, sizeof(p->tonnage), &p->tonnage, dst);
-  szclvp(cdef_SZ_o, p->data_len, p->data, dst);
+  szclvp(cdef_SZ_o, cdef_SZ_o, p->data_len, p->data, dst);
   return 0;
 szcfail:
   return 1;
@@ -50,7 +50,7 @@ SZFDECL_STATIC(traffic_s, p, dst) {
     szcyy(cdef_SZ_o, sizeof(vetyp_t), &p->vehicle_arr[i].typ, dst);
     szc_ff_t ff = get_vehicle_dgf(p->vehicle_arr[i].typ);
     if (ff == NULL) goto szcfail;
-    szclvrcrse(uint8_t, ff, &p->vehicle_arr[i].v, dst);
+    szclvrcrse(uint8_t, cdef_SZ_o, ff, &p->vehicle_arr[i].v, dst);
     if (p->vehicle_arr[i++].typ == vetyp_null) break;
   }
   if (szc_get_mode() == szcmode_read) p->num_of_vehicles = i;
