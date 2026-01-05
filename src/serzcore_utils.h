@@ -105,24 +105,24 @@
 
 #define SZFNAME(struname) SZC_CONCAT(__szcf, struname)
 #define SZFNAME2(struname) SZC_CONCAT(__szcf2, struname)
-#define SZFDECL(struname, p, dst)                                                                                                      \
-  static inline int SZFNAME2(struname)(const struct szc_dga_s *szca__, struct struname *p, struct szc_dgs_s *dst, void ****__dg_ptrs); \
-  int SZFNAME(struname)(const struct szc_dga_s *szca__, void *p, struct szc_dgs_s *dst) {                                              \
-    void ***ptrs = NULL;                                                                                                               \
-    int ans = SZFNAME2(struname)(szca__, (struct struname *)p, dst, &ptrs);                                                            \
-    szc_cvector_free(ptrs);                                                                                                            \
-    return ans;                                                                                                                        \
-  }                                                                                                                                    \
-  static inline int SZFNAME2(struname)(const struct szc_dga_s *szca__, struct struname *p, struct szc_dgs_s *dst, void ****__dg_ptrs)
-#define SZFDECL_STATIC(struname, p, dst)                                                                                               \
-  static inline int SZFNAME2(struname)(const struct szc_dga_s *szca__, struct struname *p, struct szc_dgs_s *dst, void ****__dg_ptrs); \
-  static int SZFNAME(struname)(const struct szc_dga_s *szca__, void *p, struct szc_dgs_s *dst) {                                       \
-    void ***ptrs = NULL;                                                                                                               \
-    int ans = SZFNAME2(struname)(szca__, (struct struname *)p, dst, &ptrs);                                                            \
-    szc_cvector_free(ptrs);                                                                                                            \
-    return ans;                                                                                                                        \
-  }                                                                                                                                    \
-  static inline int SZFNAME2(struname)(const struct szc_dga_s *szca__, struct struname *p, struct szc_dgs_s *dst, void ****__dg_ptrs)
+#define SZFDECL(t__, struname, p, dst)                                                                                              \
+  static inline int SZFNAME2(struname)(const struct szc_dga_s *szca__, t__ struname *p, struct szc_dgs_s *dst, void ****__dg_ptrs); \
+  int SZFNAME(struname)(const struct szc_dga_s *szca__, void *p, struct szc_dgs_s *dst) {                                           \
+    void ***ptrs = NULL;                                                                                                            \
+    int ans = SZFNAME2(struname)(szca__, (t__ struname *)p, dst, &ptrs);                                                            \
+    szc_cvector_free(ptrs);                                                                                                         \
+    return ans;                                                                                                                     \
+  }                                                                                                                                 \
+  static inline int SZFNAME2(struname)(const struct szc_dga_s *szca__, t__ struname *p, struct szc_dgs_s *dst, void ****__dg_ptrs)
+#define SZFDECL_STATIC(t__, struname, p, dst)                                                                                       \
+  static inline int SZFNAME2(struname)(const struct szc_dga_s *szca__, t__ struname *p, struct szc_dgs_s *dst, void ****__dg_ptrs); \
+  static int SZFNAME(struname)(const struct szc_dga_s *szca__, void *p, struct szc_dgs_s *dst) {                                    \
+    void ***ptrs = NULL;                                                                                                            \
+    int ans = SZFNAME2(struname)(szca__, (t__ struname *)p, dst, &ptrs);                                                            \
+    szc_cvector_free(ptrs);                                                                                                         \
+    return ans;                                                                                                                     \
+  }                                                                                                                                 \
+  static inline int SZFNAME2(struname)(const struct szc_dga_s *szca__, t__ struname *p, struct szc_dgs_s *dst, void ****__dg_ptrs)
 
 #define SZFREAD(struname, ll, p, data, datasz) \
   do {                                         \

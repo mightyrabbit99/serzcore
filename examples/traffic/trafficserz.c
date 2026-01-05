@@ -2,14 +2,14 @@
 
 #include "serzcore_utils.h"
 
-SZFDECL_STATIC(null_s, p, dst) {
+SZFDECL_STATIC(struct, null_s, p, dst) {
   szcy(cdef_SZ_o, 3, 0, dst);
   return 0;
 szcfail:
   return 1;
 }
 
-SZFDECL_STATIC(car_s, p, dst) {
+SZFDECL_STATIC(struct, car_s, p, dst) {
   szcyy(cdef_SZ_o, sizeof(p->brand), p->brand, dst);
   szcyy(cdef_SZ_o, sizeof(p->plate), p->plate, dst);
   szcyy(cdef_SZ_o, sizeof(p->passengers), &p->passengers, dst);
@@ -19,7 +19,7 @@ szcfail:
   return 1;
 }
 
-SZFDECL_STATIC(ship_s, p, dst) {
+SZFDECL_STATIC(struct, ship_s, p, dst) {
   szcyy(cdef_SZ_o, sizeof(p->name), p->name, dst);
   szclvstr(cdef_SZ_o, cdef_SZ_o, 100, p->manufacturer, dst);
   szcyy(cdef_SZ_o, sizeof(p->tonnage), &p->tonnage, dst);
@@ -42,7 +42,7 @@ static szc_ff_t get_vehicle_dgf(vetyp_t typ) {
   }
 }
 
-SZFDECL_STATIC(traffic_s, p, dst) {
+SZFDECL_STATIC(struct, traffic_s, p, dst) {
   int i;
   for (i = 0;;) {
     szcrealc((void **)&p->vehicle_arr, sizeof(struct vehicle_s) * (i + 1));
