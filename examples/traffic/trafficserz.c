@@ -49,7 +49,7 @@ SZFDECL_STATIC(struct, traffic_s, p, dst) {
     szcmemset((uint8_t *)&p->vehicle_arr[i], 0, sizeof(struct vehicle_s));
     szcyy(cdef_SZ_o, sizeof(vetyp_t), &p->vehicle_arr[i].typ, dst);
     szc_ff_t ff = get_vehicle_dgf(p->vehicle_arr[i].typ);
-    if (ff == NULL) goto szcfail;
+    if (ff == NULL) szcthrowerr();
     szclvrcrse(uint8_t, cdef_SZ_o, ff, &p->vehicle_arr[i].v, dst);
     if (p->vehicle_arr[i++].typ == vetyp_null) break;
   }

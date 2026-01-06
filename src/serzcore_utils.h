@@ -50,12 +50,16 @@
 #define SZC_PASTER(x, y) x##_##y
 #define SZC_CONCAT(x, y) SZC_PASTER(x, y)
 
-#define _szcy_exec(f1, ...)                               \
-  do {                                                    \
-    if (szca__->f1(__VA_ARGS__)) {                        \
-      szc_cvector_for_each(*__dg_ptrs, szca__->szcfree2); \
-      goto szcfail;                                       \
-    }                                                     \
+#define szcthrowerr()                                   \
+  do {                                                  \
+    szc_cvector_for_each(*__dg_ptrs, szca__->szcfree2); \
+    goto szcfail;                                       \
+  } while (0)
+#define _szcy_exec(f1, ...)        \
+  do {                             \
+    if (szca__->f1(__VA_ARGS__)) { \
+      szcthrowerr();               \
+    }                              \
   } while (0)
 #define szcy(typ, count, target, d) _szcy_exec(szcy, typ, count, target, d)
 #define szcyy(typ, count, target, d) _szcy_exec(szcyy, typ, count, (uint8_t *)(target), d)
