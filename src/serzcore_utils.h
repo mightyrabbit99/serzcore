@@ -105,6 +105,7 @@ static inline uint8_t szc_get_ctnsz(register unsigned long long val) {
 #define szclvstr(typ, maxlen, ptr, dst)                                    \
   do {                                                                     \
     size_t tlv_len__ = (ptr) == NULL ? 0 : (strnlen(ptr, maxlen) + 1);     \
+    if (tlv_len__ > maxlen) szcthrowerr();                                 \
     szcyx(typ, szc_get_ctnsz(maxlen), sizeof(tlv_len__), &tlv_len__, dst); \
     szcmlcyy(typ, tlv_len__, ptr, dst);                                    \
   } while (0)
