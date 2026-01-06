@@ -21,9 +21,9 @@ szcfail:
 
 SZFDECL_STATIC(struct, ship_s, p, dst) {
   szcyy(cdef_SZ_o, sizeof(p->name), p->name, dst);
-  szclvstr(cdef_SZ_o, cdef_SZ_o, 100, p->manufacturer, dst);
+  szclvstr(cdef_SZ_o, 100, p->manufacturer, dst);
   szcyy(cdef_SZ_o, sizeof(p->tonnage), &p->tonnage, dst);
-  szclvp(cdef_SZ_o, cdef_SZ_o, p->data_len, p->data, dst);
+  szclvp(cdef_SZ_o, p->data_len, p->data, dst);
   return 0;
 szcfail:
   return 1;
