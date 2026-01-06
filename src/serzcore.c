@@ -101,15 +101,19 @@ static inline void _szcpy(uint8_t typ, uint8_t *dst, uint8_t *src, size_t count,
     case cdef_SZ_o2:
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
       for (i = 0; i < count; i++) dst[i] = src[i];
-#else
+#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
       for (i = 0; i < count; i++) dst[i] = src[count - i - 1];
+#else
+#error byte order not defined
 #endif
       break;
     case cdef_SZ_o3:
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
       for (i = 0; i < count; i++) dst[i] = src[i];
-#else
+#elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
       for (i = 0; i < count; i++) dst[i] = src[count - i - 1];
+#else
+#error byte order not defined
 #endif
       break;
     case cdef_SZ_b:

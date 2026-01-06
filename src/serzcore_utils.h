@@ -9,6 +9,15 @@
 #define SERZCORE_UTILS_H
 #include "serzcore.h"
 
+static inline uint8_t szc_get_msb32(register unsigned int val) { return 32 - __builtin_clz(val); }
+
+static inline uint8_t szc_get_msb64(register unsigned long long val) { return 64 - __builtin_clzll(val); }
+
+static inline uint8_t szc_get_ctnsz(register unsigned long long val) {
+  uint8_t a = szc_get_msb64(val);
+  return (a / 8) + (a % 8 > 0 ? 1 : 0);
+}
+
 #define szc_cvector_size(vec) ((vec) ? ((size_t *)(vec))[-1] : (size_t)0)
 #define szc_cvector_set_size(vec, size) \
   do {                                  \
@@ -70,6 +79,13 @@
 #define szcmemset(s, c, sz) szca__->szcmemset(s, c, sz)
 #define szcdelete(pt) szca__->szcfree(pt)
 #define szc_get_mode() szca__->szc_get_mode()
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+#define szcyx(typ, count, bbcnt, target, d) szcyy(typ, count, target + (bbcnt - count), d)
+#elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+#define szcyx(typ, count, bbcnt, target, d) szcyy(typ, count, target, d)
+#else
+#error byte order not defined
+#endif
 #define szcmlcl(ptr, len)                              \
   do {                                                 \
     szcmlc((void **)(ptr), len);                       \
@@ -86,25 +102,25 @@
     szcyy(lentyp, sizeof(len), (uint8_t *)&(len), dst); \
     szcmlcyy(typ, len, ptr, dst);                       \
   } while (0)
-#define szclvstr(typ, lentyp, maxlen, ptr, dst)                        \
-  do {                                                                 \
-    size_t tlv_len__ = (ptr) == NULL ? 0 : (strnlen(ptr, maxlen) + 1); \
-    szcyy(lentyp, sizeof(tlv_len__), (uint8_t *)&tlv_len__, dst);      \
-    szcmlcyy(typ, tlv_len__, ptr, dst);                                \
+#define szclvstr(typ, lentyp, maxlen, ptr, dst)                               \
+  do {                                                                        \
+    size_t tlv_len__ = (ptr) == NULL ? 0 : (strnlen(ptr, maxlen) + 1);        \
+    szcyx(lentyp, szc_get_ctnsz(maxlen), sizeof(tlv_len__), &tlv_len__, dst); \
+    szcmlcyy(typ, tlv_len__, ptr, dst);                                       \
   } while (0)
-#define szclvrcrse(tlv_len_t, lentyp, ff, target, dst)            \
-  do {                                                            \
-    struct szc_dgs_s *szc_tlvv__ = szca__->szc_init();            \
-    szcyf(ff, target, szc_tlvv__);                                \
-    tlv_len_t tlv_len__ = szca__->szc_get_len(szc_tlvv__);        \
-    szcyy(lentyp, sizeof(tlv_len__), (uint8_t *)&tlv_len__, dst); \
-    szca__->szc_set_maxlen(szc_tlvv__, tlv_len__);                \
-    size_t l1 = szca__->szc_get_len(dst);                         \
-    szcys_val(szc_tlvv__, dst);                                   \
-    size_t l2 = szca__->szc_get_len(dst);                         \
-    szca__->szc_destruct(szc_tlvv__);                             \
-    szc_tlvv__ = NULL;                                            \
-    if (l2 - l1 != tlv_len__) goto szcfail;                       \
+#define szclvrcrse(tlv_len_t, lentyp, ff, target, dst)     \
+  do {                                                     \
+    struct szc_dgs_s *szc_tlvv__ = szca__->szc_init();     \
+    szcyf(ff, target, szc_tlvv__);                         \
+    tlv_len_t tlv_len__ = szca__->szc_get_len(szc_tlvv__); \
+    szcyy(lentyp, sizeof(tlv_len__), &tlv_len__, dst);     \
+    szca__->szc_set_maxlen(szc_tlvv__, tlv_len__);         \
+    size_t l1 = szca__->szc_get_len(dst);                  \
+    szcys_val(szc_tlvv__, dst);                            \
+    size_t l2 = szca__->szc_get_len(dst);                  \
+    szca__->szc_destruct(szc_tlvv__);                      \
+    szc_tlvv__ = NULL;                                     \
+    if (l2 - l1 != tlv_len__) szcthrowerr();               \
   } while (0)
 
 #define SZFNAME(struname) SZC_CONCAT(__szcf, struname)
