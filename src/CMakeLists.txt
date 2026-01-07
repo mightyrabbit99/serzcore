@@ -1,4 +1,5 @@
 add_library(serzcore STATIC)
+set_target_properties(serzcore PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
 target_sources(serzcore
   PRIVATE
     serzcore.c
