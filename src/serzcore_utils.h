@@ -79,6 +79,7 @@ static inline uint8_t szc_get_ctnsz(register unsigned long long val) {
 #define szcmemset(s, c, sz) szca__->szcmemset(s, c, sz)
 #define szcdelete(pt) szca__->szcfree(pt)
 #define szc_get_mode() szca__->szc_get_mode()
+
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
 #define szcyx(typ, count, bbcnt, target, d) szcyy(typ, count, target + (bbcnt - count), d)
 #elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
@@ -86,6 +87,7 @@ static inline uint8_t szc_get_ctnsz(register unsigned long long val) {
 #else
 #error byte order not defined
 #endif
+#define szcf(f, p, dst) SZFNAME(f)(szca__, p, dst)
 #define szcmlcl(ptr, len)                              \
   do {                                                 \
     szcmlc((void **)(ptr), len);                       \
