@@ -102,7 +102,7 @@ static inline uint8_t szc_get_ctnsz(register unsigned long long val) {
 #define szclvp(typ, len, ptr, dst)                   \
   do {                                               \
     szcyy(typ, sizeof(len), (uint8_t *)&(len), dst); \
-    szcmlcyy(typ, len, ptr, dst);                    \
+    szcmlcyy(typ, (len) * sizeof(*(ptr)), ptr, dst);   \
   } while (0)
 #define szclvstr(typ, maxlen, ptr, dst)                                    \
   do {                                                                     \
