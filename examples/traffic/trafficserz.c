@@ -50,7 +50,7 @@ SZFDECL_STATIC(struct, traffic_s, p, dst) {
     szcyy(cdef_SZ_o, sizeof(vetyp_t), &p->vehicle_arr[i].typ, dst);
     szc_ff_t ff = get_vehicle_dgf(p->vehicle_arr[i].typ);
     if (ff == NULL) szcthrowerr();
-    szclvrcrse(uint8_t, cdef_SZ_o, ff, &p->vehicle_arr[i].v, dst);
+    szclvrcrse(cdef_SZ_o, uint8_t, ff, &p->vehicle_arr[i].v, dst);
     if (p->vehicle_arr[i++].typ == vetyp_null) break;
   }
   if (szc_get_mode() == szcmode_read) p->num_of_vehicles = i;
