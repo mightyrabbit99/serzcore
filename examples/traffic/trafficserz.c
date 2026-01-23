@@ -42,6 +42,19 @@ static szc_ff_t get_vehicle_dgf(vetyp_t typ) {
   }
 }
 
+static void *get_vehicle_dgtg(union vehicle_u *vehicle, vetyp_t typ) {
+  switch (typ) {
+    case vetyp_null:
+      return (void *)&vehicle->null;
+    case vetyp_car:
+      return (void *)&vehicle->car;
+    case vetyp_ship:
+      return (void *)&vehicle->ship;
+    default:
+      return NULL;
+  }
+}
+
 SZFDECL_STATIC(struct, traffic_s, p, dst) {
   int i;
   for (i = 0;;) {
@@ -50,7 +63,9 @@ SZFDECL_STATIC(struct, traffic_s, p, dst) {
     szcyy(cdef_SZ_o, sizeof(vetyp_t), &p->vehicle_arr[i].typ, dst);
     szc_ff_t ff = get_vehicle_dgf(p->vehicle_arr[i].typ);
     if (ff == NULL) szcthrowerr();
-    szclvrcrse(cdef_SZ_o, uint8_t, ff, &p->vehicle_arr[i].v, dst);
+    void *tgt = get_vehicle_dgtg(&p->vehicle_arr[i].v, p->vehicle_arr[i].typ);
+    if (tgt == NULL) szcthrowerr();
+    szclvrcrse(cdef_SZ_o, uint8_t, ff, tgt, dst);
     if (p->vehicle_arr[i++].typ == vetyp_null) break;
   }
   if (szc_get_mode() == szcmode_read) p->num_of_vehicles = i;
