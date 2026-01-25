@@ -22,19 +22,18 @@
 
 struct szc_dgsw_s {
   struct szc_dga_s *dga1;
-  long long int bitlen;
+  unsigned long long int bitlen;
   size_t maxlen;
   uint8_t *val;
 };
 
-int szc_get_mode_w(void) { return szcmode_write; }
+szcmode_t szc_get_mode_w(void) { return szcmode_write; }
 
 struct szc_dgs_s *szc_init_w(void) {
   struct szc_dgsw_s *dd = (struct szc_dgsw_s *)szc_malloc(sizeof(struct szc_dgsw_s));
   if (dd == NULL) return NULL;
-  dd->bitlen = 0;
+  *dd = (struct szc_dgsw_s){0};
   dd->maxlen = MAZ_SZ;
-  dd->val = (uint8_t *)szc_malloc(1);
   dd->dga1 = &szca_w;
   return (struct szc_dgs_s *)dd;
 }
@@ -84,109 +83,29 @@ void szc_destruct_w(struct szc_dgs_s *d) {
   szc_free(dd);
 }
 
-static inline void _szcpy(uint8_t typ, uint8_t *dst, uint8_t *src, size_t count, uint8_t pos_bb);
-
-static inline int szcyy_b_w(size_t count, uint8_t *target, struct szc_dgs_s *d) {
-  struct szc_dgsw_s *dd = (struct szc_dgsw_s *)d;
-  size_t start = dd->bitlen >> 3;
-  size_t end = ((dd->bitlen + count) >> 3) + ((dd->bitlen + count) % 8 == 0 ? 0 : 1);
-  if (end > dd->maxlen) return 1;
-
-  dd->val = szc_realloc(dd->val, end);
-  _szcpy(cdef_SZ_b, dd->val + start, target, count, dd->bitlen % 8);
-  dd->bitlen += count;
-  return 0;
-}
-
-static inline int szcyy_b2_w(size_t count, uint8_t *target, struct szc_dgs_s *d) {
-  struct szc_dgsw_s *dd = (struct szc_dgsw_s *)d;
-  size_t start = dd->bitlen >> 3;
-  size_t end = ((dd->bitlen + count) >> 3) + ((dd->bitlen + count) % 8 == 0 ? 0 : 1);
-  if (end > dd->maxlen) return 1;
-
-  dd->val = szc_realloc(dd->val, end);
-  _szcpy(cdef_SZ_b2, dd->val + start, target, count, dd->bitlen % 8);
-  dd->bitlen += count;
-  return 0;
-}
-
-static inline int szcyy_o_w(size_t count, uint8_t *target, struct szc_dgs_s *d) {
-  struct szc_dgsw_s *dd = (struct szc_dgsw_s *)d;
-  dd->bitlen += dd->bitlen % 8 == 0 ? 0 : (8 - (dd->bitlen % 8));
-  size_t start = dd->bitlen >> 3;
-  size_t end = start + count;
-  if (end > dd->maxlen) return 1;
-
-  dd->val = szc_realloc(dd->val, end);
-  _szcpy(cdef_SZ_o, dd->val + start, target, count, 0);
-  dd->bitlen += count << 3;
-  return 0;
-}
-
-static inline int szcyy_o2_w(size_t count, uint8_t *target, struct szc_dgs_s *d) {
-  struct szc_dgsw_s *dd = (struct szc_dgsw_s *)d;
-  dd->bitlen += dd->bitlen % 8 == 0 ? 0 : (8 - (dd->bitlen % 8));
-  size_t start = dd->bitlen >> 3;
-  size_t end = start + count;
-  if (end > dd->maxlen) return 1;
-
-  dd->val = szc_realloc(dd->val, end);
-  _szcpy(cdef_SZ_o2, dd->val + start, target, count, 0);
-  dd->bitlen += count << 3;
-  return 0;
-}
-
-static inline int szcyy_o3_w(size_t count, uint8_t *target, struct szc_dgs_s *d) {
-  struct szc_dgsw_s *dd = (struct szc_dgsw_s *)d;
-  dd->bitlen += dd->bitlen % 8 == 0 ? 0 : (8 - (dd->bitlen % 8));
-  size_t start = dd->bitlen >> 3;
-  size_t end = start + count;
-  if (end > dd->maxlen) return 1;
-
-  dd->val = szc_realloc(dd->val, end);
-  _szcpy(cdef_SZ_o3, dd->val + start, target, count, 0);
-  dd->bitlen += count << 3;
-  return 0;
-}
-
-int szcy_w(uint8_t typ, size_t count, szcv_t target, struct szc_dgs_s *d) {
+int szcy_w(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d) {
   if (count == 0) return 0;
-  if (count > sizeof(szcv_t)) return 1;
-  switch (typ) {
-    case cdef_SZ_o:
-      return szcyy_o_w(count, (uint8_t *)&target, d);
-    case cdef_SZ_o2:
-      return szcyy_o2_w(count, (uint8_t *)&target, d);
-    case cdef_SZ_o3:
-      return szcyy_o3_w(count, (uint8_t *)&target, d);
-    case cdef_SZ_b:
-      return szcyy_b_w(count, (uint8_t *)&target, d);
-    case cdef_SZ_b2:
-      return szcyy_b2_w(count, (uint8_t *)&target, d);
-    default:
-      return 1;
-  }
-}
+  if (typ >= _cdef_SZ_max) return 1;
+  struct szc_dgsw_s *dd = (struct szc_dgsw_s *)d;
+  if (szc_typ_is_octal(typ)) dd->bitlen += dd->bitlen % 8 == 0 ? 0 : (8 - (dd->bitlen % 8));
+  size_t start = dd->bitlen >> 3;
+  size_t end;
+  if (szc_typ_is_octal(typ))
+    end = start + count;
+  else
+    end = ((dd->bitlen + count) >> 3) + ((dd->bitlen + count) % 8 == 0 ? 0 : 1);
+  uint8_t *val_p;
+  if (end > dd->maxlen) return 1;
+  val_p = szc_realloc(dd->val, end);
+  if (val_p == NULL) return 1;
+  dd->val = val_p;
+  _szcpy(typ, dd->val + start, target, count, szc_typ_is_octal(typ) ? 0 : dd->bitlen % 8);
+  dd->bitlen += szc_typ_is_octal(typ) ? count << 3 : count;
 
-int szcyy_w(uint8_t typ, size_t count, uint8_t *target, struct szc_dgs_s *d) {
-  if (count == 0) return 0;
-  int i;
-  switch (typ) {
-    case cdef_SZ_o:
-      return szcyy_o_w(count, target, d);
-    case cdef_SZ_o2:
-      return szcyy_o2_w(count, target, d);
-    case cdef_SZ_o3:
-      return szcyy_o3_w(count, target, d);
-    case cdef_SZ_b:
-      return szcyy_b_w(count, target, d);
-    case cdef_SZ_b2:
-      return szcyy_b2_w(count, target, d);
-    default:
-      return 1;
-  }
   return 0;
 }
+
+int szcyy_w(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d) { return szcy_w(typ, count, target, d); }
 
 int szcmlc_w(void **target, size_t sz) { return 0; }
 

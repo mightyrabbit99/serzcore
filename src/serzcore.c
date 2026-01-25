@@ -89,7 +89,7 @@ static inline uint8_t bb_mask2(uint8_t target, char p1, char p2, char off1) {
   return off1 > 0 ? (target & a) << off1 : (target & a) >> (-off1);
 }
 
-static inline void _szcpy(uint8_t typ, uint8_t *dst, uint8_t *src, size_t count, uint8_t pos_bb) {
+static inline void _szcpy(szc_dtyp_t typ, uint8_t *dst, uint8_t *src, unsigned long long int count, uint8_t pos_bb) {
   uint8_t pos_ba = count % 8;
   uint8_t ba_left = 8 - pos_ba, bb_left = 8 - pos_bb;
   uint8_t x1 = MIN(bb_left, pos_ba), x2 = pos_ba - x1;

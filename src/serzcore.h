@@ -13,21 +13,41 @@
 
 #define _target_ex void *
 
-enum szcmode_e {
+typedef enum {
   szcmode_read,
   szcmode_write,
-};
+} szcmode_t;
 
-enum szc_dtyp_e { cdef_SZ_o, cdef_SZ_o2, cdef_SZ_o3, cdef_SZ_b, cdef_SZ_b2 };
+typedef enum {
+  cdef_SZ_o,
+  cdef_SZ_o2,
+  cdef_SZ_o3,
+  cdef_SZ_b,
+  cdef_SZ_b2,
+  _cdef_SZ_max
+} szc_dtyp_t;
+
+static inline int szc_typ_is_octal(szc_dtyp_t typ) {
+  switch (typ) {
+    case cdef_SZ_o:
+    case cdef_SZ_o2:
+    case cdef_SZ_o3:
+      return 1;
+    case cdef_SZ_b:
+    case cdef_SZ_b2:
+      return 0;
+    default:
+      return -1;
+  }
+}
 
 struct szc_dga_s;
 struct szc_dgs_s;
-typedef uint32_t szcv_t;
 
 typedef int (*szc_ff_t)(const struct szc_dga_s *, _target_ex, struct szc_dgs_s *);
 
 /////
-int szc_get_mode_r(void);
+szcmode_t szc_get_mode_r(void);
 struct szc_dgs_s *szc_init_r(void);
 size_t szc_get_len_r(struct szc_dgs_s *d);
 void szc_set_maxlen_r(struct szc_dgs_s *d, size_t maxlen);
@@ -36,8 +56,8 @@ size_t szc_get_val_r(struct szc_dgs_s *d, size_t len, uint8_t *val_ptr);
 void szc_set_val_r(struct szc_dgs_s *d, size_t len, uint8_t *val);
 void szc_destruct_r(struct szc_dgs_s *d);
 void szc_fprint_r(FILE *stream, struct szc_dgs_s *d);
-int szcy_r(uint8_t typ, size_t count, szcv_t target, struct szc_dgs_s *d);
-int szcyy_r(uint8_t typ, size_t count, uint8_t *target, struct szc_dgs_s *d);
+int szcy_r(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d);
+int szcyy_r(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d);
 int szcmlc_r(void **target, size_t sz);
 int szcrealc_r(void **target, size_t sz);
 void *szcmemset_r(uint8_t *s, int c, size_t sz);
@@ -46,7 +66,7 @@ void szcfree2_r(void **target_p);
 int szcyf_r(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d);
 int szcys_val_r(struct szc_dgs_s *target, struct szc_dgs_s *d);
 
-int szc_get_mode_w(void);
+szcmode_t szc_get_mode_w(void);
 struct szc_dgs_s *szc_init_w(void);
 size_t szc_get_len_w(struct szc_dgs_s *d);
 void szc_set_maxlen_w(struct szc_dgs_s *d, size_t maxlen);
@@ -55,8 +75,8 @@ size_t szc_get_val_w(struct szc_dgs_s *d, size_t len, uint8_t *val_ptr);
 void szc_set_val_w(struct szc_dgs_s *d, size_t len, uint8_t *val);
 void szc_destruct_w(struct szc_dgs_s *d);
 void szc_fprint_w(FILE *stream, struct szc_dgs_s *d);
-int szcy_w(uint8_t typ, size_t count, szcv_t target, struct szc_dgs_s *d);
-int szcyy_w(uint8_t typ, size_t count, uint8_t *target, struct szc_dgs_s *d);
+int szcy_w(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d);
+int szcyy_w(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d);
 int szcmlc_w(void **target, size_t sz);
 int szcrealc_w(void **target, size_t sz);
 void *szcmemset_w(uint8_t *s, int c, size_t sz);
@@ -69,7 +89,7 @@ void szc_set_mem_functions(void *(*malloc_fn)(size_t), void *(*realloc_fn)(void 
 ////
 
 struct szc_dga_s {
-  int (*szc_get_mode)(void);
+  szcmode_t (*szc_get_mode)(void);
   struct szc_dgs_s *(*szc_init)(void);
   size_t (*szc_get_len)(struct szc_dgs_s *);
   void (*szc_set_maxlen)(struct szc_dgs_s *, size_t);
@@ -78,8 +98,8 @@ struct szc_dga_s {
   void (*szc_set_val)(struct szc_dgs_s *, size_t, uint8_t *);
   void (*szc_destruct)(struct szc_dgs_s *);
   void (*szc_fprint)(FILE *, struct szc_dgs_s *);
-  int (*szcy)(uint8_t, size_t, szcv_t, struct szc_dgs_s *);
-  int (*szcyy)(uint8_t, size_t, uint8_t *, struct szc_dgs_s *);
+  int (*szcy)(szc_dtyp_t, unsigned long long int, uint8_t *, struct szc_dgs_s *);
+  int (*szcyy)(szc_dtyp_t, unsigned long long int, uint8_t *, struct szc_dgs_s *);
   int (*szcmlc)(void **, size_t);
   int (*szcrealc)(void **, size_t);
   void *(*szcmemset)(uint8_t *, int, size_t);
