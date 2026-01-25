@@ -31,6 +31,7 @@ int szc_get_mode_w(void) { return szcmode_write; }
 
 struct szc_dgs_s *szc_init_w(void) {
   struct szc_dgsw_s *dd = (struct szc_dgsw_s *)szc_malloc(sizeof(struct szc_dgsw_s));
+  if (dd == NULL) return NULL;
   dd->bitlen = 0;
   dd->maxlen = MAZ_SZ;
   dd->val = (uint8_t *)szc_malloc(1);

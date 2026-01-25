@@ -33,6 +33,7 @@ int szc_get_mode_r(void) { return szcmode_read; }
 
 struct szc_dgs_s *szc_init_r(void) {
   struct szc_dgsr_s *dd = (struct szc_dgsr_s *)szc_malloc(sizeof(struct szc_dgsr_s));
+  if (dd == NULL) return NULL;
   dd->bitlen = 0;
   dd->maxlen = 0;
   dd->dga1 = &szca_r;

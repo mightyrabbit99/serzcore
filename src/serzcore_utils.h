@@ -114,6 +114,7 @@ static inline uint8_t szc_get_ctnsz(register unsigned long long val) {
 #define szclvrcrse(typ, tlv_len_t, ff, target, dst)        \
   do {                                                     \
     struct szc_dgs_s *szc_tlvv__ = szca__->szc_init();     \
+    if (szc_tlvv__ == NULL) szcthrowerr();                 \
     szcyf(ff, target, szc_tlvv__);                         \
     tlv_len_t tlv_len__ = szca__->szc_get_len(szc_tlvv__); \
     szcyy(typ, sizeof(tlv_len__), &tlv_len__, dst);        \
@@ -151,6 +152,7 @@ static inline uint8_t szc_get_ctnsz(register unsigned long long val) {
 #define SZFREAD(struname, ll, p, data, datasz) \
   do {                                         \
     struct szc_dgs_s *d = szca_r.szc_init();   \
+    if (d == NULL) goto szcfail;               \
     szca_r.szc_set_val(d, datasz, data);       \
     if (SZFNAME(struname)(&szca_r, p, d)) {    \
       szca_r.szc_destruct(d);                  \
@@ -162,6 +164,7 @@ static inline uint8_t szc_get_ctnsz(register unsigned long long val) {
 #define SZFWRITE(struname, ll, p, buf, bufsz) \
   do {                                        \
     struct szc_dgs_s *d = szca_w.szc_init();  \
+    if (d == NULL) goto szcfail;              \
     if (SZFNAME(struname)(&szca_w, p, d)) {   \
       szca_w.szc_destruct(d);                 \
       goto szcfail;                           \
