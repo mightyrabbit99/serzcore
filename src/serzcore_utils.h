@@ -64,13 +64,13 @@ static inline uint8_t szc_get_ctnsz(register unsigned long long val) {
     if ((vec) && (func) != NULL) {                  \
       size_t i;                                     \
       for (i = 0; i < szc_cvector_size(vec); i++) { \
-        func((vec)[i]);                             \
+        func((vec)[szc_cvector_size(vec) - i - 1]); \
       }                                             \
     }                                               \
   } while (0)
 #define szc_cvector_begin(vec) (vec)
 #define szc_cvector_end(vec) ((vec) ? &((vec)[szc_cvector_size(vec)]) : NULL)
-#define szc_cvector_for_each_in(it, vec) for (it = szc_cvector_begin(vec); it < szc_cvector_end(vec); it++)
+#define szc_cvector_for_each_in(it, vec) for (it = szc_cvector_end(vec) - 1; it >= szc_cvector_begin(vec); it--)
 
 #define SZC_PASTER(x, y) x##_##y
 #define SZC_CONCAT(x, y) SZC_PASTER(x, y)
