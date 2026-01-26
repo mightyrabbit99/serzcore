@@ -58,7 +58,7 @@ static void *get_vehicle_dgtg(union vehicle_u *vehicle, vetyp_t typ) {
 SZFDECL_STATIC(struct, traffic_s, p) {
   int i;
   for (i = 0;;) {
-    szcrealc((void **)&p->vehicle_arr, sizeof(struct vehicle_s) * (i + 1));
+    szcrealcl((void **)&p->vehicle_arr, sizeof(struct vehicle_s) * (i + 1));
     szcmemset((uint8_t *)&p->vehicle_arr[i], 0, sizeof(struct vehicle_s));
     szcyy(cdef_SZ_o, sizeof(vetyp_t), &p->vehicle_arr[i].typ);
     szc_ff_t ff = get_vehicle_dgf(p->vehicle_arr[i].typ);
@@ -73,7 +73,6 @@ SZFDECL_STATIC(struct, traffic_s, p) {
 
   return 0;
 szcfail:
-  szcdelete(p->vehicle_arr);
   return 1;
 }
 

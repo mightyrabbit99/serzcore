@@ -68,6 +68,9 @@ static inline uint8_t szc_get_ctnsz(register unsigned long long val) {
       }                                             \
     }                                               \
   } while (0)
+#define szc_cvector_begin(vec) (vec)
+#define szc_cvector_end(vec) ((vec) ? &((vec)[szc_cvector_size(vec)]) : NULL)
+#define szc_cvector_for_each_in(it, vec) for (it = szc_cvector_begin(vec); it < szc_cvector_end(vec); it++)
 
 #define SZC_PASTER(x, y) x##_##y
 #define SZC_CONCAT(x, y) SZC_PASTER(x, y)
@@ -125,7 +128,12 @@ static inline uint8_t szc_get_ctnsz(register unsigned long long val) {
     szcmlc((void **)(ptr), len);                            \
     szc_cvector_push_back(*SZC_DGARR_NAME, (void **)(ptr)); \
   } while (0)
-
+#define szcrealcl(ptr, len)                                                         \
+  do {                                                                              \
+    void *ptr_orig__ = *(ptr);                                                      \
+    szcrealc((void **)(ptr), len);                                                  \
+    if (ptr_orig__ == NULL) szc_cvector_push_back(*SZC_DGARR_NAME, (void **)(ptr)); \
+  } while (0)
 #define szcmlcyy(typ, len, ptr)        \
   do {                                 \
     szcmlcl(&(ptr), len);              \
