@@ -83,6 +83,14 @@ void szc_destruct_w(struct szc_dgs_s *d) {
   szc_free(dd);
 }
 
+void szc_set_ctx_w_ex(struct szc_dgs_s *d, void *ctx1) {
+  return;
+}
+
+int szc_get_fieldlen_w_ex(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d, szc_extyp_t extyp, const char *name) {
+  return 0;
+}
+
 int szcy_w(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d) {
   if (count == 0) return 0;
   if (typ >= _cdef_SZ_max) return 1;
@@ -107,6 +115,14 @@ int szcy_w(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct
 
 int szcyy_w(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d) { return szcy_w(typ, count, target, d); }
 
+int szcy_w_ex(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d, szc_extyp_t extyp, const char *name) {
+  return szcy_w(typ, count, target, d);
+}
+
+int szcyy_w_ex(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d, szc_extyp_t extyp, const char *name) {
+  return szcyy_w(typ, count, target, d);
+}
+
 int szcmlc_w(void **target, size_t sz) { return 0; }
 
 int szcrealc_w(void **target, size_t sz) { return 0; }
@@ -116,6 +132,8 @@ void *szcmemset_w(uint8_t *s, int c, size_t sz) { return s; }
 void szcfree_w(void *target) { return; }
 
 void szcfree2_w(void **target_p) { return; }
+
+void szc_ptop_w_ex(void **target_p) { return; }
 
 int szcyf_w(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d) {
   struct szc_dgsw_s *dd = (struct szc_dgsw_s *)d;
@@ -132,3 +150,6 @@ int szcyff_w(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d) {
   return f(dd->dga1, target_ex, d);
 }
 
+int szcyff_w_ex(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, const char *name) {
+  return szcyff_w(f, target_ex, d);
+}

@@ -77,6 +77,14 @@ void szc_set_val_r(struct szc_dgs_s *d, size_t len, uint8_t *val) {
 
 void szc_destruct_r(struct szc_dgs_s *d) { szc_free(d); }
 
+void szc_set_ctx_r_ex(struct szc_dgs_s *d, void *ctx1) {
+  return;
+}
+
+int szc_get_fieldlen_r_ex(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d, szc_extyp_t extyp, const char *name) {
+  return 0;
+}
+
 int szcy_r(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d) {
   if (count == 0) return 1;
   if (typ >= _cdef_SZ_max) return 1;
@@ -107,6 +115,14 @@ int szcyy_r(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struc
   _szcpy(typ, target, dd->val + start, count, szc_typ_is_octal(typ) ? 0 : dd->bitlen % 8);
   dd->bitlen += szc_count_bit(typ, count);
   return 0;
+}
+
+int szcy_r_ex(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d, szc_extyp_t extyp, const char *name) {
+  return szcy_r(typ, count, target, d);
+}
+
+int szcyy_r_ex(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d, szc_extyp_t extyp, const char *name) {
+  return szcyy_r(typ, count, target, d);
 }
 
 int szcmlc_r(void **target, size_t sz) {
@@ -141,6 +157,8 @@ void szcfree2_r(void **target_p) {
   *target_p = NULL;
 }
 
+void szc_ptop_r_ex(void **target_p) { return; }
+
 int szcyf_r(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d) {
   struct szc_dgsr_s *dd = (struct szc_dgsr_s *)d;
   dd->f = f;
@@ -165,4 +183,8 @@ int szcys_val_r(struct szc_dgs_s *target, struct szc_dgs_s *d) {
 int szcyff_r(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d) {
   struct szc_dgsr_s *dd = (struct szc_dgsr_s *)d;
   return f(dd->dga1, target_ex, d);
+}
+
+int szcyff_r_ex(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, const char *name) {
+  return szcyff_r(f, target_ex, d);
 }

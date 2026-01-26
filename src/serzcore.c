@@ -26,6 +26,11 @@
 #include <stdlib.h>
 #include <string.h>
 
+#ifdef SERZCORE_LUA
+#include "lauxlib.h"
+#include "lualib.h"
+#endif  // SERZCORE_LUA
+
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
 #define MAX(a, b) (((a) > (b)) ? (a) : (b))
 #define MAZ_SZ (~(size_t)0)
@@ -89,7 +94,7 @@ static inline uint8_t bb_mask2(uint8_t target, char p1, char p2, char off1) {
   return off1 > 0 ? (target & a) << off1 : (target & a) >> (-off1);
 }
 
-static inline void _szcpy(szc_dtyp_t typ, uint8_t *dst, uint8_t *src, unsigned long long int count, uint8_t pos_bb) {
+static inline void _szcpy(szc_dtyp_t typ, uint8_t *dst, const uint8_t *src, unsigned long long int count, uint8_t pos_bb) {
   uint8_t pos_ba = count % 8;
   uint8_t ba_left = 8 - pos_ba, bb_left = 8 - pos_bb;
   uint8_t x1 = MIN(bb_left, pos_ba), x2 = pos_ba - x1;
@@ -160,8 +165,101 @@ void szc_set_mem_functions(void *(*malloc_fn)(size_t), void *(*realloc_fn)(void 
   szc_free = free_fn;
 }
 
+#if defined(SERZCORE_LUA)
+static inline int _szclua_r(lua_State *L, szc_extyp_t extyp, const char *name, uint8_t *src, size_t src_sz) {
+  if (!lua_istable(L, -1)) return 1;
+  switch (extyp) {
+    case szc_extyp_int:
+      lua_pushstring(L, name);
+      lua_pushnumber(L, *(int *)src);
+      lua_settable(L, -3);
+      break;
+    case szc_extyp_data:
+    case szc_extyp_string:
+      lua_pushstring(L, name);
+      lua_pushlstring(L, src, src_sz);
+      lua_settable(L, -3);
+      break;
+    default:
+      return 1;
+  }
+  return 0;
+}
+
+static inline ssize_t _szclua_w_get_fieldlen(lua_State *L, szc_extyp_t extyp, const char *name) {
+  if (extyp >= _szc_extyp_max) return -1;
+  if (!lua_istable(L, -1)) return -1;
+  lua_getfield(L, -1, name);
+  size_t res = 0;
+  switch (extyp) {
+    case szc_extyp_int:
+      return -1;
+    case szc_extyp_data:
+    case szc_extyp_string:
+      lua_tolstring(L, -1, &res);
+      break;
+    default:
+      break;
+  }
+
+  lua_pop(L, 1);
+  return res;
+}
+
+static inline int _szclua_w_append(lua_State *L, szc_extyp_t extyp, const char *name,\
+  szc_dtyp_t typ, uint8_t **valp, unsigned long long int *bitlen, size_t maxlen,\
+  unsigned long long int count) {
+  if (extyp >= _szc_extyp_max) return 1;
+  if (!lua_istable(L, -1)) return 1;
+  lua_getfield(L, -1, name);
+  size_t start, end;
+  size_t target2_strlen;
+  const char *target2_str;
+  int target2_int;
+  uint8_t *val2;
+
+  start = *bitlen >> 3;
+  if (szc_typ_is_octal(typ))
+    end = start + count;
+  else
+    end = ((*bitlen + count) >> 3) + ((*bitlen + count) % 8 == 0 ? 0 : 1);
+  switch (extyp) {
+    case szc_extyp_int:
+      target2_int = (int)lua_tonumber(L, -1);
+      val2 = szc_realloc(*valp, end);
+      if (val2 == NULL) goto fail;
+      *valp = val2;
+      _szcpy(typ, val2 + (*bitlen >> 3), (uint8_t *)&target2_int, count, szc_typ_is_octal(typ) ? 0 : (*bitlen) % 8);
+      *bitlen += szc_count_bit(typ, count);
+      break;
+    case szc_extyp_data:
+    case szc_extyp_string:
+      target2_str = lua_tolstring(L, -1, &target2_strlen);
+      end = start + target2_strlen;
+      if (end > maxlen) goto fail;
+      val2 = szc_realloc(*valp, end);
+      if (val2 == NULL) goto fail;
+      *valp = val2;
+      _szcpy(typ, val2 + (*bitlen >> 3), target2_str, target2_strlen, szc_typ_is_octal(typ) ? 0 : (*bitlen) % 8);
+      *bitlen += (target2_strlen << 3);
+      break;
+    default:
+      break;
+  }
+  lua_pop(L, 1);
+  return 0;
+fail:
+  lua_pop(L, 1);
+  return 1;
+}
+#endif
 
 // clang-format off
+#if defined(SERZCORE_LUA)
+#include "serzcore.read.lua.c"
+#include "serzcore.write.lua.c"
+#else
 #include "serzcore.read.c"
 #include "serzcore.write.c"
+#endif
 // clang-format on
