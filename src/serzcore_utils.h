@@ -91,7 +91,8 @@ static inline uint8_t szc_get_ctnsz(register unsigned long long val) {
 
 #define szcy(typ, count, target) _szcy_exec(szcy, typ, count, (uint8_t *)(target), SZC_DST_NAME)
 #define szcyy(typ, count, target) _szcy_exec(szcyy, typ, count, (uint8_t *)(target), SZC_DST_NAME)
-#define szcf(f, p) SZFNAME(f)(SZC_SZCA_NAME, p, SZC_DST_NAME)
+// #define szcf(struname, p) SZFNAME(struname)(SZC_SZCA_NAME, p, SZC_DST_NAME)
+#define szcf(struname, p) _szcy_exec(szcyff, SZFNAME(struname), p, SZC_DST_NAME)
 
 #define szcmlc(target, sz) _szcy_exec(szcmlc, target, sz)
 #define szcrealc(target, sz) _szcy_exec(szcrealc, target, sz)

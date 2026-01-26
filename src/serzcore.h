@@ -68,6 +68,7 @@ void szcfree_r(void *target);
 void szcfree2_r(void **target_p);
 int szcyf_r(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d);
 int szcys_val_r(struct szc_dgs_s *target, struct szc_dgs_s *d);
+int szcyff_r(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d);
 
 szcmode_t szc_get_mode_w(void);
 struct szc_dgs_s *szc_init_w(void);
@@ -87,6 +88,8 @@ void szcfree_w(void *target);
 void szcfree2_w(void **target_p);
 int szcyf_w(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d);
 int szcys_val_w(struct szc_dgs_s *target, struct szc_dgs_s *d);
+int szcyff_w(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d);
+
 void szc_set_mem_functions(void *(*malloc_fn)(size_t), void *(*realloc_fn)(void *, size_t), void (*free_fn)(void *));
 
 ////
@@ -110,6 +113,7 @@ struct szc_dga_s {
   void (*szcfree2)(void **);
   int (*szcyf)(szc_ff_t, _target_ex, struct szc_dgs_s *);
   int (*szcys_val)(struct szc_dgs_s *, struct szc_dgs_s *);
+  int (*szcyff)(szc_ff_t, _target_ex, struct szc_dgs_s *);
 };
 
 static struct szc_dga_s szca_r = (struct szc_dga_s){
@@ -131,6 +135,7 @@ static struct szc_dga_s szca_r = (struct szc_dga_s){
     .szcfree2 = szcfree2_r,
     .szcyf = szcyf_r,
     .szcys_val = szcys_val_r,
+    .szcyff = szcyff_r,
 };
 
 static struct szc_dga_s szca_w = (struct szc_dga_s){
@@ -152,6 +157,7 @@ static struct szc_dga_s szca_w = (struct szc_dga_s){
     .szcfree2 = szcfree2_w,
     .szcyf = szcyf_w,
     .szcys_val = szcys_val_w,
+    .szcyff = szcyff_w,
 };
 
 #endif  // SERZCORE_H
