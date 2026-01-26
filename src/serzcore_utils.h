@@ -75,7 +75,11 @@ static inline uint8_t szc_get_ctnsz(register unsigned long long val) {
 #define SZC_PASTER(x, y) x##_##y
 #define SZC_CONCAT(x, y) SZC_PASTER(x, y)
 
-#define _szcy_exec(f1, ...) SZC_SZCA_NAME->f1(__VA_ARGS__)
+#define _szcy_exec(f1, ...)                                   \
+  do {                                                        \
+    int ans__;                                                \
+    if (ans__ = SZC_SZCA_NAME->f1(__VA_ARGS__)) return ans__; \
+  } while (0)
 #define szcyf(f, target_ex, d) _szcy_exec(szcyf, f, target_ex, d)
 #define szcys_val(target, d) _szcy_exec(szcys_val, target, d)
 
