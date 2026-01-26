@@ -19,7 +19,7 @@ SZFDECL_STATIC(struct, ship_s, p) {
   szcyy(cdef_SZ_o, sizeof(p->name), p->name);
   szclvstr(cdef_SZ_o, 100, p->manufacturer);
   szcyy(cdef_SZ_o, sizeof(p->tonnage), &p->tonnage);
-  szclvp(cdef_SZ_o, p->data_len, p->data);
+  szclvp(cdef_SZ_o, p->data_len, 200, p->data);
   return 0;
 }
 

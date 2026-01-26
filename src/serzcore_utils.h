@@ -127,17 +127,18 @@ static inline uint8_t szc_get_ctnsz(register unsigned long long val) {
     szcmlcl(&(ptr), len);              \
     szcyy(typ, len, (uint8_t *)(ptr)); \
   } while (0)
-#define szclvp(typ, len, ptr)                                    \
-  do {                                                           \
-    szcyy(typ, szc_conv_1(typ, sizeof(len)), (uint8_t *)&(len)); \
-    szcmlcyy(typ, szc_conv_1(typ, (len) * sizeof(*(ptr))), ptr); \
+#define szclvp(typ, len, maxlen, ptr)                                                                     \
+  do {                                                                                                    \
+    if (len > maxlen) return 1;                                                                           \
+    szcyyx(typ, szc_conv_1(typ, szc_get_ctnsz(maxlen)), szc_conv_1(typ, sizeof(len)), (uint8_t *)&(len)); \
+    szcmlcyy(typ, szc_conv_1(typ, (len) * sizeof(*(ptr))), ptr);                                          \
   } while (0)
 #define szclvstr(typ, maxlen, ptr)                                                                       \
   do {                                                                                                   \
     size_t tlv_len__ = (ptr) == NULL ? 0 : (strnlen(ptr, maxlen) + 1);                                   \
     if (tlv_len__ > maxlen) return 1;                                                                    \
     szcyyx(typ, szc_conv_1(typ, szc_get_ctnsz(maxlen)), szc_conv_1(typ, sizeof(tlv_len__)), &tlv_len__); \
-    szcmlcyy(typ, tlv_len__, ptr);                                                                       \
+    szcmlcyy(typ, szc_conv_1(typ, tlv_len__), ptr);                                                      \
   } while (0)
 #define szclvrcrse(typ, tlv_len_t, ff, target)                    \
   do {                                                            \
