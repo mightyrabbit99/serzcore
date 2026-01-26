@@ -100,7 +100,7 @@ int szcy_w(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct
   if (val_p == NULL) return 1;
   dd->val = val_p;
   _szcpy(typ, dd->val + start, target, count, szc_typ_is_octal(typ) ? 0 : dd->bitlen % 8);
-  dd->bitlen += szc_typ_is_octal(typ) ? count << 3 : count;
+  dd->bitlen += szc_count_bit(typ, count);
 
   return 0;
 }

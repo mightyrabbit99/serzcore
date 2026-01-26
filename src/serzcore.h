@@ -41,6 +41,9 @@ static inline int szc_typ_is_octal(szc_dtyp_t typ) {
   }
 }
 
+#define szc_count_oct(typ, count) ((size_t)(szc_typ_is_octal(typ) ? (count) : ((count) >> 3) + ((count) % 8 == 0 ? 0 : 1)))
+#define szc_count_bit(typ, count) ((unsigned long long int)(szc_typ_is_octal(typ) ? ((unsigned long long int)(count) << 3) : (count)))
+
 struct szc_dga_s;
 struct szc_dgs_s;
 

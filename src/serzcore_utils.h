@@ -72,8 +72,6 @@ static inline uint8_t szc_get_ctnsz(register unsigned long long val) {
 #define SZC_PASTER(x, y) x##_##y
 #define SZC_CONCAT(x, y) SZC_PASTER(x, y)
 
-#define szc_count_oct(typ, count) ((size_t)(szc_typ_is_octal(typ) ? (count) : ((count) >> 3) + ((count) % 8 == 0 ? 0 : 1)))
-#define szc_count_bit(typ, count) ((unsigned long long int)(szc_typ_is_octal(typ) ? ((unsigned long long int)(count) << 3) : (count)))
 #define szcthrowerr()                                               \
   do {                                                              \
     szc_cvector_for_each(*SZC_DGARR_NAME, SZC_SZCA_NAME->szcfree2); \
