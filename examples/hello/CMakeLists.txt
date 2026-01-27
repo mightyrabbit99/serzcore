@@ -16,6 +16,7 @@ install(TARGETS hello_test1
   DESTINATION bin
 )
 
+if(BUILD_SERZCORE_LUA)
 add_library(helloendec-lua SHARED)
 set_target_properties(helloendec-lua PROPERTIES LIBRARY_OUTPUT_NAME "helloendec")
 set_target_properties(helloendec-lua PROPERTIES PREFIX "")
@@ -42,7 +43,7 @@ install(FILES base64.lua DESTINATION lib/lua)
 install(FILES tester.lua DESTINATION bin RENAME hello_tester.lua)
 
 add_library(lua STATIC IMPORTED)
-set_target_properties(lua PROPERTIES IMPORTED_LOCATION ${LUA_LIBRARY})
+set_target_properties(lua PROPERTIES IMPORTED_LOCATION "${LUA_LIBRARY}")
 find_library(MATH_LIBRARY m)
 add_executable(hello_test2)
 target_sources(hello_test2
@@ -63,5 +64,4 @@ target_include_directories(hello_test2
 install(TARGETS hello_test2
   DESTINATION bin
 )
-
-
+endif()

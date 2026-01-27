@@ -17,7 +17,7 @@ install(TARGETS serzcore
   PUBLIC_HEADER DESTINATION include
 )
 
-
+if(BUILD_SERZCORE_LUA)
 add_library(serzcore-lua STATIC)
 target_compile_options(serzcore-lua PRIVATE -undefined -DSERZCORE_LUA)
 set_target_properties(serzcore-lua PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
@@ -41,3 +41,4 @@ install(TARGETS serzcore-lua
   LIBRARY DESTINATION lib
   PUBLIC_HEADER DESTINATION include
 )
+endif()
