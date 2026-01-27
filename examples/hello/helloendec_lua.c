@@ -21,10 +21,7 @@ int hello_decode_lua(lua_State *L) {
 }
 
 int hello_encode_lua(lua_State *L) {
-  size_t ll;
-  char buf[BUFFER_SIZE];
-  SZFWRITE2(struct, hello_s, ll, buf, sizeof(buf), L);
-  lua_pushlstring(L, buf, ll);
+  SZFOUTEXEC(struct, hello_s, lua_pushlstring, L);
   return 1;
 }
 

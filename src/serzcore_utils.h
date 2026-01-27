@@ -267,6 +267,22 @@ static inline uint8_t szc_get_ctnsz(register unsigned long long val) {
     szca_w.szc_destruct(d__);                   \
   } while (0)
 #endif
+#define SZFOUTEXEC(t__, struname, f, ctx1)       \
+  do {                                           \
+    const uint8_t *buf;                          \
+    size_t ll;                                   \
+    t__ struname p__ = (t__ struname){0};        \
+    struct szc_dgs_s *d__ = szca_w.szc_init();   \
+    if (d__ == NULL) return -1;                  \
+    szca_w.szc_set_ctx_ex(d__, ctx1);            \
+    if (SZFNAME(struname)(&szca_w, &p__, d__)) { \
+      szca_w.szc_destruct(d__);                  \
+      return -1;                                 \
+    }                                            \
+    buf = szca_w.szc_retrieve_val(d__, &(ll));   \
+    f(ctx1, buf, ll);                            \
+    szca_w.szc_destruct(d__);                    \
+  } while (0)
 
 #define szc_member_size(type, member) (sizeof(((type *)0)->member))
 
