@@ -136,7 +136,7 @@ static inline int _szcyv_r_ex_lua(szc_dtyp_t typ, unsigned long long int count, 
   else
     end = ((dd->bitlen + count) >> 3) + ((dd->bitlen + count) % 8 == 0 ? 0 : 1);
   if (end > dd->maxlen) return 1;
-  
+
   uint8_t target2[szc_count_oct(typ, count)];
   _szcpy(typ, target2, dd->val + start, count, szc_typ_is_octal(typ) ? 0 : dd->bitlen % 8);
   int res = _szclua_r(dd->L, extyp, extyp_va, name, target2, sizeof(target2));
@@ -161,53 +161,23 @@ int szcyy_r_ex_lua(szc_dtyp_t typ, unsigned long long int count, uint8_t *target
   return ans;
 }
 
-int szcmlc_r_lua(void **target, size_t sz) {
-  if (sz == 0) {
-    *target = NULL;
-    return 0;
-  }
-  *target = (void *)szc_malloc(sz);
-  if (*target == NULL) return 1;
-  memset(*target, 0, sz);
-  return 0;
-}
+int szcmlc_r_lua(void **target, size_t sz) { return 0; }
 
-int szcrealc_r_lua(void **target, size_t sz) {
-  if (sz == 0) {
-    *target = NULL;
-    return 0;
-  }
-  *target = (void *)szc_realloc(*target, sz);
-  if (*target == NULL) return 1;
-  return 0;
-}
+int szcrealc_r_lua(void **target, size_t sz) { return 0; }
 
-void *szcmemset_r_lua(uint8_t *s, int c, size_t sz) { return memset(s, c, sz); }
+void *szcmemset_r_lua(uint8_t *s, int c, size_t sz) { return s; }
 
-void szcfree_r_lua(void *target) {
-  if (target) szc_free(target);
-}
+void szcfree_r_lua(void *target) { return; }
 
-void szcfree2_r_lua(void **target_p) {
-  if (*target_p) szc_free(*target_p);
-  *target_p = NULL;
-}
+void szcfree2_r_lua(void **target_p) { return; }
 
-void szc_ptop_r_ex_lua(void **target_p) {
-  szcfree2_r_lua(target_p);
-}
+void szc_ptop_r_ex_lua(void **target_p) { return; }
 
-int szcyf_r_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d) {
-  return 0;
-}
+int szcyf_r_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d) { return 0; }
 
-int szcys_val_r_lua(struct szc_dgs_s *target, struct szc_dgs_s *d) {
-  return 0;
-}
+int szcys_val_r_lua(struct szc_dgs_s *target, struct szc_dgs_s *d) { return 0; }
 
-int szcyff_r_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d) {
-  return 0;
-}
+int szcyff_r_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d) { return 0; }
 
 int szcyff_r_ex_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, const char *name, int arr_i) {
   struct szc_dgsr_lua_s *dd = (struct szc_dgsr_lua_s *)d;
