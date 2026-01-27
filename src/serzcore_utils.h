@@ -161,9 +161,23 @@ static inline uint8_t szc_get_ctnsz(register unsigned long long val) {
   } while (0)
 
 #define szcy_ex(typ, count, target, extyp, name) _szcy_exec(szcy_ex, typ, count, (uint8_t *)(target), SZC_DST_NAME, extyp, name)
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+#define szcyx_ex(typ, count, bbcnt, target, extyp, name) szcy_ex(typ, count, (target) + ((bbcnt) - szc_count_oct(typ, count)), extyp, name)
+#elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+#define szcyx_ex(typ, count, bbcnt, target, extyp, name) szcy_ex(typ, count, target, extyp, name)
+#else
+#error byte order not defined
+#endif
+#define szc_get_fieldlen_ex(typ, count, target, extyp, name) _szcy_exec(szc_get_fieldlen_ex, typ, count, (uint8_t *)(target), SZC_DST_NAME, extyp, name)
+#define szcval_ex(typ, count, valtyp, val, extyp, name)                                      \
+  do {                                                                                       \
+    valtyp target__ = val;                                                                   \
+    unsigned long long int count2__ = count;                                                 \
+    if (szc_conv_1(typ, sizeof(valtyp)) < count) count2__ = szc_conv_1(typ, sizeof(valtyp)); \
+    szcyx_ex(typ, count2__, szc_conv_1(typ, sizeof(valtyp)), &target__, extyp, name);        \
+  } while (0)
 #define szcyy_ex(typ, count, target, extyp, name) _szcy_exec(szcyy_ex, typ, count, (uint8_t *)(target), SZC_DST_NAME, extyp, name)
 #define szcf_ex(struname, p, name) _szcy_exec(szcyff_ex, SZFNAME(struname), p, SZC_DST_NAME, name)
-#define szc_get_fieldlen_ex(typ, count, target, extyp, name) _szcy_exec(szc_get_fieldlen_ex, typ, count, (uint8_t *)(target), SZC_DST_NAME, extyp, name)
 #define szcmlcyy_ex(typ, len, ptr, extyp, name)        \
   do {                                                 \
     szcmlcl(&(ptr), len);                              \
