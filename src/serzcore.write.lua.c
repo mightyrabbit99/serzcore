@@ -101,7 +101,7 @@ int szc_get_fieldlen_w_ex_lua(szc_dtyp_t typ, unsigned long long int count, uint
 
 int szcy_w_lua(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d) {
   if (count == 0) return 0;
-  if (typ >= _cdef_SZ_max) return 1;
+  if (typ >= _szc_dtyp_max) return 1;
   struct szc_dgsw_lua_s *dd = (struct szc_dgsw_lua_s *)d;
   if (szc_typ_is_octal(typ)) dd->bitlen += dd->bitlen % 8 == 0 ? 0 : (8 - (dd->bitlen % 8));
   size_t start = dd->bitlen >> 3;
@@ -125,7 +125,7 @@ int szcyy_w_lua(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, s
 
 int szcy_w_ex_lua(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d, szc_extyp_t extyp, const char *name) {
   if (count == 0) return 0;
-  if (typ >= _cdef_SZ_max) return 1;
+  if (typ >= _szc_dtyp_max) return 1;
   struct szc_dgsw_lua_s *dd = (struct szc_dgsw_lua_s *)d;
   if (szc_typ_is_octal(typ)) dd->bitlen += dd->bitlen % 8 == 0 ? 0 : (8 - (dd->bitlen % 8));
   int res = _szclua_w_append(dd->L, extyp, name, typ, &dd->val, &dd->bitlen, dd->maxlen, count);
@@ -156,7 +156,7 @@ int szcyf_w_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d) {
 
 int szcys_val_w_lua(struct szc_dgs_s *target, struct szc_dgs_s *d) {
   struct szc_dgsw_lua_s *dd_t = (struct szc_dgsw_lua_s *)target;
-  return szcyy_w_lua(cdef_SZ_b, dd_t->bitlen, dd_t->val, d);
+  return szcyy_w_lua(szc_dtyp_b, dd_t->bitlen, dd_t->val, d);
 }
 
 int szcyff_w_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d) { return 0; }

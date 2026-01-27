@@ -19,12 +19,12 @@ typedef enum {
 } szcmode_t;
 
 typedef enum {
-  cdef_SZ_o,
-  cdef_SZ_o2,
-  cdef_SZ_o3,
-  cdef_SZ_b,
-  cdef_SZ_b2,
-  _cdef_SZ_max
+  szc_dtyp_o,
+  szc_dtyp_o2,
+  szc_dtyp_o3,
+  szc_dtyp_b,
+  szc_dtyp_b2,
+  _szc_dtyp_max
 } szc_dtyp_t;
 
 typedef enum {
@@ -38,12 +38,12 @@ typedef enum {
 
 static inline int szc_typ_is_octal(szc_dtyp_t typ) {
   switch (typ) {
-    case cdef_SZ_o:
-    case cdef_SZ_o2:
-    case cdef_SZ_o3:
+    case szc_dtyp_o:
+    case szc_dtyp_o2:
+    case szc_dtyp_o3:
       return 1;
-    case cdef_SZ_b:
-    case cdef_SZ_b2:
+    case szc_dtyp_b:
+    case szc_dtyp_b2:
       return 0;
     default:
       return -1;

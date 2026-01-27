@@ -100,10 +100,10 @@ static inline void _szcpy(szc_dtyp_t typ, uint8_t *dst, const uint8_t *src, unsi
   uint8_t x1 = MIN(bb_left, pos_ba), x2 = pos_ba - x1;
   size_t i, cnt2 = count >> 3;
   switch (typ) {
-    case cdef_SZ_o:
+    case szc_dtyp_o:
       for (i = 0; i < count; i++) dst[i] = src[i];
       break;
-    case cdef_SZ_o2:
+    case szc_dtyp_o2:
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
       for (i = 0; i < count; i++) dst[i] = src[i];
 #elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
@@ -112,7 +112,7 @@ static inline void _szcpy(szc_dtyp_t typ, uint8_t *dst, const uint8_t *src, unsi
 #error byte order not defined
 #endif
       break;
-    case cdef_SZ_o3:
+    case szc_dtyp_o3:
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
       for (i = 0; i < count; i++) dst[i] = src[i];
 #elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
@@ -121,7 +121,7 @@ static inline void _szcpy(szc_dtyp_t typ, uint8_t *dst, const uint8_t *src, unsi
 #error byte order not defined
 #endif
       break;
-    case cdef_SZ_b:
+    case szc_dtyp_b:
       for (i = 0; i < cnt2; i++) {
         dst[i] &= bb_mask(255, 0, pos_bb, 0);
         dst[i] |= bb_mask(src[i], 0, bb_left, pos_bb);
@@ -140,7 +140,7 @@ static inline void _szcpy(szc_dtyp_t typ, uint8_t *dst, const uint8_t *src, unsi
         dst[i + 1] |= bb_mask(src[i], x1, x1 + x2, -bb_left);
       }
       break;
-    case cdef_SZ_b2:
+    case szc_dtyp_b2:
       cnt2 -= (pos_ba == 0 ? 1 : 0);
       dst[0] &= bb_mask2(255, bb_left, 8, 0);
       for (i = 0; i <= cnt2; i++) {
