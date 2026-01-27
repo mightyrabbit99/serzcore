@@ -69,6 +69,12 @@ size_t szc_get_val_w_lua(struct szc_dgs_s *d, size_t len, uint8_t *val_ptr) {
   return ll;
 }
 
+const uint8_t *szc_retrieve_val_w_lua(struct szc_dgs_s *d, size_t *len) {
+  struct szc_dgsw_lua_s *dd = (struct szc_dgsw_lua_s *)d;
+  *len = szc_get_len_w_lua(d);
+  return dd->val;
+}
+
 void szc_set_val_w_lua(struct szc_dgs_s *d, size_t len, uint8_t *val) {
   struct szc_dgsw_lua_s *dd = (struct szc_dgsw_lua_s *)d;
   dd->bitlen = len << 3;

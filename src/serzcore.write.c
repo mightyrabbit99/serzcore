@@ -68,6 +68,12 @@ size_t szc_get_val_w(struct szc_dgs_s *d, size_t len, uint8_t *val_ptr) {
   return ll;
 }
 
+const uint8_t *szc_retrieve_val_w(struct szc_dgs_s *d, size_t *len) {
+  struct szc_dgsw_s *dd = (struct szc_dgsw_s *)d;
+  *len = szc_get_len_w(d);
+  return dd->val;
+}
+
 void szc_set_val_w(struct szc_dgs_s *d, size_t len, uint8_t *val) {
   struct szc_dgsw_s *dd = (struct szc_dgsw_s *)d;
   dd->bitlen = len << 3;

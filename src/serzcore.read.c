@@ -69,6 +69,12 @@ size_t szc_get_val_r(struct szc_dgs_s *d, size_t len, uint8_t *val_ptr) {
   return ll;
 }
 
+const uint8_t *szc_retrieve_val_r(struct szc_dgs_s *d, size_t *len) {
+  struct szc_dgsr_s *dd = (struct szc_dgsr_s *)d;
+  *len = szc_get_len_r(d);
+  return dd->val;
+}
+
 void szc_set_val_r(struct szc_dgs_s *d, size_t len, uint8_t *val) {
   struct szc_dgsr_s *dd = (struct szc_dgsr_s *)d;
   dd->maxlen = len;

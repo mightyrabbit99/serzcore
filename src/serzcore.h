@@ -66,7 +66,8 @@ struct szc_dgs_s *szc_init_r_lua(void);
 size_t szc_get_len_r_lua(struct szc_dgs_s *d);
 void szc_set_maxlen_r_lua(struct szc_dgs_s *d, size_t maxlen);
 size_t szc_get_maxlen_r_lua(struct szc_dgs_s *d);
-size_t szc_get_val_r_lua(struct szc_dgs_s *d, size_t len, uint8_t *val_ptr);
+size_t szc_get_val_r_lua(struct szc_dgs_s *d, size_t bufsz, uint8_t *buf);
+const uint8_t *szc_retrieve_val_r_lua(struct szc_dgs_s *d, size_t *len);
 void szc_set_val_r_lua(struct szc_dgs_s *d, size_t len, uint8_t *val);
 void szc_destruct_r_lua(struct szc_dgs_s *d);
 void szc_fprint_r_lua(FILE *stream, struct szc_dgs_s *d);
@@ -92,7 +93,8 @@ struct szc_dgs_s *szc_init_w_lua(void);
 size_t szc_get_len_w_lua(struct szc_dgs_s *d);
 void szc_set_maxlen_w_lua(struct szc_dgs_s *d, size_t maxlen);
 size_t szc_get_maxlen_w_lua(struct szc_dgs_s *d);
-size_t szc_get_val_w_lua(struct szc_dgs_s *d, size_t len, uint8_t *val_ptr);
+size_t szc_get_val_w_lua(struct szc_dgs_s *d, size_t bufsz, uint8_t *buf);
+const uint8_t *szc_retrieve_val_w_lua(struct szc_dgs_s *d, size_t *len);
 void szc_set_val_w_lua(struct szc_dgs_s *d, size_t len, uint8_t *val);
 void szc_destruct_w_lua(struct szc_dgs_s *d);
 void szc_fprint_w_lua(FILE *stream, struct szc_dgs_s *d);
@@ -120,7 +122,8 @@ struct szc_dgs_s *szc_init_r(void);
 size_t szc_get_len_r(struct szc_dgs_s *d);
 void szc_set_maxlen_r(struct szc_dgs_s *d, size_t maxlen);
 size_t szc_get_maxlen_r(struct szc_dgs_s *d);
-size_t szc_get_val_r(struct szc_dgs_s *d, size_t len, uint8_t *val_ptr);
+size_t szc_get_val_r(struct szc_dgs_s *d, size_t bufsz, uint8_t *buf);
+const uint8_t *szc_retrieve_val_r(struct szc_dgs_s *d, size_t *len);
 void szc_set_val_r(struct szc_dgs_s *d, size_t len, uint8_t *val);
 void szc_destruct_r(struct szc_dgs_s *d);
 void szc_fprint_r(FILE *stream, struct szc_dgs_s *d);
@@ -146,7 +149,8 @@ struct szc_dgs_s *szc_init_w(void);
 size_t szc_get_len_w(struct szc_dgs_s *d);
 void szc_set_maxlen_w(struct szc_dgs_s *d, size_t maxlen);
 size_t szc_get_maxlen_w(struct szc_dgs_s *d);
-size_t szc_get_val_w(struct szc_dgs_s *d, size_t len, uint8_t *val_ptr);
+size_t szc_get_val_w(struct szc_dgs_s *d, size_t bufsz, uint8_t *buf);
+const uint8_t *szc_retrieve_val_w(struct szc_dgs_s *d, size_t *len);
 void szc_set_val_w(struct szc_dgs_s *d, size_t len, uint8_t *val);
 void szc_destruct_w(struct szc_dgs_s *d);
 void szc_fprint_w(FILE *stream, struct szc_dgs_s *d);
@@ -180,6 +184,7 @@ struct szc_dga_s {
   void (*szc_set_maxlen)(struct szc_dgs_s *, size_t);
   size_t (*szc_get_maxlen)(struct szc_dgs_s *);
   size_t (*szc_get_val)(struct szc_dgs_s *, size_t, uint8_t *);
+  const uint8_t *(*szc_retrieve_val)(struct szc_dgs_s *, size_t *);
   void (*szc_set_val)(struct szc_dgs_s *, size_t, uint8_t *);
   void (*szc_destruct)(struct szc_dgs_s *);
   void (*szc_fprint)(FILE *, struct szc_dgs_s *);
@@ -209,6 +214,7 @@ static struct szc_dga_s szca_r = (struct szc_dga_s){
     .szc_set_maxlen = szc_set_maxlen_r_lua,
     .szc_get_maxlen = szc_get_maxlen_r_lua,
     .szc_get_val = szc_get_val_r_lua,
+    .szc_retrieve_val = szc_retrieve_val_r_lua,
     .szc_set_val = szc_set_val_r_lua,
     .szc_destruct = szc_destruct_r_lua,
     .szc_fprint = szc_fprint_r_lua,
@@ -237,6 +243,7 @@ static struct szc_dga_s szca_w = (struct szc_dga_s){
     .szc_set_maxlen = szc_set_maxlen_w_lua,
     .szc_get_maxlen = szc_get_maxlen_w_lua,
     .szc_get_val = szc_get_val_w_lua,
+    .szc_retrieve_val = szc_retrieve_val_w_lua,
     .szc_set_val = szc_set_val_w_lua,
     .szc_destruct = szc_destruct_w_lua,
     .szc_fprint = szc_fprint_w_lua,
@@ -266,6 +273,7 @@ static struct szc_dga_s szca_r = (struct szc_dga_s){
     .szc_set_maxlen = szc_set_maxlen_r,
     .szc_get_maxlen = szc_get_maxlen_r,
     .szc_get_val = szc_get_val_r,
+    .szc_retrieve_val = szc_retrieve_val_r,
     .szc_set_val = szc_set_val_r,
     .szc_destruct = szc_destruct_r,
     .szc_fprint = szc_fprint_r,
@@ -294,6 +302,7 @@ static struct szc_dga_s szca_w = (struct szc_dga_s){
     .szc_set_maxlen = szc_set_maxlen_w,
     .szc_get_maxlen = szc_get_maxlen_w,
     .szc_get_val = szc_get_val_w,
+    .szc_retrieve_val = szc_retrieve_val_w,
     .szc_set_val = szc_set_val_w,
     .szc_destruct = szc_destruct_w,
     .szc_fprint = szc_fprint_w,
