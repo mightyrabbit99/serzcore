@@ -187,26 +187,26 @@ static inline uint8_t szc_get_ctnsz(register unsigned long long val) {
 
 #define SZFREAD(struname, ll, p, data, datasz) \
   do {                                         \
-    struct szc_dgs_s *d = szca_r.szc_init();   \
-    if (d == NULL) return -1;                  \
-    szca_r.szc_set_val(d, datasz, data);       \
-    if (SZFNAME(struname)(&szca_r, p, d)) {    \
-      szca_r.szc_destruct(d);                  \
+    struct szc_dgs_s *d__ = szca_r.szc_init(); \
+    if (d__ == NULL) return -1;                \
+    szca_r.szc_set_val(d__, datasz, data);     \
+    if (SZFNAME(struname)(&szca_r, p, d__)) {  \
+      szca_r.szc_destruct(d__);                \
       return -1;                               \
     }                                          \
-    (ll) = szca_r.szc_get_len(d);              \
-    szca_r.szc_destruct(d);                    \
+    (ll) = szca_r.szc_get_len(d__);            \
+    szca_r.szc_destruct(d__);                  \
   } while (0)
-#define SZFWRITE(struname, ll, p, buf, bufsz) \
-  do {                                        \
-    struct szc_dgs_s *d = szca_w.szc_init();  \
-    if (d == NULL) return -1;                 \
-    if (SZFNAME(struname)(&szca_w, p, d)) {   \
-      szca_w.szc_destruct(d);                 \
-      return -1;                              \
-    }                                         \
-    (ll) = szca_w.szc_get_val(d, bufsz, buf); \
-    szca_w.szc_destruct(d);                   \
+#define SZFWRITE(struname, ll, p, buf, bufsz)   \
+  do {                                          \
+    struct szc_dgs_s *d__ = szca_w.szc_init();  \
+    if (d__ == NULL) return -1;                 \
+    if (SZFNAME(struname)(&szca_w, p, d__)) {   \
+      szca_w.szc_destruct(d__);                 \
+      return -1;                                \
+    }                                           \
+    (ll) = szca_w.szc_get_val(d__, bufsz, buf); \
+    szca_w.szc_destruct(d__);                   \
   } while (0)
 
 #define szc_member_size(type, member) (sizeof(((type *)0)->member))
