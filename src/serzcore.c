@@ -235,21 +235,23 @@ static inline ssize_t _szclua_w_get_fieldlen(lua_State *L, szc_extyp_t extyp, co
 
 static inline int _szclua_w_append(lua_State *L, szc_extyp_t extyp, va_list extyp_va, const char *name,\
   szc_dtyp_t typ, uint8_t **valp, unsigned long long int *bitlen, size_t maxlen,\
-  unsigned long long int count) {
+  unsigned long long int count, int arr_i) {
   szc_extyp_t extyp2;
-  if (extyp == szc_extyp_arr) {
-    extyp2 = va_arg(extyp_va, int);
-  } else {
-    extyp2 = extyp;
-  }
-  if (extyp2 >= _szc_extyp_max) return 1;
-  if (!lua_istable(L, -1)) return 1;
-  lua_getfield(L, -1, name);
   size_t start, end;
   size_t target2_strlen;
   const char *target2_str;
   int target2_int;
   uint8_t *val2;
+
+  if (!lua_istable(L, -1)) return 1;
+  lua_getfield(L, -1, name);
+  if (extyp == szc_extyp_arr) {
+    extyp2 = va_arg(extyp_va, int);
+    lua_rawgeti(L, -1, arr_i + 1);
+  } else {
+    extyp2 = extyp;
+  }
+  if (extyp2 >= _szc_extyp_max) return 1;
 
   start = *bitlen >> 3;
   if (szc_typ_is_octal(typ))
@@ -281,9 +283,15 @@ static inline int _szclua_w_append(lua_State *L, szc_extyp_t extyp, va_list exty
       break;
   }
   lua_pop(L, 1);
+  if (extyp == szc_extyp_arr) {
+    lua_pop(L, 1);
+  }
   return 0;
 fail:
   lua_pop(L, 1);
+  if (extyp == szc_extyp_arr) {
+    lua_pop(L, 1);
+  }
   return 1;
 }
 #endif

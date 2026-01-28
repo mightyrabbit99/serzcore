@@ -160,6 +160,7 @@ static inline uint8_t szc_get_ctnsz(register unsigned long long val) {
     if (l2 - l1 != len__) return 1;                       \
   } while (0)
 
+#define szc_set_arr_i_ex(i) SZC_SZCA_NAME->szc_set_arr_i_ex(SZC_DST_NAME, i)
 #define szcy_ex(typ, count, target, name, ...) _szcy_exec(szcy_ex, typ, count, (uint8_t *)(target), SZC_DST_NAME, name, __VA_ARGS__)
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
 #define szcyx_ex(typ, count, bbcnt, target, name, ...) szcy_ex(typ, count, (target) + ((bbcnt) - szc_count_oct(typ, count)), name, __VA_ARGS__)

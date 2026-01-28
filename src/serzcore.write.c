@@ -93,6 +93,10 @@ void szc_set_ctx_w_ex(struct szc_dgs_s *d, void *ctx1) {
   return;
 }
 
+void szc_set_arr_i_w_ex(struct szc_dgs_s *d, int arr_i) {
+  return;
+}
+
 int szc_get_fieldlen_w_ex(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, size_t maxlen, struct szc_dgs_s *d, const char *name, szc_extyp_t extyp, ...) {
   struct szc_dgsw_s *dd = (struct szc_dgsw_s *)d;
   szc_extyp_t extyp2;

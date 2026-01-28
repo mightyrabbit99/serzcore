@@ -25,6 +25,7 @@ struct szc_dgsw_lua_s {
   unsigned long long int bitlen;
   size_t maxlen;
   uint8_t *val;
+  int arr_i;
   lua_State *L;
 };
 
@@ -95,6 +96,11 @@ void szc_set_ctx_w_ex_lua(struct szc_dgs_s *d, void *ctx1) {
   dd->L = (lua_State *)ctx1;
 }
 
+void szc_set_arr_i_w_ex_lua(struct szc_dgs_s *d, int arr_i) {
+  struct szc_dgsw_lua_s *dd = (struct szc_dgsw_lua_s *)d;
+  dd->arr_i = arr_i;
+}
+
 int szc_get_fieldlen_w_ex_lua(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, size_t maxlen, struct szc_dgs_s *d, const char *name, szc_extyp_t extyp, ...) {
   struct szc_dgsw_lua_s *dd = (struct szc_dgsw_lua_s *)d;
   size_t sz = 0;
@@ -143,7 +149,7 @@ static inline int _szcyv_w_ex_lua(szc_dtyp_t typ, unsigned long long int count, 
   if (typ >= _szc_dtyp_max) return 1;
   struct szc_dgsw_lua_s *dd = (struct szc_dgsw_lua_s *)d;
   if (szc_typ_is_octal(typ)) dd->bitlen += dd->bitlen % 8 == 0 ? 0 : (8 - (dd->bitlen % 8));
-  int res = _szclua_w_append(dd->L, extyp, extyp_va, name, typ, &dd->val, &dd->bitlen, dd->maxlen, count);
+  int res = _szclua_w_append(dd->L, extyp, extyp_va, name, typ, &dd->val, &dd->bitlen, dd->maxlen, count, dd->arr_i);
   if (res) return res;
   return 0;
 }

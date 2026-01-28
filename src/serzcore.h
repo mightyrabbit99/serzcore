@@ -74,6 +74,7 @@ void szc_set_val_r_lua(struct szc_dgs_s *d, size_t len, uint8_t *val);
 void szc_destruct_r_lua(struct szc_dgs_s *d);
 void szc_fprint_r_lua(FILE *stream, struct szc_dgs_s *d);
 void szc_set_ctx_r_ex_lua(struct szc_dgs_s *d, void *ctx1);
+void szc_set_arr_i_r_ex_lua(struct szc_dgs_s *d, int arr_i);
 int szc_get_fieldlen_r_ex_lua(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, size_t maxlen, struct szc_dgs_s *d, const char *name, szc_extyp_t extyp, ...);
 int szcy_r_lua(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d);
 int szcyy_r_lua(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d);
@@ -101,6 +102,7 @@ void szc_set_val_w_lua(struct szc_dgs_s *d, size_t len, uint8_t *val);
 void szc_destruct_w_lua(struct szc_dgs_s *d);
 void szc_fprint_w_lua(FILE *stream, struct szc_dgs_s *d);
 void szc_set_ctx_w_ex_lua(struct szc_dgs_s *d, void *ctx1);
+void szc_set_arr_i_w_ex_lua(struct szc_dgs_s *d, int arr_i);
 int szc_get_fieldlen_w_ex_lua(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, size_t maxlen, struct szc_dgs_s *d, const char *name, szc_extyp_t extyp, ...);
 int szcy_w_lua(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d);
 int szcyy_w_lua(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d);
@@ -130,6 +132,7 @@ void szc_set_val_r(struct szc_dgs_s *d, size_t len, uint8_t *val);
 void szc_destruct_r(struct szc_dgs_s *d);
 void szc_fprint_r(FILE *stream, struct szc_dgs_s *d);
 void szc_set_ctx_r_ex(struct szc_dgs_s *d, void *ctx1);
+void szc_set_arr_i_r_ex(struct szc_dgs_s *d, int arr_i);
 int szc_get_fieldlen_r_ex(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, size_t maxlen, struct szc_dgs_s *d, const char *name, szc_extyp_t extyp, ...);
 int szcy_r(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d);
 int szcyy_r(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d);
@@ -157,6 +160,7 @@ void szc_set_val_w(struct szc_dgs_s *d, size_t len, uint8_t *val);
 void szc_destruct_w(struct szc_dgs_s *d);
 void szc_fprint_w(FILE *stream, struct szc_dgs_s *d);
 void szc_set_ctx_w_ex(struct szc_dgs_s *d, void *ctx1);
+void szc_set_arr_i_w_ex(struct szc_dgs_s *d, int arr_i);
 int szc_get_fieldlen_w_ex(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, size_t maxlen, struct szc_dgs_s *d, const char *name, szc_extyp_t extyp, ...);
 int szcy_w(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d);
 int szcyy_w(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d);
@@ -191,6 +195,7 @@ struct szc_dga_s {
   void (*szc_destruct)(struct szc_dgs_s *);
   void (*szc_fprint)(FILE *, struct szc_dgs_s *);
   void (*szc_set_ctx_ex)(struct szc_dgs_s *, void *);
+  void (*szc_set_arr_i_ex)(struct szc_dgs_s *, int);
   int (*szc_get_fieldlen_ex)(szc_dtyp_t, unsigned long long int, uint8_t *, size_t, struct szc_dgs_s *, const char *, szc_extyp_t, ...);
   int (*szcy)(szc_dtyp_t, unsigned long long int, uint8_t *, struct szc_dgs_s *);
   int (*szcyy)(szc_dtyp_t, unsigned long long int, uint8_t *, struct szc_dgs_s *);
@@ -221,6 +226,7 @@ static struct szc_dga_s szca_r = (struct szc_dga_s){
     .szc_destruct = szc_destruct_r_lua,
     .szc_fprint = szc_fprint_r_lua,
     .szc_set_ctx_ex = szc_set_ctx_r_ex_lua,
+    .szc_set_arr_i_ex = szc_set_arr_i_r_ex_lua,
     .szc_get_fieldlen_ex = szc_get_fieldlen_r_ex_lua,
     .szcy = szcy_r_lua,
     .szcyy = szcyy_r_lua,
@@ -250,6 +256,7 @@ static struct szc_dga_s szca_w = (struct szc_dga_s){
     .szc_destruct = szc_destruct_w_lua,
     .szc_fprint = szc_fprint_w_lua,
     .szc_set_ctx_ex = szc_set_ctx_w_ex_lua,
+    .szc_set_arr_i_ex = szc_set_arr_i_w_ex_lua,
     .szc_get_fieldlen_ex = szc_get_fieldlen_w_ex_lua,
     .szcy = szcy_w_lua,
     .szcyy = szcyy_w_lua,
@@ -280,6 +287,7 @@ static struct szc_dga_s szca_r = (struct szc_dga_s){
     .szc_destruct = szc_destruct_r,
     .szc_fprint = szc_fprint_r,
     .szc_set_ctx_ex = szc_set_ctx_r_ex,
+    .szc_set_arr_i_ex = szc_set_arr_i_r_ex,
     .szc_get_fieldlen_ex = szc_get_fieldlen_r_ex,
     .szcy = szcy_r,
     .szcyy = szcyy_r,
@@ -309,6 +317,7 @@ static struct szc_dga_s szca_w = (struct szc_dga_s){
     .szc_destruct = szc_destruct_w,
     .szc_fprint = szc_fprint_w,
     .szc_set_ctx_ex = szc_set_ctx_w_ex,
+    .szc_set_arr_i_ex = szc_set_arr_i_w_ex,
     .szc_get_fieldlen_ex = szc_get_fieldlen_w_ex,
     .szcy = szcy_w,
     .szcyy = szcyy_w,
