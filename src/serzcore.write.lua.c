@@ -95,10 +95,19 @@ void szc_set_ctx_w_ex_lua(struct szc_dgs_s *d, void *ctx1) {
   dd->L = (lua_State *)ctx1;
 }
 
-int szc_get_fieldlen_w_ex_lua(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d, szc_extyp_t extyp, const char *name) {
+int szc_get_fieldlen_w_ex_lua(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d, const char *name, szc_extyp_t extyp, ...) {
   struct szc_dgsw_lua_s *dd = (struct szc_dgsw_lua_s *)d;
   size_t sz = 0;
-  ssize_t res = _szclua_w_get_fieldlen(dd->L, extyp, name);
+  szc_extyp_t extyp2;
+  if (extyp == szc_extyp_arr) {
+    va_list argp;
+    va_start(argp, extyp);
+    extyp2 = va_arg(argp, int);
+    va_end(argp);
+  } else {
+    extyp2 = extyp;
+  }
+  ssize_t res = _szclua_w_get_fieldlen(dd->L, extyp2, name);
   if (res < 0) return 1;
   sz = res;
   _szcpy(typ, target, (uint8_t *)&sz, count, szc_typ_is_octal(typ) ? 0 : dd->bitlen % 8);
@@ -129,18 +138,30 @@ int szcy_w_lua(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, st
 
 int szcyy_w_lua(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d) { return szcy_w_lua(typ, count, target, d); }
 
-int szcy_w_ex_lua(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d, szc_extyp_t extyp, const char *name) {
+static inline int _szcyv_w_ex_lua(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d, const char *name, szc_extyp_t extyp, va_list extyp_va) {
   if (count == 0) return 0;
   if (typ >= _szc_dtyp_max) return 1;
   struct szc_dgsw_lua_s *dd = (struct szc_dgsw_lua_s *)d;
   if (szc_typ_is_octal(typ)) dd->bitlen += dd->bitlen % 8 == 0 ? 0 : (8 - (dd->bitlen % 8));
-  int res = _szclua_w_append(dd->L, extyp, name, typ, &dd->val, &dd->bitlen, dd->maxlen, count);
+  int res = _szclua_w_append(dd->L, extyp, extyp_va, name, typ, &dd->val, &dd->bitlen, dd->maxlen, count);
   if (res) return res;
   return 0;
 }
 
-int szcyy_w_ex_lua(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d, szc_extyp_t extyp, const char *name) {
-  return szcy_w_ex_lua(typ, count, target, d, extyp, name);
+int szcy_w_ex_lua(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d, const char *name, szc_extyp_t extyp, ...) {
+  va_list argp;
+  va_start(argp, extyp);
+  int ans = _szcyv_w_ex_lua(typ, count, target, d, name, extyp, argp);
+  va_end(argp);
+  return ans;
+}
+
+int szcyy_w_ex_lua(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d, const char *name, szc_extyp_t extyp, ...) {
+  va_list argp;
+  va_start(argp, extyp);
+  int ans = _szcyv_w_ex_lua(typ, count, target, d, name, extyp, argp);
+  va_end(argp);
+  return ans;
 }
 
 int szcmlc_w_lua(void **target, size_t sz) { return 0; }

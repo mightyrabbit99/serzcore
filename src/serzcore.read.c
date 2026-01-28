@@ -87,7 +87,7 @@ void szc_set_ctx_r_ex(struct szc_dgs_s *d, void *ctx1) {
   return;
 }
 
-int szc_get_fieldlen_r_ex(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d, szc_extyp_t extyp, const char *name) {
+int szc_get_fieldlen_r_ex(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d, const char *name, szc_extyp_t extyp, ...) {
   return 0;
 }
 
@@ -123,11 +123,11 @@ int szcyy_r(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struc
   return 0;
 }
 
-int szcy_r_ex(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d, szc_extyp_t extyp, const char *name) {
+int szcy_r_ex(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d, const char *name, szc_extyp_t extyp, ...) {
   return szcy_r(typ, count, target, d);
 }
 
-int szcyy_r_ex(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d, szc_extyp_t extyp, const char *name) {
+int szcyy_r_ex(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d, const char *name, szc_extyp_t extyp, ...) {
   return szcyy_r(typ, count, target, d);
 }
 

@@ -166,34 +166,60 @@ void szc_set_mem_functions(void *(*malloc_fn)(size_t), void *(*realloc_fn)(void 
 }
 
 #if defined(SERZCORE_LUA)
-static inline int _szclua_r(lua_State *L, szc_extyp_t extyp, const char *name, uint8_t *src, size_t src_sz) {
+static inline int _szclua_r(lua_State *L, szc_extyp_t extyp, va_list extyp_va, const char *name, uint8_t *src, size_t src_sz) {
+  int res = 0;
+  szc_extyp_t extyp2;
   if (!lua_istable(L, -1)) return 1;
-  switch (extyp) {
-    case szc_extyp_int:
+
+  if (extyp == szc_extyp_arr) {
+    lua_getfield(L, -1, name);
+    if (lua_isnil(L, -1)) {
+      lua_pop(L, 1);
       lua_pushstring(L, name);
+      lua_newtable(L);
+      lua_settable(L, -3);
+      lua_getfield(L, -1, name);
+    }
+    int arrlen = lua_objlen(L, -1);
+    extyp2 = va_arg(extyp_va, int);
+    lua_pushnumber(L, arrlen + 1);
+  } else {
+    extyp2 = extyp;
+    lua_pushstring(L, name);
+  }
+
+  switch (extyp2) {
+    case szc_extyp_int:
+    case szc_extyp_bigint:
       lua_pushnumber(L, *(int *)src);
       lua_settable(L, -3);
       break;
     case szc_extyp_data:
     case szc_extyp_string:
-      lua_pushstring(L, name);
       lua_pushlstring(L, src, src_sz);
       lua_settable(L, -3);
       break;
     default:
-      return 1;
+      res = 1;
+      break;
   }
-  return 0;
+
+  if (extyp == szc_extyp_arr) {
+    lua_pop(L, 1);
+  }
+
+  return res;
 }
 
 static inline ssize_t _szclua_w_get_fieldlen(lua_State *L, szc_extyp_t extyp, const char *name) {
   if (extyp >= _szc_extyp_max) return -1;
   if (!lua_istable(L, -1)) return -1;
   lua_getfield(L, -1, name);
-  size_t res = 0;
+  ssize_t res = -1;
   switch (extyp) {
     case szc_extyp_int:
-      return -1;
+    case szc_extyp_bigint:
+      break;
     case szc_extyp_data:
     case szc_extyp_string:
       lua_tolstring(L, -1, &res);
@@ -206,10 +232,16 @@ static inline ssize_t _szclua_w_get_fieldlen(lua_State *L, szc_extyp_t extyp, co
   return res;
 }
 
-static inline int _szclua_w_append(lua_State *L, szc_extyp_t extyp, const char *name,\
+static inline int _szclua_w_append(lua_State *L, szc_extyp_t extyp, va_list extyp_va, const char *name,\
   szc_dtyp_t typ, uint8_t **valp, unsigned long long int *bitlen, size_t maxlen,\
   unsigned long long int count) {
-  if (extyp >= _szc_extyp_max) return 1;
+  szc_extyp_t extyp2;
+  if (extyp == szc_extyp_arr) {
+    extyp2 = va_arg(extyp_va, int);
+  } else {
+    extyp2 = extyp;
+  }
+  if (extyp2 >= _szc_extyp_max) return 1;
   if (!lua_istable(L, -1)) return 1;
   lua_getfield(L, -1, name);
   size_t start, end;
@@ -223,8 +255,9 @@ static inline int _szclua_w_append(lua_State *L, szc_extyp_t extyp, const char *
     end = start + count;
   else
     end = ((*bitlen + count) >> 3) + ((*bitlen + count) % 8 == 0 ? 0 : 1);
-  switch (extyp) {
+  switch (extyp2) {
     case szc_extyp_int:
+    case szc_extyp_bigint:
       target2_int = (int)lua_tonumber(L, -1);
       val2 = szc_realloc(*valp, end);
       if (val2 == NULL) goto fail;

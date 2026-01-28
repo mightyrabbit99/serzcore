@@ -87,7 +87,7 @@ void szc_set_ctx_r_ex_lua(struct szc_dgs_s *d, void *ctx1) {
   dd->L = (lua_State *)ctx1;
 }
 
-int szc_get_fieldlen_r_ex_lua(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d, szc_extyp_t extyp, const char *name) {
+int szc_get_fieldlen_r_ex_lua(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d, const char *name, szc_extyp_t extyp, ...) {
   return 0;
 }
 
@@ -123,7 +123,8 @@ int szcyy_r_lua(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, s
   return 0;
 }
 
-int szcy_r_ex_lua(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d, szc_extyp_t extyp, const char *name) {
+
+static inline int _szcyv_r_ex_lua(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d, const char *name, szc_extyp_t extyp, va_list extyp_va) {
   if (count == 0) return 0;
   if (typ >= _szc_dtyp_max) return 1;
   struct szc_dgsr_lua_s *dd = (struct szc_dgsr_lua_s *)d;
@@ -138,14 +139,26 @@ int szcy_r_ex_lua(szc_dtyp_t typ, unsigned long long int count, uint8_t *target,
   
   uint8_t target2[szc_count_oct(typ, count)];
   _szcpy(typ, target2, dd->val + start, count, szc_typ_is_octal(typ) ? 0 : dd->bitlen % 8);
-  int res = _szclua_r(dd->L, extyp, name, target2, sizeof(target2));
+  int res = _szclua_r(dd->L, extyp, extyp_va, name, target2, sizeof(target2));
   if (res) return res;
   dd->bitlen += szc_count_bit(typ, count);
   return 0;
 }
 
-int szcyy_r_ex_lua(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d, szc_extyp_t extyp, const char *name) {
-  return szcy_r_ex_lua(typ, count, target, d, extyp, name);
+int szcy_r_ex_lua(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d, const char *name, szc_extyp_t extyp, ...) {
+  va_list argp;
+  va_start(argp, extyp);
+  int ans = _szcyv_r_ex_lua(typ, count, target, d, name, extyp, argp);
+  va_end(argp);
+  return ans;
+}
+
+int szcyy_r_ex_lua(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d, const char *name, szc_extyp_t extyp, ...) {
+  va_list argp;
+  va_start(argp, extyp);
+  int ans = _szcyv_r_ex_lua(typ, count, target, d, name, extyp, argp);
+  va_end(argp);
+  return ans;
 }
 
 int szcmlc_r_lua(void **target, size_t sz) {

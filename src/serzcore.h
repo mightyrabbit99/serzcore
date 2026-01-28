@@ -31,6 +31,8 @@ typedef enum {
   szc_extyp_bool,
   szc_extyp_int,
   szc_extyp_double,
+  szc_extyp_bigint,
+  szc_extyp_arr,
   szc_extyp_string,
   szc_extyp_data,
   _szc_extyp_max,
@@ -72,11 +74,11 @@ void szc_set_val_r_lua(struct szc_dgs_s *d, size_t len, uint8_t *val);
 void szc_destruct_r_lua(struct szc_dgs_s *d);
 void szc_fprint_r_lua(FILE *stream, struct szc_dgs_s *d);
 void szc_set_ctx_r_ex_lua(struct szc_dgs_s *d, void *ctx1);
-int szc_get_fieldlen_r_ex_lua(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d, szc_extyp_t extyp, const char *name);
+int szc_get_fieldlen_r_ex_lua(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d, const char *name, szc_extyp_t extyp, ...);
 int szcy_r_lua(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d);
 int szcyy_r_lua(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d);
-int szcy_r_ex_lua(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d, szc_extyp_t extyp, const char *name);
-int szcyy_r_ex_lua(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d, szc_extyp_t extyp, const char *name);
+int szcy_r_ex_lua(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d, const char *name, szc_extyp_t extyp, ...);
+int szcyy_r_ex_lua(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d, const char *name, szc_extyp_t extyp, ...);
 int szcmlc_r_lua(void **target, size_t sz);
 int szcrealc_r_lua(void **target, size_t sz);
 void *szcmemset_r_lua(uint8_t *s, int c, size_t sz);
@@ -99,11 +101,11 @@ void szc_set_val_w_lua(struct szc_dgs_s *d, size_t len, uint8_t *val);
 void szc_destruct_w_lua(struct szc_dgs_s *d);
 void szc_fprint_w_lua(FILE *stream, struct szc_dgs_s *d);
 void szc_set_ctx_w_ex_lua(struct szc_dgs_s *d, void *ctx1);
-int szc_get_fieldlen_w_ex_lua(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d, szc_extyp_t extyp, const char *name);
+int szc_get_fieldlen_w_ex_lua(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d, const char *name, szc_extyp_t extyp, ...);
 int szcy_w_lua(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d);
 int szcyy_w_lua(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d);
-int szcy_w_ex_lua(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d, szc_extyp_t extyp, const char *name);
-int szcyy_w_ex_lua(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d, szc_extyp_t extyp, const char *name);
+int szcy_w_ex_lua(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d, const char *name, szc_extyp_t extyp, ...);
+int szcyy_w_ex_lua(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d, const char *name, szc_extyp_t extyp, ...);
 int szcmlc_w_lua(void **target, size_t sz);
 int szcrealc_w_lua(void **target, size_t sz);
 void *szcmemset_w_lua(uint8_t *s, int c, size_t sz);
@@ -128,11 +130,11 @@ void szc_set_val_r(struct szc_dgs_s *d, size_t len, uint8_t *val);
 void szc_destruct_r(struct szc_dgs_s *d);
 void szc_fprint_r(FILE *stream, struct szc_dgs_s *d);
 void szc_set_ctx_r_ex(struct szc_dgs_s *d, void *ctx1);
-int szc_get_fieldlen_r_ex(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d, szc_extyp_t extyp, const char *name);
+int szc_get_fieldlen_r_ex(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d, const char *name, szc_extyp_t extyp, ...);
 int szcy_r(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d);
 int szcyy_r(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d);
-int szcy_r_ex(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d, szc_extyp_t extyp, const char *name);
-int szcyy_r_ex(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d, szc_extyp_t extyp, const char *name);
+int szcy_r_ex(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d, const char *name, szc_extyp_t extyp, ...);
+int szcyy_r_ex(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d, const char *name, szc_extyp_t extyp, ...);
 int szcmlc_r(void **target, size_t sz);
 int szcrealc_r(void **target, size_t sz);
 void *szcmemset_r(uint8_t *s, int c, size_t sz);
@@ -155,11 +157,11 @@ void szc_set_val_w(struct szc_dgs_s *d, size_t len, uint8_t *val);
 void szc_destruct_w(struct szc_dgs_s *d);
 void szc_fprint_w(FILE *stream, struct szc_dgs_s *d);
 void szc_set_ctx_w_ex(struct szc_dgs_s *d, void *ctx1);
-int szc_get_fieldlen_w_ex(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d, szc_extyp_t extyp, const char *name);
+int szc_get_fieldlen_w_ex(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d, const char *name, szc_extyp_t extyp, ...);
 int szcy_w(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d);
 int szcyy_w(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d);
-int szcy_w_ex(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d, szc_extyp_t extyp, const char *name);
-int szcyy_w_ex(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d, szc_extyp_t extyp, const char *name);
+int szcy_w_ex(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d, const char *name, szc_extyp_t extyp, ...);
+int szcyy_w_ex(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d, const char *name, szc_extyp_t extyp, ...);
 int szcmlc_w(void **target, size_t sz);
 int szcrealc_w(void **target, size_t sz);
 void *szcmemset_w(uint8_t *s, int c, size_t sz);
@@ -189,11 +191,11 @@ struct szc_dga_s {
   void (*szc_destruct)(struct szc_dgs_s *);
   void (*szc_fprint)(FILE *, struct szc_dgs_s *);
   void (*szc_set_ctx_ex)(struct szc_dgs_s *, void *);
-  int (*szc_get_fieldlen_ex)(szc_dtyp_t, unsigned long long int, uint8_t *, struct szc_dgs_s *, szc_extyp_t, const char *);
+  int (*szc_get_fieldlen_ex)(szc_dtyp_t, unsigned long long int, uint8_t *, struct szc_dgs_s *, const char *, szc_extyp_t, ...);
   int (*szcy)(szc_dtyp_t, unsigned long long int, uint8_t *, struct szc_dgs_s *);
   int (*szcyy)(szc_dtyp_t, unsigned long long int, uint8_t *, struct szc_dgs_s *);
-  int (*szcy_ex)(szc_dtyp_t, unsigned long long int, uint8_t *, struct szc_dgs_s *, szc_extyp_t, const char *);
-  int (*szcyy_ex)(szc_dtyp_t, unsigned long long int, uint8_t *, struct szc_dgs_s *, szc_extyp_t, const char *);
+  int (*szcy_ex)(szc_dtyp_t, unsigned long long int, uint8_t *, struct szc_dgs_s *, const char *, szc_extyp_t, ...);
+  int (*szcyy_ex)(szc_dtyp_t, unsigned long long int, uint8_t *, struct szc_dgs_s *, const char *, szc_extyp_t, ...);
   int (*szcmlc)(void **, size_t);
   int (*szcrealc)(void **, size_t);
   void *(*szcmemset)(uint8_t *, int, size_t);
