@@ -186,6 +186,10 @@ int szcys_val_r(struct szc_dgs_s *target, struct szc_dgs_s *d) {
   return 0;
 }
 
+int szcys_val_r_ex(struct szc_dgs_s *target, struct szc_dgs_s *d, const char *name, int arr_i) {
+  return szcys_val_r(target, d);
+}
+
 int szcyff_r(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d) {
   struct szc_dgsr_s *dd = (struct szc_dgsr_s *)d;
   return f(dd->dga1, target_ex, d);

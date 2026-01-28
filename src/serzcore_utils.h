@@ -181,6 +181,7 @@ static inline uint8_t szc_get_ctnsz(register unsigned long long val) {
   } while (0)
 #define szcyy_ex(typ, count, target, name, ...) _szcy_exec(szcyy_ex, typ, count, (uint8_t *)(target), SZC_DST_NAME, name, __VA_ARGS__)
 #define szcf_ex(struname, p, name, ...) _szcy_exec(szcyff_ex, SZFNAME(struname), p, SZC_DST_NAME, name, (-1, ##__VA_ARGS__))
+#define szcys_val_ex(target, d, name, ...) _szcy_exec(szcys_val, target, d, name, (-1, ##__VA_ARGS__))
 #define szcmlcyy_ex(typ, len, ptr, name, ...)                \
   do {                                                       \
     szcmlcl(&(ptr), len);                                    \
@@ -204,6 +205,21 @@ static inline uint8_t szc_get_ctnsz(register unsigned long long val) {
     szc_get_fieldlen_ex(typ, szc_conv_1(typ, sizeof(len)), (uint8_t *)&(len), maxlen, name, __VA_ARGS__); \
     szcyyx(typ, szc_conv_1(typ, szc_get_ctnsz(maxlen)), szc_conv_1(typ, sizeof(len)), (uint8_t *)&(len)); \
     szcmlcyy_ex(typ, szc_conv_1(typ, (len) * sizeof(*(ptr))), ptr, name, __VA_ARGS__);                    \
+  } while (0)
+#define szclvrcrse_ex(typ, tlv_len_t, ff, target, name, ...) \
+  do {                                                       \
+    struct szc_dgs_s *d2__ = SZC_SZCA_NAME->szc_init();      \
+    if (d2__ == NULL) return 1;                              \
+    szcyf(ff, target, d2__);                                 \
+    tlv_len_t len__ = SZC_SZCA_NAME->szc_get_len(d2__);      \
+    szcyy(typ, sizeof(len__), &len__);                       \
+    SZC_SZCA_NAME->szc_set_maxlen(d2__, len__);              \
+    size_t l1 = SZC_SZCA_NAME->szc_get_len(SZC_DST_NAME);    \
+    szcys_val_ex(d2__, SZC_DST_NAME, name, __VA_ARGS__);     \
+    size_t l2 = SZC_SZCA_NAME->szc_get_len(SZC_DST_NAME);    \
+    SZC_SZCA_NAME->szc_destruct(d2__);                       \
+    d2__ = NULL;                                             \
+    if (l2 - l1 != len__) return 1;                          \
   } while (0)
 
 #define SZF_NAME_PREFIX2 SZC_CONCAT(SZF_NAME_PREFIX, inner)

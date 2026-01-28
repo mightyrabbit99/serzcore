@@ -21,7 +21,9 @@
  */
 
 struct szc_dgsr_lua_s {
+  szc_ff_t f;
   struct szc_dga_s *dga1;
+  _target_ex target_ex;
   unsigned long long int bitlen;
   size_t maxlen;
   uint8_t *val;
@@ -198,11 +200,32 @@ void szc_ptop_r_ex_lua(void **target_p) {
 }
 
 int szcyf_r_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d) {
+  struct szc_dgsr_lua_s *dd = (struct szc_dgsr_lua_s *)d;
+  dd->f = f;
+  dd->target_ex = target_ex;
   return 0;
 }
 
 int szcys_val_r_lua(struct szc_dgs_s *target, struct szc_dgs_s *d) {
+  struct szc_dgsr_lua_s *dd = (struct szc_dgsr_lua_s *)d;
+  struct szc_dgsr_lua_s *dd_t = (struct szc_dgsr_lua_s *)target;
+  if (dd_t->maxlen > 0) {
+    if (dd_t->maxlen > dd->maxlen - (dd->bitlen >> 3)) return 1;
+    szc_set_val_r_lua(target, dd_t->maxlen, &dd->val[dd->bitlen >> 3]);
+    if (dd_t->f(dd_t->dga1, dd_t->target_ex, target)) return 1;
+    dd->bitlen += dd_t->bitlen;
+  } else {
+    if (dd_t->f(dd_t->dga1, dd_t->target_ex, d)) return 1;
+  }
   return 0;
+}
+
+int szcyff_r_ex_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, const char *name, int arr_i);
+int szcys_val_r_ex_lua(struct szc_dgs_s *target, struct szc_dgs_s *d, const char *name, int arr_i) {
+  struct szc_dgsr_lua_s *dd = (struct szc_dgsr_lua_s *)d;
+  struct szc_dgsr_lua_s *dd_t = (struct szc_dgsr_lua_s *)target;
+  szc_set_val_r_lua(target, dd_t->maxlen, &dd->val[dd->bitlen >> 3]);
+  return szcyff_r_ex_lua(dd_t->f, dd_t->target_ex, target, name, arr_i);
 }
 
 int szcyff_r_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d) {

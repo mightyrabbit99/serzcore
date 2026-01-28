@@ -166,6 +166,10 @@ int szcys_val_w(struct szc_dgs_s *target, struct szc_dgs_s *d) {
   return szcyy_w(szc_dtyp_b, dd_t->bitlen, dd_t->val, d);
 }
 
+int szcys_val_w_ex(struct szc_dgs_s *target, struct szc_dgs_s *d, const char *name, int arr_i) {
+  return szcys_val_w(target, d);
+}
+
 int szcyff_w(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d) {
   struct szc_dgsw_s *dd = (struct szc_dgsw_s *)d;
   return f(dd->dga1, target_ex, d);
