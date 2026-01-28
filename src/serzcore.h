@@ -33,6 +33,7 @@ typedef enum {
   szc_extyp_double,
   szc_extyp_bigint,
   szc_extyp_arr,
+  szc_extyp_arrlen,
   szc_extyp_string,
   szc_extyp_data,
   _szc_extyp_max,

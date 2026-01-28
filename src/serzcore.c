@@ -200,6 +200,8 @@ static inline int _szclua_r(lua_State *L, szc_extyp_t extyp, va_list extyp_va, c
       lua_pushlstring(L, src, src_sz);
       lua_settable(L, -3);
       break;
+    case szc_extyp_arrlen:
+      break;
     default:
       res = 1;
       break;
@@ -220,6 +222,7 @@ static inline ssize_t _szclua_w_get_fieldlen(lua_State *L, szc_extyp_t extyp, co
   switch (extyp) {
     case szc_extyp_int:
     case szc_extyp_bigint:
+    case szc_extyp_arrlen:
       break;
     case szc_extyp_data:
     case szc_extyp_string:
@@ -238,7 +241,7 @@ static inline int _szclua_w_append(lua_State *L, szc_extyp_t extyp, va_list exty
   unsigned long long int count) {
   szc_extyp_t extyp2;
   size_t start, end;
-  size_t target2_strlen;
+  size_t target2_len;
   const char *target2_str;
   int target2_int;
   uint8_t *val2;
@@ -270,16 +273,24 @@ static inline int _szclua_w_append(lua_State *L, szc_extyp_t extyp, va_list exty
       _szcpy(typ, val2 + (*bitlen >> 3), (uint8_t *)&target2_int, count, szc_typ_is_octal(typ) ? 0 : (*bitlen) % 8);
       *bitlen += szc_count_bit(typ, count);
       break;
+    case szc_extyp_arrlen:
+      target2_len = lua_objlen(L, -1);
+      val2 = szc_realloc(*valp, end);
+      if (val2 == NULL) goto fail;
+      *valp = val2;
+      _szcpy(typ, val2 + (*bitlen >> 3), (uint8_t *)&target2_len, count, szc_typ_is_octal(typ) ? 0 : (*bitlen) % 8);
+      *bitlen += szc_count_bit(typ, count);
+      break;
     case szc_extyp_data:
     case szc_extyp_string:
-      target2_str = lua_tolstring(L, -1, &target2_strlen);
-      end = start + target2_strlen;
+      target2_str = lua_tolstring(L, -1, &target2_len);
+      end = start + target2_len;
       if (end > maxlen) goto fail;
       val2 = szc_realloc(*valp, end);
       if (val2 == NULL) goto fail;
       *valp = val2;
-      _szcpy(typ, val2 + (*bitlen >> 3), target2_str, target2_strlen, szc_typ_is_octal(typ) ? 0 : (*bitlen) % 8);
-      *bitlen += (target2_strlen << 3);
+      _szcpy(typ, val2 + (*bitlen >> 3), target2_str, target2_len, szc_typ_is_octal(typ) ? 0 : (*bitlen) % 8);
+      *bitlen += (target2_len << 3);
       break;
     default:
       break;
