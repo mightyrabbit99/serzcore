@@ -22,6 +22,9 @@
 #define SZF_NAME_PREFIX __szcf
 #endif  // SZF_NAME_PREFIX
 
+#define SZC_ELEVENTH_ARGUMENT(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, ...) a11
+#define SZC_VAARGC(...) SZC_ELEVENTH_ARGUMENT(dummy, ##__VA_ARGS__, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)
+
 static inline uint8_t szc_get_msb32(register unsigned int val) { return 32 - __builtin_clz(val); }
 
 static inline uint8_t szc_get_msb64(register unsigned long long val) { return 64 - __builtin_clzll(val); }
@@ -183,12 +186,18 @@ static inline uint8_t szc_get_ctnsz(register unsigned long long val) {
     szcmlcl(&(ptr), len);                                    \
     szcyy_ex(typ, len, (uint8_t *)(ptr), name, __VA_ARGS__); \
   } while (0)
-#define szclvstr_ex(typ, maxlen, ptr, name)                                                                        \
-  do {                                                                                                             \
-    size_t len__;                                                                                                  \
-    szc_get_fieldlen_ex(typ, szc_conv_1(typ, sizeof(len__)), (uint8_t *)&(len__), maxlen, name, szc_extyp_string); \
-    szcyyx(typ, szc_get_ctnsz(maxlen), sizeof(len__), &len__);                                                     \
-    szcmlcyy_ex(typ, len__, ptr, name, szc_extyp_string);                                                          \
+#define szclvstr_ex(typ, maxlen, ptr, name, ...)                                                                                                 \
+  do {                                                                                                                                           \
+    size_t len__;                                                                                                                                \
+    if (SZC_VAARGC(__VA_ARGS__) == 0)                                                                                                            \
+      szc_get_fieldlen_ex(typ, szc_conv_1(typ, sizeof(len__)), (uint8_t *)&(len__), maxlen, name, szc_extyp_string);                             \
+    else                                                                                                                                         \
+      szc_get_fieldlen_ex(typ, szc_conv_1(typ, sizeof(len__)), (uint8_t *)&(len__), maxlen, name, szc_extyp_arr, szc_extyp_string, __VA_ARGS__); \
+    szcyyx(typ, szc_get_ctnsz(maxlen), sizeof(len__), &len__);                                                                                   \
+    if (SZC_VAARGC(__VA_ARGS__) == 0)                                                                                                            \
+      szcmlcyy_ex(typ, len__, ptr, name, szc_extyp_string);                                                                                      \
+    else                                                                                                                                         \
+      szcmlcyy_ex(typ, len__, ptr, name, szc_extyp_arr, szc_extyp_string, __VA_ARGS__);                                                          \
   } while (0)
 #define szclvp_ex(typ, len, maxlen, ptr, name, ...)                                                       \
   do {                                                                                                    \
