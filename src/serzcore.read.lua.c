@@ -87,7 +87,7 @@ void szc_set_ctx_r_ex_lua(struct szc_dgs_s *d, void *ctx1) {
   dd->L = (lua_State *)ctx1;
 }
 
-int szc_get_fieldlen_r_ex_lua(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d, const char *name, szc_extyp_t extyp, ...) {
+int szc_get_fieldlen_r_ex_lua(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, size_t maxlen, struct szc_dgs_s *d, const char *name, szc_extyp_t extyp, ...) {
   return 0;
 }
 

@@ -25,6 +25,7 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdarg.h>
 
 #ifdef SERZCORE_LUA
 #include "lauxlib.h"

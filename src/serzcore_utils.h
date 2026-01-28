@@ -137,27 +137,27 @@ static inline uint8_t szc_get_ctnsz(register unsigned long long val) {
     szcyyx(typ, szc_conv_1(typ, szc_get_ctnsz(maxlen)), szc_conv_1(typ, sizeof(len)), (uint8_t *)&(len)); \
     szcmlcyy(typ, szc_conv_1(typ, (len) * sizeof(*(ptr))), ptr);                                          \
   } while (0)
-#define szclvstr(typ, maxlen, ptr)                                                                       \
-  do {                                                                                                   \
-    size_t tlv_len__ = (ptr) == NULL ? 0 : (strnlen(ptr, maxlen) + 1);                                   \
-    if (tlv_len__ > maxlen) return 1;                                                                    \
-    szcyyx(typ, szc_conv_1(typ, szc_get_ctnsz(maxlen)), szc_conv_1(typ, sizeof(tlv_len__)), &tlv_len__); \
-    szcmlcyy(typ, szc_conv_1(typ, tlv_len__), ptr);                                                      \
+#define szclvstr(typ, maxlen, ptr)                                                               \
+  do {                                                                                           \
+    size_t len__ = (ptr) == NULL ? 0 : (strnlen(ptr, maxlen) + 1);                               \
+    if (len__ > maxlen) return 1;                                                                \
+    szcyyx(typ, szc_conv_1(typ, szc_get_ctnsz(maxlen)), szc_conv_1(typ, sizeof(len__)), &len__); \
+    szcmlcyy(typ, szc_conv_1(typ, len__), ptr);                                                  \
   } while (0)
-#define szclvrcrse(typ, tlv_len_t, ff, target)                    \
-  do {                                                            \
-    struct szc_dgs_s *szc_tlvv__ = SZC_SZCA_NAME->szc_init();     \
-    if (szc_tlvv__ == NULL) return 1;                             \
-    szcyf(ff, target, szc_tlvv__);                                \
-    tlv_len_t tlv_len__ = SZC_SZCA_NAME->szc_get_len(szc_tlvv__); \
-    szcyy(typ, sizeof(tlv_len__), &tlv_len__);                    \
-    SZC_SZCA_NAME->szc_set_maxlen(szc_tlvv__, tlv_len__);         \
-    size_t l1 = SZC_SZCA_NAME->szc_get_len(SZC_DST_NAME);         \
-    szcys_val(szc_tlvv__, SZC_DST_NAME);                          \
-    size_t l2 = SZC_SZCA_NAME->szc_get_len(SZC_DST_NAME);         \
-    SZC_SZCA_NAME->szc_destruct(szc_tlvv__);                      \
-    szc_tlvv__ = NULL;                                            \
-    if (l2 - l1 != tlv_len__) return 1;                           \
+#define szclvrcrse(typ, tlv_len_t, ff, target)            \
+  do {                                                    \
+    struct szc_dgs_s *d2__ = SZC_SZCA_NAME->szc_init();   \
+    if (d2__ == NULL) return 1;                           \
+    szcyf(ff, target, d2__);                              \
+    tlv_len_t len__ = SZC_SZCA_NAME->szc_get_len(d2__);   \
+    szcyy(typ, sizeof(len__), &len__);                    \
+    SZC_SZCA_NAME->szc_set_maxlen(d2__, len__);           \
+    size_t l1 = SZC_SZCA_NAME->szc_get_len(SZC_DST_NAME); \
+    szcys_val(d2__, SZC_DST_NAME);                        \
+    size_t l2 = SZC_SZCA_NAME->szc_get_len(SZC_DST_NAME); \
+    SZC_SZCA_NAME->szc_destruct(d2__);                    \
+    d2__ = NULL;                                          \
+    if (l2 - l1 != len__) return 1;                       \
   } while (0)
 
 #define szcy_ex(typ, count, target, name, ...) _szcy_exec(szcy_ex, typ, count, (uint8_t *)(target), SZC_DST_NAME, name, __VA_ARGS__)
@@ -168,7 +168,7 @@ static inline uint8_t szc_get_ctnsz(register unsigned long long val) {
 #else
 #error byte order not defined
 #endif
-#define szc_get_fieldlen_ex(typ, count, target, name, ...) _szcy_exec(szc_get_fieldlen_ex, typ, count, (uint8_t *)(target), SZC_DST_NAME, name, __VA_ARGS__)
+#define szc_get_fieldlen_ex(typ, count, target, maxlen, name, ...) _szcy_exec(szc_get_fieldlen_ex, typ, count, (uint8_t *)(target), maxlen, SZC_DST_NAME, name, __VA_ARGS__)
 #define szcval_ex(typ, count, valtyp, val, name, ...)                                        \
   do {                                                                                       \
     valtyp target__ = val;                                                                   \
@@ -183,16 +183,16 @@ static inline uint8_t szc_get_ctnsz(register unsigned long long val) {
     szcmlcl(&(ptr), len);                                    \
     szcyy_ex(typ, len, (uint8_t *)(ptr), name, __VA_ARGS__); \
   } while (0)
-#define szclvstr_ex(typ, maxlen, ptr, name)                                                                \
-  do {                                                                                                     \
-    size_t len__;                                                                                          \
-    szc_get_fieldlen_ex(typ, szc_conv_1(typ, sizeof(len__)), (uint8_t *)&(len__), name, szc_extyp_string); \
-    szcyyx(typ, szc_get_ctnsz(maxlen), sizeof(len__), &len__);                                             \
-    szcmlcyy_ex(typ, len__, ptr, name, szc_extyp_string);                                                  \
+#define szclvstr_ex(typ, maxlen, ptr, name)                                                                        \
+  do {                                                                                                             \
+    size_t len__;                                                                                                  \
+    szc_get_fieldlen_ex(typ, szc_conv_1(typ, sizeof(len__)), (uint8_t *)&(len__), maxlen, name, szc_extyp_string); \
+    szcyyx(typ, szc_get_ctnsz(maxlen), sizeof(len__), &len__);                                                     \
+    szcmlcyy_ex(typ, len__, ptr, name, szc_extyp_string);                                                          \
   } while (0)
 #define szclvp_ex(typ, len, maxlen, ptr, name, ...)                                                       \
   do {                                                                                                    \
-    szc_get_fieldlen_ex(typ, szc_conv_1(typ, sizeof(len)), (uint8_t *)&(len), name, __VA_ARGS__);         \
+    szc_get_fieldlen_ex(typ, szc_conv_1(typ, sizeof(len)), (uint8_t *)&(len), maxlen, name, __VA_ARGS__); \
     szcyyx(typ, szc_conv_1(typ, szc_get_ctnsz(maxlen)), szc_conv_1(typ, sizeof(len)), (uint8_t *)&(len)); \
     szcmlcyy_ex(typ, szc_conv_1(typ, (len) * sizeof(*(ptr))), ptr, name, __VA_ARGS__);                    \
   } while (0)

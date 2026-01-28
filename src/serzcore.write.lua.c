@@ -95,7 +95,7 @@ void szc_set_ctx_w_ex_lua(struct szc_dgs_s *d, void *ctx1) {
   dd->L = (lua_State *)ctx1;
 }
 
-int szc_get_fieldlen_w_ex_lua(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d, const char *name, szc_extyp_t extyp, ...) {
+int szc_get_fieldlen_w_ex_lua(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, size_t maxlen, struct szc_dgs_s *d, const char *name, szc_extyp_t extyp, ...) {
   struct szc_dgsw_lua_s *dd = (struct szc_dgsw_lua_s *)d;
   size_t sz = 0;
   szc_extyp_t extyp2;
@@ -109,7 +109,7 @@ int szc_get_fieldlen_w_ex_lua(szc_dtyp_t typ, unsigned long long int count, uint
   }
   ssize_t res = _szclua_w_get_fieldlen(dd->L, extyp2, name);
   if (res < 0) return 1;
-  sz = res;
+  sz = MIN(maxlen, (size_t)res);
   _szcpy(typ, target, (uint8_t *)&sz, count, szc_typ_is_octal(typ) ? 0 : dd->bitlen % 8);
   return 0;
 }

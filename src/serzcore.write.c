@@ -93,7 +93,22 @@ void szc_set_ctx_w_ex(struct szc_dgs_s *d, void *ctx1) {
   return;
 }
 
-int szc_get_fieldlen_w_ex(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d, const char *name, szc_extyp_t extyp, ...) {
+int szc_get_fieldlen_w_ex(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, size_t maxlen, struct szc_dgs_s *d, const char *name, szc_extyp_t extyp, ...) {
+  struct szc_dgsw_s *dd = (struct szc_dgsw_s *)d;
+  szc_extyp_t extyp2;
+  if (extyp == szc_extyp_arr) {
+    va_list argp;
+    va_start(argp, extyp);
+    extyp2 = va_arg(argp, int);
+    va_end(argp);
+  } else {
+    extyp2 = extyp;
+  }
+  size_t sz = 0;
+  if (extyp2 == szc_extyp_string) {
+    sz = strnlen(target, maxlen);
+    _szcpy(typ, target, (uint8_t *)&sz, count, szc_typ_is_octal(typ) ? 0 : dd->bitlen % 8);
+  }
   return 0;
 }
 
