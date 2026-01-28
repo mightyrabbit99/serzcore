@@ -188,7 +188,7 @@ int szcys_val_w_lua(struct szc_dgs_s *target, struct szc_dgs_s *d) {
 
 int szcyff_w_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d) { return 0; }
 
-int szcyff_w_ex_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, const char *name) {
+int szcyff_w_ex_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, const char *name, int arr_i) {
   struct szc_dgsw_lua_s *dd = (struct szc_dgsw_lua_s *)d;
   if (!lua_istable(dd->L, -1)) return 1;
   lua_getfield(dd->L, -1, name);

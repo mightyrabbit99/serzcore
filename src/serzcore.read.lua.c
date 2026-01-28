@@ -209,14 +209,33 @@ int szcyff_r_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d) {
   return 0;
 }
 
-int szcyff_r_ex_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, const char *name) {
+int szcyff_r_ex_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, const char *name, int arr_i) {
   struct szc_dgsr_lua_s *dd = (struct szc_dgsr_lua_s *)d;
-  lua_pushstring(dd->L, name);
-  lua_newtable(dd->L);
+  if (!lua_istable(dd->L, -1)) return 1;
+  if (arr_i == -1) {
+    lua_pushstring(dd->L, name);
+    lua_newtable(dd->L);
+  } else {
+    lua_getfield(dd->L, -1, name);
+    if (lua_isnil(dd->L, -1)) {
+      lua_pop(dd->L, 1);
+      lua_pushstring(dd->L, name);
+      lua_newtable(dd->L);
+      lua_settable(dd->L, -3);
+      lua_getfield(dd->L, -1, name);
+    }
+    lua_pushnumber(dd->L, arr_i + 1);
+    lua_newtable(dd->L);
+    lua_settable(dd->L, -3);
+    lua_rawgeti(dd->L, -1, arr_i + 1);
+  }
   if (f(dd->dga1, target_ex, d)) {
     lua_pop(dd->L, 2);
     return 1;
   }
-  lua_settable(dd->L, -3);
+  if (arr_i == -1)
+    lua_settable(dd->L, -3);
+  else
+    lua_pop(dd->L, 2);
   return 0;
 }

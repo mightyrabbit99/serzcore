@@ -177,7 +177,7 @@ static inline uint8_t szc_get_ctnsz(register unsigned long long val) {
     szcyx_ex(typ, count2__, szc_conv_1(typ, sizeof(valtyp)), &target__, name, __VA_ARGS__);  \
   } while (0)
 #define szcyy_ex(typ, count, target, name, ...) _szcy_exec(szcyy_ex, typ, count, (uint8_t *)(target), SZC_DST_NAME, name, __VA_ARGS__)
-#define szcf_ex(struname, p, name) _szcy_exec(szcyff_ex, SZFNAME(struname), p, SZC_DST_NAME, name)
+#define szcf_ex(struname, p, name, ...) _szcy_exec(szcyff_ex, SZFNAME(struname), p, SZC_DST_NAME, name, (-1, ##__VA_ARGS__))
 #define szcmlcyy_ex(typ, len, ptr, name, ...)                \
   do {                                                       \
     szcmlcl(&(ptr), len);                                    \

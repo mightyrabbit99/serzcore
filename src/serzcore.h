@@ -89,7 +89,7 @@ void szc_ptop_r_ex_lua(void **target_p);
 int szcyf_r_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d);
 int szcys_val_r_lua(struct szc_dgs_s *target, struct szc_dgs_s *d);
 int szcyff_r_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d);
-int szcyff_r_ex_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, const char *name);
+int szcyff_r_ex_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, const char *name, int arr_i);
 
 szcmode_t szc_get_mode_w_lua(void);
 struct szc_dgs_s *szc_init_w_lua(void);
@@ -116,7 +116,7 @@ void szc_ptop_w_ex_lua(void **target_p);
 int szcyf_w_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d);
 int szcys_val_w_lua(struct szc_dgs_s *target, struct szc_dgs_s *d);
 int szcyff_w_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d);
-int szcyff_w_ex_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, const char *name);
+int szcyff_w_ex_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, const char *name, int arr_i);
 
 #else
 
@@ -145,7 +145,7 @@ void szc_ptop_r_ex(void **target_p);
 int szcyf_r(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d);
 int szcys_val_r(struct szc_dgs_s *target, struct szc_dgs_s *d);
 int szcyff_r(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d);
-int szcyff_r_ex(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, const char *name);
+int szcyff_r_ex(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, const char *name, int arr_i);
 
 szcmode_t szc_get_mode_w(void);
 struct szc_dgs_s *szc_init_w(void);
@@ -172,7 +172,7 @@ void szc_ptop_w_ex(void **target_p);
 int szcyf_w(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d);
 int szcys_val_w(struct szc_dgs_s *target, struct szc_dgs_s *d);
 int szcyff_w(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d);
-int szcyff_w_ex(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, const char *name);
+int szcyff_w_ex(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, const char *name, int arr_i);
 
 #endif // SERZCORE_LUA
 
@@ -206,7 +206,7 @@ struct szc_dga_s {
   int (*szcyf)(szc_ff_t, _target_ex, struct szc_dgs_s *);
   int (*szcys_val)(struct szc_dgs_s *, struct szc_dgs_s *);
   int (*szcyff)(szc_ff_t, _target_ex, struct szc_dgs_s *);
-  int (*szcyff_ex)(szc_ff_t, _target_ex, struct szc_dgs_s *, const char *);
+  int (*szcyff_ex)(szc_ff_t, _target_ex, struct szc_dgs_s *, const char *, int);
 };
 
 #if defined(SERZCORE_LUA)

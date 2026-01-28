@@ -181,8 +181,8 @@ static inline int _szclua_r(lua_State *L, szc_extyp_t extyp, va_list extyp_va, c
       lua_settable(L, -3);
       lua_getfield(L, -1, name);
     }
-    int arrlen = lua_objlen(L, -1);
     extyp2 = va_arg(extyp_va, int);
+    size_t arrlen = va_arg(extyp_va, int);
     lua_pushnumber(L, arrlen + 1);
   } else {
     extyp2 = extyp;

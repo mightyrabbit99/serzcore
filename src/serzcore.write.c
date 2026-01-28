@@ -171,6 +171,6 @@ int szcyff_w(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d) {
   return f(dd->dga1, target_ex, d);
 }
 
-int szcyff_w_ex(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, const char *name) {
+int szcyff_w_ex(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, const char *name, int arr_i) {
   return szcyff_w(f, target_ex, d);
 }
