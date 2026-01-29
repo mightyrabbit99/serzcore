@@ -9,5 +9,7 @@
 
 ssize_t hello_deserialize(struct hello_s *p, uint8_t *data, size_t datasz);
 ssize_t hello_serialize(struct hello_s *p, uint8_t *buf, size_t bufsz);
+int hello_printw(struct hello_s *p);
+int hello_printr(uint8_t *data, size_t datasz);
 
 #endif  // HELLOENDEC_H

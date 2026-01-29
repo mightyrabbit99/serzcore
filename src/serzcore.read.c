@@ -131,7 +131,7 @@ int szcyy_r_ex(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, st
   return szcyy_r(typ, count, target, d);
 }
 
-int szcmlc_r(void **target, size_t sz) {
+int szcmlc_r(void **target, size_t sz, struct szc_dgs_s *d) {
   if (sz == 0) {
     *target = NULL;
     return 0;
@@ -142,7 +142,7 @@ int szcmlc_r(void **target, size_t sz) {
   return 0;
 }
 
-int szcrealc_r(void **target, size_t sz) {
+int szcrealc_r(void **target, size_t sz, struct szc_dgs_s *d) {
   if (sz == 0) {
     *target = NULL;
     return 0;
@@ -152,18 +152,18 @@ int szcrealc_r(void **target, size_t sz) {
   return 0;
 }
 
-void *szcmemset_r(uint8_t *s, int c, size_t sz) { return memset(s, c, sz); }
+void *szcmemset_r(uint8_t *s, int c, size_t sz, struct szc_dgs_s *d) { return memset(s, c, sz); }
 
-void szcfree_r(void *target) {
+void szcfree_r(void *target, struct szc_dgs_s *d) {
   if (target) szc_free(target);
 }
 
-void szcfree2_r(void **target_p) {
+void szcfree2_r(void **target_p, struct szc_dgs_s *d) {
   if (*target_p) szc_free(*target_p);
   *target_p = NULL;
 }
 
-void szc_ptop_r_ex(void **target_p) { return; }
+void szc_ptop_r_ex(void **target_p, struct szc_dgs_s *d) { return; }
 
 int szcyf_r(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d) {
   struct szc_dgsr_s *dd = (struct szc_dgsr_s *)d;

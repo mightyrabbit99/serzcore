@@ -61,7 +61,19 @@ static inline int test1() {
   return 0;
 }
 
+static inline int test2() {
+  printf("\n=== %s ===\n", __FUNCTION__);
+  struct hello_s *h1 = createdummy_hello_s();
+  if (hello_printw(h1)) {
+    lg("print error!\n");
+    return 1;
+  }
+  delete_hello_s(h1);
+  return 0;
+}
+
 int main(int argc, char *argv[]) {
   test1();
+  test2();
   return 0;
 }

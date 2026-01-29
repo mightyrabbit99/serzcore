@@ -144,17 +144,17 @@ int szcyy_w_ex(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, st
   return szcyy_w(typ, count, target, d);
 }
 
-int szcmlc_w(void **target, size_t sz) { return 0; }
+int szcmlc_w(void **target, size_t sz, struct szc_dgs_s *d) { return 0; }
 
-int szcrealc_w(void **target, size_t sz) { return 0; }
+int szcrealc_w(void **target, size_t sz, struct szc_dgs_s *d) { return 0; }
 
-void *szcmemset_w(uint8_t *s, int c, size_t sz) { return s; }
+void *szcmemset_w(uint8_t *s, int c, size_t sz, struct szc_dgs_s *d) { return s; }
 
-void szcfree_w(void *target) { return; }
+void szcfree_w(void *target, struct szc_dgs_s *d) { return; }
 
-void szcfree2_w(void **target_p) { return; }
+void szcfree2_w(void **target_p, struct szc_dgs_s *d) { return; }
 
-void szc_ptop_w_ex(void **target_p) { return; }
+void szc_ptop_w_ex(void **target_p, struct szc_dgs_s *d) { return; }
 
 int szcyf_w(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d) {
   struct szc_dgsw_s *dd = (struct szc_dgsw_s *)d;

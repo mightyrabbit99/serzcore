@@ -164,17 +164,17 @@ int szcyy_w_ex_lua(szc_dtyp_t typ, unsigned long long int count, uint8_t *target
   return ans;
 }
 
-int szcmlc_w_lua(void **target, size_t sz) { return 0; }
+int szcmlc_w_lua(void **target, size_t sz, struct szc_dgs_s *d) { return 0; }
 
-int szcrealc_w_lua(void **target, size_t sz) { return 0; }
+int szcrealc_w_lua(void **target, size_t sz, struct szc_dgs_s *d) { return 0; }
 
-void *szcmemset_w_lua(uint8_t *s, int c, size_t sz) { return s; }
+void *szcmemset_w_lua(uint8_t *s, int c, size_t sz, struct szc_dgs_s *d) { return s; }
 
-void szcfree_w_lua(void *target) { return; }
+void szcfree_w_lua(void *target, struct szc_dgs_s *d) { return; }
 
-void szcfree2_w_lua(void **target_p) { return; }
+void szcfree2_w_lua(void **target_p, struct szc_dgs_s *d) { return; }
 
-void szc_ptop_w_ex_lua(void **target_p) { return; }
+void szc_ptop_w_ex_lua(void **target_p, struct szc_dgs_s *d) { return; }
 
 int szcyf_w_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d) {
   struct szc_dgsw_lua_s *dd = (struct szc_dgsw_lua_s *)d;

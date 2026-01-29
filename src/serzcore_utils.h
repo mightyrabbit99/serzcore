@@ -62,14 +62,14 @@ static inline uint8_t szc_get_ctnsz(register unsigned long long val) {
     (vec)[szc_cvector_size(vec)] = (value);                 \
     szc_cvector_set_size((vec), szc_cvector_size(vec) + 1); \
   } while (0)
-#define szc_cvector_for_each(vec, func)             \
-  do {                                              \
-    if ((vec) && (func) != NULL) {                  \
-      size_t i;                                     \
-      for (i = 0; i < szc_cvector_size(vec); i++) { \
-        func((vec)[szc_cvector_size(vec) - i - 1]); \
-      }                                             \
-    }                                               \
+#define szc_cvector_for_each(vec, func, ctx)             \
+  do {                                                   \
+    if ((vec) && (func) != NULL) {                       \
+      size_t i;                                          \
+      for (i = 0; i < szc_cvector_size(vec); i++) {      \
+        func((vec)[szc_cvector_size(vec) - i - 1], ctx); \
+      }                                                  \
+    }                                                    \
   } while (0)
 #define szc_cvector_begin(vec) (vec)
 #define szc_cvector_end(vec) ((vec) ? &((vec)[szc_cvector_size(vec)]) : NULL)
@@ -91,10 +91,10 @@ static inline uint8_t szc_get_ctnsz(register unsigned long long val) {
 // #define szcf(struname, p) SZFNAME(struname)(SZC_SZCA_NAME, p, SZC_DST_NAME)
 #define szcf(struname, p) _szcy_exec(szcyff, SZFNAME(struname), p, SZC_DST_NAME)
 
-#define szcmlc(target, sz) _szcy_exec(szcmlc, target, sz)
-#define szcrealc(target, sz) _szcy_exec(szcrealc, target, sz)
-#define szcmemset(s, c, sz) SZC_SZCA_NAME->szcmemset(s, c, sz)
-#define szcdelete(pt) SZC_SZCA_NAME->szcfree(pt)
+#define szcmlc(target, sz) _szcy_exec(szcmlc, target, sz, SZC_DST_NAME)
+#define szcrealc(target, sz) _szcy_exec(szcrealc, target, sz, SZC_DST_NAME)
+#define szcmemset(s, c, sz) SZC_SZCA_NAME->szcmemset(s, c, sz, SZC_DST_NAME)
+#define szcdelete(pt) SZC_SZCA_NAME->szcfree(pt, SZC_DST_NAME)
 #define szc_get_mode() SZC_SZCA_NAME->szc_get_mode()
 
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
@@ -232,9 +232,9 @@ static inline uint8_t szc_get_ctnsz(register unsigned long long val) {
     void ***ptrs = NULL;                                                                                                                                 \
     int ans = SZFNAME2(struname)(szca, (t__ struname *)p, dst, &ptrs);                                                                                   \
     if (ans != 0)                                                                                                                                        \
-      szc_cvector_for_each(ptrs, szca->szcfree2);                                                                                                        \
+      szc_cvector_for_each(ptrs, szca->szcfree2, dst);                                                                                                        \
     else                                                                                                                                                 \
-      szc_cvector_for_each(ptrs, szca->szc_ptop_ex);                                                                                                     \
+      szc_cvector_for_each(ptrs, szca->szc_ptop_ex, dst);                                                                                                     \
     szc_cvector_free(ptrs);                                                                                                                              \
     return ans;                                                                                                                                          \
   }                                                                                                                                                      \
@@ -245,9 +245,9 @@ static inline uint8_t szc_get_ctnsz(register unsigned long long val) {
     void ***ptrs = NULL;                                                                                                                                 \
     int ans = SZFNAME2(struname)(szca, (t__ struname *)p, dst, &ptrs);                                                                                   \
     if (ans != 0)                                                                                                                                        \
-      szc_cvector_for_each(ptrs, szca->szcfree2);                                                                                                        \
+      szc_cvector_for_each(ptrs, szca->szcfree2, dst);                                                                                                        \
     else                                                                                                                                                 \
-      szc_cvector_for_each(ptrs, szca->szc_ptop_ex);                                                                                                     \
+      szc_cvector_for_each(ptrs, szca->szc_ptop_ex, dst);                                                                                                     \
     szc_cvector_free(ptrs);                                                                                                                              \
     return ans;                                                                                                                                          \
   }                                                                                                                                                      \
@@ -306,23 +306,49 @@ static inline uint8_t szc_get_ctnsz(register unsigned long long val) {
     szca_w.szc_destruct(d__);                   \
   } while (0)
 #endif
-#define SZFOUTEXEC(t__, struname, f, ctx1)       \
-  do {                                           \
-    const uint8_t *buf;                          \
-    size_t ll;                                   \
-    t__ struname p__ = (t__ struname){0};        \
-    struct szc_dgs_s *d__ = szca_w.szc_init();   \
-    if (d__ == NULL) return -1;                  \
-    szca_w.szc_set_ctx_ex(d__, ctx1);            \
-    if (SZFNAME(struname)(&szca_w, &p__, d__)) { \
-      szca_w.szc_destruct(d__);                  \
-      return -1;                                 \
-    }                                            \
-    buf = szca_w.szc_retrieve_val(d__, &(ll));   \
-    f(ctx1, buf, ll);                            \
-    szca_w.szc_destruct(d__);                    \
+#define SZFOUTEXEC(t__, struname, f, ctx1)         \
+  do {                                             \
+    const uint8_t *buf__;                          \
+    size_t ll__;                                   \
+    t__ struname p__ = (t__ struname){0};          \
+    struct szc_dgs_s *d__ = szca_w.szc_init();     \
+    if (d__ == NULL) return -1;                    \
+    szca_w.szc_set_ctx_ex(d__, ctx1);              \
+    if (SZFNAME(struname)(&szca_w, &p__, d__)) {   \
+      szca_w.szc_destruct(d__);                    \
+      return -1;                                   \
+    }                                              \
+    buf__ = szca_w.szc_retrieve_val(d__, &(ll__)); \
+    f(ctx1, buf__, ll__);                          \
+    szca_w.szc_destruct(d__);                      \
   } while (0)
 
+#define SZFPRINT_R(t__, struname, data, datasz)  \
+  do {                                           \
+    t__ struname p__ = (t__ struname){0};        \
+    struct szc_dgs_s *d__ = szca_p.szc_init();   \
+    uint8_t ptyp__ = szc_ptyp_stream;            \
+    if (d__ == NULL) return -1;                  \
+    szca_p.szc_set_ctx_ex(d__, &ptyp__);         \
+    szca_p.szc_set_val(d__, datasz, data);       \
+    if (SZFNAME(struname)(&szca_p, &p__, d__)) { \
+      szca_p.szc_destruct(d__);                  \
+      return -1;                                 \
+    }                                            \
+    szca_p.szc_destruct(d__);                    \
+  } while (0)
+#define SZFPRINT_W(struname, p)                \
+  do {                                         \
+    struct szc_dgs_s *d__ = szca_p.szc_init(); \
+    uint8_t ptyp__ = szc_ptyp_struct;          \
+    if (d__ == NULL) return -1;                \
+    szca_p.szc_set_ctx_ex(d__, &ptyp__);       \
+    if (SZFNAME(struname)(&szca_p, p, d__)) {  \
+      szca_p.szc_destruct(d__);                \
+      return -1;                               \
+    }                                          \
+    szca_p.szc_destruct(d__);                  \
+  } while (0)
 #define szc_member_size(type, member) (sizeof(((type *)0)->member))
 
 #endif  // SERZCORE_UTILS_H

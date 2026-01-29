@@ -22,10 +22,10 @@
 
 #include "serzcore.h"
 
+#include <stdarg.h>
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdarg.h>
 
 #ifdef SERZCORE_LUA
 #include "lauxlib.h"
@@ -160,6 +160,98 @@ static inline void _szcpy(szc_dtyp_t typ, uint8_t *dst, const uint8_t *src, unsi
   }
 }
 
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+#define _szcpy2(typ, dst, src, count, bbcnt) _szcpy(typ, (dst) + ((bbcnt) - szc_count_oct(typ, count)), src, count, 0)
+#elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+#define _szcpy2(typ, dst, src, count, bbcnt) _szcpy(typ, dst, src, count, 0)
+#else
+#error byte order not defined
+#endif
+#define _szcpy3(typ, dst, src, count, dsttyp) _szcpy2(typ, dst, src, count, szc_conv_1(typ, sizeof(dsttyp)));
+
+
+#define print_bits(f, arg, x)                                          \
+  do {                                                                 \
+    typeof(x) a__ = (x);                                               \
+    char *p__ = (char *)&a__ + sizeof(x) - 1;                          \
+    size_t bytes__ = sizeof(x);                                        \
+    while (bytes__--) {                                                \
+      char bits__ = 8;                                                 \
+      while (bits__--) f(arg, "%c", *p__ & (1 << bits__) ? '1' : '0'); \
+      p__--;                                                           \
+    }                                                                  \
+  } while (0)
+
+static inline void _szcprint_d(void (*f)(void *, const char *format, ...), void *arg, szc_dtyp_t typ, const uint8_t *src, unsigned long long int count, uint8_t pos_bb) {
+  size_t i, cnt2 = count >> 3;
+  switch (typ) {
+    case szc_dtyp_o:
+      for (i = 0; i < count; i++) f(arg, i == 0 ? "%.2x" : " %.2x", src[i]);
+      break;
+    case szc_dtyp_o2:
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+      for (i = 0; i < count; i++) f(arg, i == 0 ? "%.2x" : " %.2x", src[i]);
+#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+      for (i = 0; i < count; i++) f(arg, i == 0 ? "%.2x" : " %.2x", src[count - i - 1]);
+#else
+#error byte order not defined
+#endif
+      break;
+    case szc_dtyp_o3:
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+      for (i = 0; i < count; i++) f(arg, i == 0 ? "%.2x" : " %.2x", src[i]);
+#elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+      for (i = 0; i < count; i++) f(arg, i == 0 ? "%.2x" : " %.2x", src[count - i - 1]);
+#else
+#error byte order not defined
+#endif
+      break;
+    case szc_dtyp_b:
+      for (i = 0; i < cnt2; i++) print_bits(f, arg, src[i]);
+      break;
+    case szc_dtyp_b2:
+      for (i = 0; i < cnt2; i++) print_bits(f, arg, src[cnt2 - i - 1]);
+      break;
+  }
+}
+
+static void _fprintf(void *file, const char *fmt, ...) {
+  va_list argp;
+  va_start(argp, fmt);
+  vfprintf(file, fmt, argp);
+  va_end(argp);
+}
+
+static inline void _szcprint(void (*f)(void *, const char *format, ...), void *arg, szc_dtyp_t typ, const uint8_t *src, unsigned long long int count, uint8_t pos_bb, const char *name,
+                             szc_extyp_t extyp, va_list extyp_va) {
+  szc_extyp_t extyp2;
+  int arr_i = -1;
+  unsigned long long int val1 = 0;
+
+  if (extyp == szc_extyp_arr) {
+    extyp2 = va_arg(extyp_va, int);
+    arr_i = va_arg(extyp_va, int);
+  } else {
+    extyp2 = extyp;
+  }
+  f(arg, "%s", name);
+  if (arr_i != -1) f(arg, "[%d]", arr_i);
+  f(arg, ": ");
+
+  switch (extyp2) {
+    case szc_extyp_string:
+      f(arg, "%s", src);
+      break;
+    case szc_extyp_int:
+      _szcpy3(szc_dtyp_o, ((uint8_t *)&val1), src, count, val1);
+      f(arg, "%lld", val1);
+      break;
+    case szc_extyp_data:
+      _szcprint_d(f, arg, typ, src, count, pos_bb);
+      break;
+  }
+}
+
 void szc_set_mem_functions(void *(*malloc_fn)(size_t), void *(*realloc_fn)(void *, size_t), void (*free_fn)(void *)) {
   szc_malloc = malloc_fn;
   szc_realloc = realloc_fn;
@@ -236,9 +328,8 @@ static inline ssize_t _szclua_w_get_fieldlen(lua_State *L, szc_extyp_t extyp, co
   return res;
 }
 
-static inline int _szclua_w_append(lua_State *L, szc_extyp_t extyp, va_list extyp_va, const char *name,\
-  szc_dtyp_t typ, uint8_t **valp, unsigned long long int *bitlen, size_t maxlen,\
-  unsigned long long int count) {
+static inline int _szclua_w_append(lua_State *L, szc_extyp_t extyp, va_list extyp_va, const char *name, szc_dtyp_t typ, uint8_t **valp, unsigned long long int *bitlen, size_t maxlen,
+                                   unsigned long long int count) {
   szc_extyp_t extyp2;
   size_t start, end;
   size_t target2_len;
@@ -317,4 +408,5 @@ fail:
 #include "serzcore.read.c"
 #include "serzcore.write.c"
 #endif
+#include "serzcore.print.c"
 // clang-format on
