@@ -83,7 +83,7 @@ void szc_set_val_r(struct szc_dgs_s *d, size_t len, uint8_t *val) {
 
 void szc_destruct_r(struct szc_dgs_s *d) { szc_free(d); }
 
-void szc_set_ctx_r_ex(struct szc_dgs_s *d, void *ctx1) {
+void szc_set_ctx_r_ex(struct szc_dgs_s *d, void *ctx1, ...) {
   return;
 }
 

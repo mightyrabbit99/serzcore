@@ -25,10 +25,26 @@ int hello_encode_lua(lua_State *L) {
   return 1;
 }
 
+int hello_printw_lua(lua_State *L) {
+  SZFPRINT_W2(struct, hello_s, L);
+  return 0;
+}
+
+int hello_printr_lua(lua_State *L) {
+  size_t datasz;
+  const char *data = lua_tolstring(L, -1, &datasz);
+  char data2[datasz];
+  memcpy(data2, data, datasz);
+  SZFPRINT_R2(struct, hello_s, data2, datasz, L);
+  return 0;
+}
+
 // clang-format off
 static const struct luaL_Reg mylib[] = {
     {"hello_decode", hello_decode_lua},
     {"hello_encode", hello_encode_lua},
+    {"hello_printw", hello_printw_lua},
+    {"hello_printr", hello_printr_lua},
     {NULL, NULL} /* sentinel */
 };
 // clang-format on

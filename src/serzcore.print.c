@@ -31,6 +31,10 @@ struct szc_dgsp_s {
   uint8_t indent;
 };
 
+#define _print_indent(dd) do {\
+  for (uint8_t i = 0; i < dd->indent; i++) printf("  ");\
+} while (0)
+
 szcmode_t szc_get_mode_p(void) { return szcmode_print; }
 
 struct szc_dgs_s *szc_init_p(void) {
@@ -85,7 +89,7 @@ void szc_set_val_p(struct szc_dgs_s *d, size_t len, uint8_t *val) {
 
 void szc_destruct_p(struct szc_dgs_s *d) { szc_free(d); }
 
-void szc_set_ctx_p_ex(struct szc_dgs_s *d, void *ctx1) {
+void szc_set_ctx_p_ex(struct szc_dgs_s *d, void *ctx1, ...) {
   struct szc_dgsp_s *dd = (struct szc_dgsp_s *)d;
   dd->ptyp = *(uint8_t *)ctx1;
 }
@@ -98,6 +102,7 @@ int szcy_p(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct
   if (count == 0) return 1;
   if (typ >= _szc_dtyp_max) return 1;
   struct szc_dgsp_s *dd = (struct szc_dgsp_s *)d;
+  if (dd->ptyp == szc_ptyp_struct) return 0;
   if (szc_typ_is_octal(typ)) {
     if (((dd->bitlen >> 3) + (dd->bitlen % 8 == 0 ? 0 : 1) + count) > dd->maxlen) return 1;
     dd->bitlen += dd->bitlen % 8 == 0 ? 0 : (8 - (dd->bitlen % 8));
@@ -142,7 +147,7 @@ static inline int _szcyv_p_ex(szc_dtyp_t typ, unsigned long long int count, uint
   if (dd->ptyp == szc_ptyp_stream && end > dd->maxlen) return 1;
 
   uint8_t *tgt = dd->ptyp == szc_ptyp_stream ? dd->val + start : target;
-  for (uint8_t i = 0; i < dd->indent; i++) printf("  ");
+  _print_indent(dd);
   _szcprint(_fprintf, stdout, typ, tgt, count, szc_typ_is_octal(typ) ? 0 : dd->bitlen % 8, name, extyp, extyp_va);
   printf("\n");
   return 0;
@@ -233,7 +238,7 @@ int szcys_val_p(struct szc_dgs_s *target, struct szc_dgs_s *d) {
 
 int szcys_val_p_ex(struct szc_dgs_s *target, struct szc_dgs_s *d, const char *name, int arr_i) {
   struct szc_dgsp_s *dd = (struct szc_dgsp_s *)d;
-  for (uint8_t i = 0; i < dd->indent; i++) printf("  ");
+  _print_indent(dd);
   printf("::%s", name);
   if (arr_i != -1) printf("[%d]", arr_i);
   printf("::\n");
@@ -241,7 +246,7 @@ int szcys_val_p_ex(struct szc_dgs_s *target, struct szc_dgs_s *d, const char *na
   int ans = szcys_val_p(target, d);
   dd->indent--;
   if (ans == 0) {
-    for (uint8_t i = 0; i < dd->indent; i++) printf("  ");
+    _print_indent(dd);
     printf("::%s", name);
     if (arr_i != -1) printf("[%d]", arr_i);
     printf("::\n");
@@ -256,7 +261,7 @@ int szcyff_p(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d) {
 
 int szcyff_p_ex(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, const char *name, int arr_i) {
   struct szc_dgsp_s *dd = (struct szc_dgsp_s *)d;
-  for (uint8_t i = 0; i < dd->indent; i++) printf("  ");
+  _print_indent(dd);
   printf("::%s", name);
   if (arr_i != -1) printf("[%d]", arr_i);
   printf("::\n");
@@ -264,7 +269,7 @@ int szcyff_p_ex(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, const cha
   int ans = szcyff_p(f, target_ex, d);
   dd->indent--;
   if (ans == 0) {
-    for (uint8_t i = 0; i < dd->indent; i++) printf("  ");
+    _print_indent(dd);
     printf("::%s", name);
     if (arr_i != -1) printf("[%d]", arr_i);
     printf("::\n");

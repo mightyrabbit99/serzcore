@@ -53,4 +53,16 @@ local function test_t1(cb64)
   print(hexdump(data2))
 end
 
-test_t1("KgAAAGUAAAAEdGVzdA==")
+local function test_t2()
+  local tbl = {
+    a = 42,
+    world1 = {
+      c = 101,
+      data = "test"
+    }
+  }
+  helloendec.hello_printw(tbl)
+end
+
+-- test_t1("KgAAAGUAAAAEdGVzdA==")
+test_t2()

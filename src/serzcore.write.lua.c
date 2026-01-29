@@ -90,7 +90,7 @@ void szc_destruct_w_lua(struct szc_dgs_s *d) {
   szc_free(dd);
 }
 
-void szc_set_ctx_w_ex_lua(struct szc_dgs_s *d, void *ctx1) {
+void szc_set_ctx_w_ex_lua(struct szc_dgs_s *d, void *ctx1, ...) {
   struct szc_dgsw_lua_s *dd = (struct szc_dgsw_lua_s *)d;
   dd->L = (lua_State *)ctx1;
 }
@@ -143,9 +143,7 @@ static inline int _szcyv_w_ex_lua(szc_dtyp_t typ, unsigned long long int count, 
   if (typ >= _szc_dtyp_max) return 1;
   struct szc_dgsw_lua_s *dd = (struct szc_dgsw_lua_s *)d;
   if (szc_typ_is_octal(typ)) dd->bitlen += dd->bitlen % 8 == 0 ? 0 : (8 - (dd->bitlen % 8));
-  int res = _szclua_w_append(dd->L, extyp, extyp_va, name, typ, &dd->val, &dd->bitlen, dd->maxlen, count);
-  if (res) return res;
-  return 0;
+  return _szclua_w_append(dd->L, extyp, extyp_va, name, typ, &dd->val, &dd->bitlen, dd->maxlen, count);
 }
 
 int szcy_w_ex_lua(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d, const char *name, szc_extyp_t extyp, ...) {
@@ -194,13 +192,11 @@ int szcyff_w_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d) { return
 
 int szcyff_w_ex_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, const char *name, int arr_i) {
   struct szc_dgsw_lua_s *dd = (struct szc_dgsw_lua_s *)d;
+  int ans;
   if (!lua_istable(dd->L, -1)) return 1;
   lua_getfield(dd->L, -1, name);
   if (!lua_istable(dd->L, -1)) return 1;
-  if (f(dd->dga1, target_ex, d)) {
-    lua_pop(dd->L, 1);
-    return 1;
-  }
+  ans = f(dd->dga1, target_ex, d);
   lua_pop(dd->L, 1);
-  return 0;
+  return ans;
 }

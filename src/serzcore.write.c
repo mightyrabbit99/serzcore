@@ -89,7 +89,7 @@ void szc_destruct_w(struct szc_dgs_s *d) {
   szc_free(dd);
 }
 
-void szc_set_ctx_w_ex(struct szc_dgs_s *d, void *ctx1) {
+void szc_set_ctx_w_ex(struct szc_dgs_s *d, void *ctx1, ...) {
   return;
 }
 

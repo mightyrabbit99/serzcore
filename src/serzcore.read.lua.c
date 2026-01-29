@@ -84,7 +84,7 @@ void szc_set_val_r_lua(struct szc_dgs_s *d, size_t len, uint8_t *val) {
 
 void szc_destruct_r_lua(struct szc_dgs_s *d) { szc_free(d); }
 
-void szc_set_ctx_r_ex_lua(struct szc_dgs_s *d, void *ctx1) {
+void szc_set_ctx_r_ex_lua(struct szc_dgs_s *d, void *ctx1, ...) {
   struct szc_dgsr_lua_s *dd = (struct szc_dgsr_lua_s *)d;
   dd->L = (lua_State *)ctx1;
 }

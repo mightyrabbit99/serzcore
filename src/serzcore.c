@@ -169,7 +169,6 @@ static inline void _szcpy(szc_dtyp_t typ, uint8_t *dst, const uint8_t *src, unsi
 #endif
 #define _szcpy3(typ, dst, src, count, dsttyp) _szcpy2(typ, dst, src, count, szc_conv_1(typ, sizeof(dsttyp)));
 
-
 #define print_bits(f, arg, x)                                          \
   do {                                                                 \
     typeof(x) a__ = (x);                                               \
@@ -236,6 +235,7 @@ static inline void _szcprint(void (*f)(void *, const char *format, ...), void *a
   }
   f(arg, "%s", name);
   if (arr_i != -1) f(arg, "[%d]", arr_i);
+  if (extyp2 == szc_extyp_data) f(arg, " (hex)");
   f(arg, ": ");
 
   switch (extyp2) {
@@ -328,8 +328,14 @@ static inline ssize_t _szclua_w_get_fieldlen(lua_State *L, szc_extyp_t extyp, co
   return res;
 }
 
-static inline int _szclua_w_append(lua_State *L, szc_extyp_t extyp, va_list extyp_va, const char *name, szc_dtyp_t typ, uint8_t **valp, unsigned long long int *bitlen, size_t maxlen,
-                                   unsigned long long int count) {
+struct _szclua_w_param_s {
+  szcmode_t mode;
+  void (*f)(void *, const char *format, ...);
+  void *arg;
+};
+
+static inline int _szclua_w_do(struct _szclua_w_param_s param, lua_State *L, szc_extyp_t extyp, va_list extyp_va, const char *name, szc_dtyp_t typ, uint8_t **valp, unsigned long long int *bitlen,
+                               size_t maxlen, unsigned long long int count) {
   szc_extyp_t extyp2;
   size_t start, end;
   size_t target2_len;
@@ -361,7 +367,10 @@ static inline int _szclua_w_append(lua_State *L, szc_extyp_t extyp, va_list exty
       val2 = szc_realloc(*valp, end);
       if (val2 == NULL) goto fail;
       *valp = val2;
-      _szcpy(typ, val2 + (*bitlen >> 3), (uint8_t *)&target2_int, count, szc_typ_is_octal(typ) ? 0 : (*bitlen) % 8);
+      if (param.mode == szcmode_print)
+        _szcprint(param.f, param.arg, typ, (uint8_t *)&target2_int, count, szc_typ_is_octal(typ) ? 0 : (*bitlen) % 8, name, extyp, extyp_va);
+      else
+        _szcpy(typ, val2 + (*bitlen >> 3), (uint8_t *)&target2_int, count, szc_typ_is_octal(typ) ? 0 : (*bitlen) % 8);
       *bitlen += szc_count_bit(typ, count);
       break;
     case szc_extyp_arrlen:
@@ -369,18 +378,25 @@ static inline int _szclua_w_append(lua_State *L, szc_extyp_t extyp, va_list exty
       val2 = szc_realloc(*valp, end);
       if (val2 == NULL) goto fail;
       *valp = val2;
-      _szcpy(typ, val2 + (*bitlen >> 3), (uint8_t *)&target2_len, count, szc_typ_is_octal(typ) ? 0 : (*bitlen) % 8);
+      if (param.mode == szcmode_print)
+        _szcprint(param.f, param.arg, typ, (uint8_t *)&target2_len, count, szc_typ_is_octal(typ) ? 0 : (*bitlen) % 8, name, extyp, extyp_va);
+      else
+        _szcpy(typ, val2 + (*bitlen >> 3), (uint8_t *)&target2_len, count, szc_typ_is_octal(typ) ? 0 : (*bitlen) % 8);
       *bitlen += szc_count_bit(typ, count);
       break;
     case szc_extyp_data:
     case szc_extyp_string:
       target2_str = lua_tolstring(L, -1, &target2_len);
-      end = start + target2_len;
-      if (end > maxlen) goto fail;
-      val2 = szc_realloc(*valp, end);
-      if (val2 == NULL) goto fail;
-      *valp = val2;
-      _szcpy(typ, val2 + (*bitlen >> 3), target2_str, target2_len, szc_typ_is_octal(typ) ? 0 : (*bitlen) % 8);
+      if (param.mode == szcmode_print) {
+        _szcprint(param.f, param.arg, typ, target2_str, target2_len, szc_typ_is_octal(typ) ? 0 : (*bitlen) % 8, name, extyp, extyp_va);
+      } else {
+        end = start + target2_len;
+        if (end > maxlen) goto fail;
+        val2 = szc_realloc(*valp, end);
+        if (val2 == NULL) goto fail;
+        *valp = val2;
+        _szcpy(typ, val2 + (*bitlen >> 3), target2_str, target2_len, szc_typ_is_octal(typ) ? 0 : (*bitlen) % 8);
+      }
       *bitlen += (target2_len << 3);
       break;
     default:
@@ -398,15 +414,36 @@ fail:
   }
   return 1;
 }
+
+static inline int _szclua_w_append(lua_State *L, szc_extyp_t extyp, va_list extyp_va, const char *name, szc_dtyp_t typ, uint8_t **valp, unsigned long long int *bitlen, size_t maxlen,
+                                   unsigned long long int count) {
+  return _szclua_w_do(
+      (struct _szclua_w_param_s){
+          .mode = szcmode_write,
+      },
+      L, extyp, extyp_va, name, typ, valp, bitlen, maxlen, count);
+}
+
+static inline int _szclua_w_print(void (*f)(void *, const char *format, ...), void *arg, lua_State *L, szc_extyp_t extyp, va_list extyp_va, const char *name, szc_dtyp_t typ, uint8_t **valp,
+                                  unsigned long long int *bitlen, size_t maxlen, unsigned long long int count) {
+  return _szclua_w_do(
+      (struct _szclua_w_param_s){
+          .mode = szcmode_print,
+          .f = f,
+          .arg = arg,
+      },
+      L, extyp, extyp_va, name, typ, valp, bitlen, maxlen, count);
+}
 #endif
 
 // clang-format off
 #if defined(SERZCORE_LUA)
 #include "serzcore.read.lua.c"
 #include "serzcore.write.lua.c"
+#include "serzcore.print.lua.c"
 #else
 #include "serzcore.read.c"
 #include "serzcore.write.c"
-#endif
 #include "serzcore.print.c"
+#endif
 // clang-format on
