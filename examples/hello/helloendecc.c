@@ -6,6 +6,6 @@ SZFDECL_STATIC(struct, inner_world_s, p) {
 
 SZFDECL_STATIC(struct, hello_s, p) {
   szcyy_ex(szc_dtyp_o, sizeof(p->a), &p->a, "a", szc_extyp_int);
-  szcf_ex(inner_world_s, &p->world1, "world1");
+  szcfn_ex(inner_world_s, &p->world1, "world1");
   return 0;
 }

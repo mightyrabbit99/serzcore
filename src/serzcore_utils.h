@@ -88,8 +88,9 @@ static inline uint8_t szc_get_ctnsz(register unsigned long long val) {
 
 #define szcy(typ, count, target) _szcy_exec(szcy, typ, count, (uint8_t *)(target), SZC_DST_NAME)
 #define szcyy(typ, count, target) _szcy_exec(szcyy, typ, count, (uint8_t *)(target), SZC_DST_NAME)
-// #define szcf(struname, p) SZFNAME(struname)(SZC_SZCA_NAME, p, SZC_DST_NAME)
-#define szcf(struname, p) _szcy_exec(szcyff, SZFNAME(struname), p, SZC_DST_NAME)
+// #define szcf(ff, p) ff(SZC_SZCA_NAME, p, SZC_DST_NAME)
+#define szcf(ff, p) _szcy_exec(szcyff, ff, p, SZC_DST_NAME)
+#define szcfn(struname, p) szcf(SZFNAME(struname), p)
 
 #define szcmlc(target, sz) _szcy_exec(szcmlc, target, sz, SZC_DST_NAME)
 #define szcrealc(target, sz) _szcy_exec(szcrealc, target, sz, SZC_DST_NAME)
@@ -180,7 +181,8 @@ static inline uint8_t szc_get_ctnsz(register unsigned long long val) {
     szcyx_ex(typ, count2__, szc_conv_1(typ, sizeof(valtyp)), &target__, name, __VA_ARGS__);  \
   } while (0)
 #define szcyy_ex(typ, count, target, name, ...) _szcy_exec(szcyy_ex, typ, count, (uint8_t *)(target), SZC_DST_NAME, name, __VA_ARGS__)
-#define szcf_ex(struname, p, name, ...) _szcy_exec(szcyff_ex, SZFNAME(struname), p, SZC_DST_NAME, name, (-1, ##__VA_ARGS__))
+#define szcf_ex(ff, p, name, ...) _szcy_exec(szcyff_ex, ff, p, SZC_DST_NAME, name, (-1, ##__VA_ARGS__))
+#define szcfn_ex(struname, p, name, ...) szcf_ex(SZFNAME(struname), p, name, ##__VA_ARGS__)
 #define szcys_val_ex(target, d, name, ...) _szcy_exec(szcys_val, target, d, name, (-1, ##__VA_ARGS__))
 #define szcmlcyy_ex(typ, len, ptr, name, ...)                \
   do {                                                       \
