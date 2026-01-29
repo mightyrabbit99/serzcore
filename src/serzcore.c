@@ -235,7 +235,10 @@ static inline void _szcprint(void (*f)(void *, const char *format, ...), void *a
   }
   f(arg, "%s", name);
   if (arr_i != -1) f(arg, "[%d]", arr_i);
-  if (extyp2 == szc_extyp_data) f(arg, " (hex)");
+  if (extyp2 == szc_extyp_data) {
+    if (szc_typ_is_octal(typ)) f(arg, " (hex)");
+    else f(arg, " (bin)");
+  }
   f(arg, ": ");
 
   switch (extyp2) {
