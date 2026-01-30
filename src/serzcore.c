@@ -32,6 +32,8 @@
 #include "lualib.h"
 #endif  // SERZCORE_LUA
 
+#include "hashset.h"
+
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
 #define MAX(a, b) (((a) > (b)) ? (a) : (b))
 #define MAZ_SZ (~(size_t)0)

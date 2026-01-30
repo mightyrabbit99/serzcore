@@ -26,6 +26,7 @@ struct szc_dgsf_s {
   _target_ex target_ex;
   unsigned long long int bitlen;
   size_t maxlen;
+  hashset_t hs;
 };
 
 szcmode_t szc_get_mode_f(void) { return szcmode_free; }
@@ -35,7 +36,12 @@ struct szc_dgs_s *szc_init_f(void) {
   if (dd == NULL) return NULL;
   *dd = (struct szc_dgsf_s){0};
   dd->dga1 = &szca_f;
+  dd->hs = hashset_create();
+  if (dd->hs == NULL) goto fail;
   return (struct szc_dgs_s *)dd;
+fail:
+  free(dd);
+  return NULL;
 }
 
 void szc_fprint_f(FILE *stream, struct szc_dgs_s *d) {}
@@ -58,7 +64,11 @@ const uint8_t *szc_retrieve_val_f(struct szc_dgs_s *d, size_t *len) { return NUL
 
 void szc_set_val_f(struct szc_dgs_s *d, size_t len, uint8_t *val) {}
 
-void szc_destruct_f(struct szc_dgs_s *d) { szc_free(d); }
+void szc_destruct_f(struct szc_dgs_s *d) {
+  struct szc_dgsf_s *dd = (struct szc_dgsf_s *)d;
+  hashset_destroy(dd->hs);
+  szc_free(d);
+}
 
 void szc_set_ctx_f_ex(struct szc_dgs_s *d, void *ctx1, ...) { return; }
 
@@ -83,12 +93,15 @@ void szcfree_f(void *target, struct szc_dgs_s *d) { szc_free(target); }
 void szcfree2_f(void **target_p, struct szc_dgs_s *d) { szc_free(*target_p); }
 
 void **szcwrapp_f(void **target_p, struct szc_dgs_s *d) {
-  // TODO
+  struct szc_dgsf_s *dd = (struct szc_dgsf_s *)d;
+  if (hashset_is_member(dd->hs, *target_p)) return NULL;
+  hashset_add(dd->hs, *target_p);
   return target_p;
 }
 
 void szc_ptop_f(void **target_p, struct szc_dgs_s *d) {
-  // TODO
+  struct szc_dgsf_s *dd = (struct szc_dgsf_s *)d;
+  hashset_remove(dd->hs, *target_p);
   szcfree2_f(target_p, d);
 }
 

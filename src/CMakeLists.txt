@@ -3,6 +3,7 @@ set_target_properties(serzcore PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
 target_sources(serzcore
   PRIVATE
     serzcore.c
+    utils/hashset.c
   PUBLIC
     serzcore.h
     serzcore_utils.h
@@ -10,6 +11,10 @@ target_sources(serzcore
     BASE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} FILES
       serzcore.h
       serzcore_utils.h
+)
+target_include_directories(serzcore
+  PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/utils
 )
 install(TARGETS serzcore
   FILE_SET HEADERS DESTINATION include
@@ -24,10 +29,12 @@ set_target_properties(serzcore-lua PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
 target_include_directories(serzcore-lua
   PRIVATE
     ${LUA_INCLUDE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/utils
 )
 target_sources(serzcore-lua
   PRIVATE
     serzcore.c
+    utils/hashset.c
   PUBLIC
     serzcore.h
     serzcore_utils.h
