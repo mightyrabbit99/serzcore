@@ -195,7 +195,7 @@ void szcfree2_r_lua(void **target_p, struct szc_dgs_s *d) {
   *target_p = NULL;
 }
 
-void **szcwrapp_r_lua(void **target_p) {
+void **szcwrapp_r_lua(void **target_p, struct szc_dgs_s *d) {
   return target_p;
 }
 

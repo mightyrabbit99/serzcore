@@ -96,7 +96,7 @@ static inline uint8_t szc_get_ctnsz(register unsigned long long val) {
 #define szcrealc(target, sz) _szcy_exec(szcrealc, target, sz, SZC_DST_NAME)
 #define szcmemset(s, c, sz) SZC_SZCA_NAME->szcmemset(s, c, sz, SZC_DST_NAME)
 #define szcdelete(pt) SZC_SZCA_NAME->szcfree(pt, SZC_DST_NAME)
-#define szcwrapp(ppt) SZC_SZCA_NAME->szcwrapp(ppt)
+#define szcwrapp(ppt) SZC_SZCA_NAME->szcwrapp(ppt, SZC_DST_NAME)
 #define szc_get_mode() SZC_SZCA_NAME->szc_get_mode()
 
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
@@ -120,20 +120,20 @@ static inline uint8_t szc_get_ctnsz(register unsigned long long val) {
     if (szc_conv_1(typ, sizeof(valtyp)) < count) count2__ = szc_conv_1(typ, sizeof(valtyp)); \
     szcyx(typ, count2__, szc_conv_1(typ, sizeof(valtyp)), &target__);                        \
   } while (0)
-#define szcmlcl(ptr, len)                                                      \
-  do {                                                                         \
-    szcmlc((void **)(ptr), len);                                               \
-    szc_cvector_push_back(*SZC_DGARR_NAME, (void **)szcwrapp((void **)(ptr))); \
+#define szcmlcl(ptr, len)                                   \
+  do {                                                      \
+    szcmlc((void **)(ptr), len);                            \
+    szc_cvector_push_back(*SZC_DGARR_NAME, (void **)(ptr)); \
   } while (0)
-#define szcrealcl(ptr, len)                                                      \
-  do {                                                                           \
-    void *ptr_orig__ = *((void **)(ptr));                                        \
-    szcrealc((void **)(ptr), len);                                               \
-    if (ptr_orig__ == NULL && (*(ptr))) {                                        \
-      szc_cvector_push_back(*SZC_DGARR_NAME, (void **)szcwrapp((void **)(ptr))); \
-    } else if (ptr_orig__ && (*(ptr)) == NULL) {                                 \
-      szc_cvector_push_back(*SZC_DGARR_NAME, (void **)szcwrapp(&ptr_orig__));    \
-    }                                                                            \
+#define szcrealcl(ptr, len)                                            \
+  do {                                                                 \
+    void *ptr_orig__ = *(ptr);                                         \
+    szcrealc((void **)(ptr), len);                                     \
+    if (szc_get_mode() == szcmode_free) {                              \
+      void **pp2 = szcwrapp((void **)(ptr));                           \
+      if (pp2) szc_cvector_push_back(*SZC_DGARR_NAME, (void **)(pp2)); \
+    } else if (ptr_orig__ == NULL)                                     \
+      szc_cvector_push_back(*SZC_DGARR_NAME, (void **)(ptr));          \
   } while (0)
 #define szcmlcyy(typ, len, ptr)        \
   do {                                 \
