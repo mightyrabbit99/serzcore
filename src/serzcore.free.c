@@ -83,7 +83,10 @@ void *szcmemset_f(uint8_t *s, int c, size_t sz, struct szc_dgs_s *d) { return NU
 
 void szcfree_f(void *target, struct szc_dgs_s *d) {}
 
-void szcfree2_f(void **target_p, struct szc_dgs_s *d) {}
+void szcfree2_f(void **target_p, struct szc_dgs_s *d) {
+  szc_free(*target_p);
+  szc_free(target_p);
+}
 
 void **szcwrapp_f(void **target_p) {
   void **tgp2 = (void **)szc_malloc(sizeof(void *));
@@ -92,11 +95,7 @@ void **szcwrapp_f(void **target_p) {
 }
 
 void szc_ptop_f(void **target_p, struct szc_dgs_s *d) {
-  if (*target_p == NULL) return;
-  szc_free(*target_p);
-  *target_p = NULL;
-  szc_free(target_p);
-  return;
+  szcfree2_f(target_p, d);
 }
 
 int szcyf_f(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d) {
