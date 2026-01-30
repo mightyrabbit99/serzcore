@@ -172,7 +172,11 @@ void szcfree_w_lua(void *target, struct szc_dgs_s *d) { return; }
 
 void szcfree2_w_lua(void **target_p, struct szc_dgs_s *d) { return; }
 
-void szc_ptop_w_ex_lua(void **target_p, struct szc_dgs_s *d) { return; }
+void **szcwrapp_w_lua(void **target_p) {
+  return target_p;
+}
+
+void szc_ptop_w_lua(void **target_p, struct szc_dgs_s *d) { return; }
 
 int szcyf_w_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d) {
   struct szc_dgsw_lua_s *dd = (struct szc_dgsw_lua_s *)d;

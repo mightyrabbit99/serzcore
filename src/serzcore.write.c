@@ -154,7 +154,11 @@ void szcfree_w(void *target, struct szc_dgs_s *d) { return; }
 
 void szcfree2_w(void **target_p, struct szc_dgs_s *d) { return; }
 
-void szc_ptop_w_ex(void **target_p, struct szc_dgs_s *d) { return; }
+void **szcwrapp_w(void **target_p) {
+  return target_p;
+}
+
+void szc_ptop_w(void **target_p, struct szc_dgs_s *d) { return; }
 
 int szcyf_w(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d) {
   struct szc_dgsw_s *dd = (struct szc_dgsw_s *)d;

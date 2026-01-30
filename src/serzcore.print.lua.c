@@ -261,7 +261,11 @@ void szcfree2_p_lua(void **target_p, struct szc_dgs_s *d) {
   *target_p = NULL;
 }
 
-void szc_ptop_p_ex_lua(void **target_p, struct szc_dgs_s *d) {
+void **szcwrapp_p_lua(void **target_p) {
+  return target_p;
+}
+
+void szc_ptop_p_lua(void **target_p, struct szc_dgs_s *d) {
   struct szc_dgsp_lua_s *dd = (struct szc_dgsp_lua_s *)d;
   if (dd->ptyp == szc_ptyp_struct) return;
   szcfree2_p_lua(target_p, d);

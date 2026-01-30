@@ -74,7 +74,10 @@ int szcyy_f_ex(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, st
 
 int szcmlc_f(void **target, size_t sz, struct szc_dgs_s *d) { return 0; }
 
-int szcrealc_f(void **target, size_t sz, struct szc_dgs_s *d) { return 0; }
+int szcrealc_f(void **target, size_t sz, struct szc_dgs_s *d) {
+  *target = NULL;
+  return 0;
+}
 
 void *szcmemset_f(uint8_t *s, int c, size_t sz, struct szc_dgs_s *d) { return NULL; }
 
@@ -82,10 +85,17 @@ void szcfree_f(void *target, struct szc_dgs_s *d) {}
 
 void szcfree2_f(void **target_p, struct szc_dgs_s *d) {}
 
-void szc_ptop_f_ex(void **target_p, struct szc_dgs_s *d) {
+void **szcwrapp_f(void **target_p) {
+  void **tgp2 = (void **)szc_malloc(sizeof(void *));
+  *tgp2 = *target_p;
+  return tgp2;
+}
+
+void szc_ptop_f(void **target_p, struct szc_dgs_s *d) {
   if (*target_p == NULL) return;
   szc_free(*target_p);
   *target_p = NULL;
+  szc_free(target_p);
   return;
 }
 
