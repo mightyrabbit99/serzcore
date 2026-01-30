@@ -448,5 +448,6 @@ static inline int _szclua_w_print(void (*f)(void *, const char *format, ...), vo
 #include "serzcore.read.c"
 #include "serzcore.write.c"
 #include "serzcore.print.c"
+#include "serzcore.free.c"
 #endif
 // clang-format on

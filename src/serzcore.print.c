@@ -225,13 +225,16 @@ int szcyf_p(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d) {
 int szcys_val_p(struct szc_dgs_s *target, struct szc_dgs_s *d) {
   struct szc_dgsp_s *dd = (struct szc_dgsp_s *)d;
   struct szc_dgsp_s *dd_t = (struct szc_dgsp_s *)target;
+  int ans = 0;
   if (dd_t->maxlen > 0) {
     if (dd_t->maxlen > dd->maxlen - (dd->bitlen >> 3)) return 1;
     szc_set_val_p(target, dd_t->maxlen, &dd->val[dd->bitlen >> 3]);
-    if (dd_t->f(dd_t->dga1, dd_t->target_ex, target)) return 1;
+    ans = dd_t->f(dd_t->dga1, dd_t->target_ex, target);
+    if (ans) return ans;
     dd->bitlen += dd_t->bitlen;
   } else {
-    if (dd_t->f(dd_t->dga1, dd_t->target_ex, d)) return 1;
+    ans = dd_t->f(dd_t->dga1, dd_t->target_ex, d);
+    if (ans) return ans;
   }
   return 0;
 }

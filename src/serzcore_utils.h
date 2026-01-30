@@ -360,6 +360,16 @@ static inline uint8_t szc_get_ctnsz(register unsigned long long val) {
     }                                          \
     szca_p.szc_destruct(d__);                  \
   } while (0)
+#define SZFFREE(struname, p)                   \
+  do {                                         \
+    struct szc_dgs_s *d__ = szca_f.szc_init(); \
+    if (d__ == NULL) return -1;                \
+    if (SZFNAME(struname)(&szca_f, p, d__)) {  \
+      szca_p.szc_destruct(d__);                \
+      return -1;                               \
+    }                                          \
+    szca_p.szc_destruct(d__);                  \
+  } while (0)
 #endif
 #define SZFOUTEXEC(t__, struname, f, ctx1)         \
   do {                                             \

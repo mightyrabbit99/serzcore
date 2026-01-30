@@ -17,6 +17,7 @@ typedef enum {
   szcmode_read,
   szcmode_write,
   szcmode_print,
+  szcmode_free,
 } szcmode_t;
 
 typedef enum {
@@ -212,8 +213,6 @@ int szcys_val_w_ex(struct szc_dgs_s *target, struct szc_dgs_s *d, const char *na
 int szcyff_w(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d);
 int szcyff_w_ex(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, const char *name, int arr_i);
 
-#endif // SERZCORE_LUA
-
 szcmode_t szc_get_mode_p(void);
 struct szc_dgs_s *szc_init_p(void);
 size_t szc_get_len_p(struct szc_dgs_s *d);
@@ -241,6 +240,36 @@ int szcys_val_p(struct szc_dgs_s *target, struct szc_dgs_s *d);
 int szcys_val_p_ex(struct szc_dgs_s *target, struct szc_dgs_s *d, const char *name, int arr_i);
 int szcyff_p(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d);
 int szcyff_p_ex(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, const char *name, int arr_i);
+
+szcmode_t szc_get_mode_f(void);
+struct szc_dgs_s *szc_init_f(void);
+size_t szc_get_len_f(struct szc_dgs_s *d);
+void szc_set_maxlen_f(struct szc_dgs_s *d, size_t maxlen);
+size_t szc_get_maxlen_f(struct szc_dgs_s *d);
+size_t szc_get_val_f(struct szc_dgs_s *d, size_t bufsz, uint8_t *buf);
+const uint8_t *szc_retrieve_val_f(struct szc_dgs_s *d, size_t *len);
+void szc_set_val_f(struct szc_dgs_s *d, size_t len, uint8_t *val);
+void szc_destruct_f(struct szc_dgs_s *d);
+void szc_fprint_f(FILE *stream, struct szc_dgs_s *d);
+void szc_set_ctx_f_ex(struct szc_dgs_s *d, void *ctx1, ...);
+int szc_get_fieldlen_f_ex(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, size_t maxlen, struct szc_dgs_s *d, const char *name, szc_extyp_t extyp, ...);
+int szcy_f(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d);
+int szcyy_f(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d);
+int szcy_f_ex(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d, const char *name, szc_extyp_t extyp, ...);
+int szcyy_f_ex(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d, const char *name, szc_extyp_t extyp, ...);
+int szcmlc_f(void **target, size_t sz, struct szc_dgs_s *d);
+int szcrealc_f(void **target, size_t sz, struct szc_dgs_s *d);
+void *szcmemset_f(uint8_t *s, int c, size_t sz, struct szc_dgs_s *d);
+void szcfree_f(void *target, struct szc_dgs_s *d);
+void szcfree2_f(void **target_p, struct szc_dgs_s *d);
+void szc_ptop_f_ex(void **target_p, struct szc_dgs_s *d);
+int szcyf_f(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d);
+int szcys_val_f(struct szc_dgs_s *target, struct szc_dgs_s *d);
+int szcys_val_f_ex(struct szc_dgs_s *target, struct szc_dgs_s *d, const char *name, int arr_i);
+int szcyff_f(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d);
+int szcyff_f_ex(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, const char *name, int arr_i);
+
+#endif // SERZCORE_LUA
 
 void szc_set_mem_functions(void *(*malloc_fn)(size_t), void *(*realloc_fn)(void *, size_t), void (*free_fn)(void *));
 
@@ -457,6 +486,36 @@ static struct szc_dga_s szca_p = (struct szc_dga_s){
     .szcys_val_ex = szcys_val_p_ex,
     .szcyff = szcyff_p,
     .szcyff_ex = szcyff_p_ex,
+};
+
+static struct szc_dga_s szca_f = (struct szc_dga_s){
+    .szc_get_mode = szc_get_mode_f,
+    .szc_init = szc_init_f,
+    .szc_get_len = szc_get_len_f,
+    .szc_set_maxlen = szc_set_maxlen_f,
+    .szc_get_maxlen = szc_get_maxlen_f,
+    .szc_get_val = szc_get_val_f,
+    .szc_retrieve_val = szc_retrieve_val_f,
+    .szc_set_val = szc_set_val_f,
+    .szc_destruct = szc_destruct_f,
+    .szc_fprint = szc_fprint_f,
+    .szc_set_ctx_ex = szc_set_ctx_f_ex,
+    .szc_get_fieldlen_ex = szc_get_fieldlen_f_ex,
+    .szcy = szcy_f,
+    .szcyy = szcyy_f,
+    .szcy_ex = szcy_f_ex,
+    .szcyy_ex = szcyy_f_ex,
+    .szcmlc = szcmlc_f,
+    .szcrealc = szcrealc_f,
+    .szcmemset = szcmemset_f,
+    .szcfree = szcfree_f,
+    .szcfree2 = szcfree2_f,
+    .szc_ptop_ex = szc_ptop_f_ex,
+    .szcyf = szcyf_f,
+    .szcys_val = szcys_val_f,
+    .szcys_val_ex = szcys_val_f_ex,
+    .szcyff = szcyff_f,
+    .szcyff_ex = szcyff_f_ex,
 };
 
 #endif
