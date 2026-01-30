@@ -162,21 +162,44 @@ int szcyy_w_ex_lua(szc_dtyp_t typ, unsigned long long int count, uint8_t *target
   return ans;
 }
 
-int szcmlc_w_lua(void **target, size_t sz, struct szc_dgs_s *d) { return 0; }
+int szcmlc_w_lua(void **target, size_t sz, struct szc_dgs_s *d) {
+  if (sz == 0) {
+    *target = NULL;
+    return 0;
+  }
+  *target = (void *)szc_malloc(sz);
+  if (*target == NULL) return 1;
+  return 0;
+}
 
-int szcrealc_w_lua(void **target, size_t sz, struct szc_dgs_s *d) { return 0; }
+int szcrealc_w_lua(void **target, size_t sz, struct szc_dgs_s *d) {
+  if (sz == 0) {
+    *target = NULL;
+    return 0;
+  }
+  *target = (void *)szc_realloc(*target, sz);
+  if (*target == NULL) return 1;
+  return 0;
+}
 
-void *szcmemset_w_lua(uint8_t *s, int c, size_t sz, struct szc_dgs_s *d) { return s; }
+void *szcmemset_w_lua(uint8_t *s, int c, size_t sz, struct szc_dgs_s *d) { return NULL; }
 
-void szcfree_w_lua(void *target, struct szc_dgs_s *d) { return; }
+void szcfree_w_lua(void *target, struct szc_dgs_s *d) {
+  if (target) szc_free(target);
+}
 
-void szcfree2_w_lua(void **target_p, struct szc_dgs_s *d) { return; }
+void szcfree2_w_lua(void **target_p, struct szc_dgs_s *d) {
+  if (*target_p) szc_free(*target_p);
+  *target_p = NULL;
+}
 
 void **szcwrapp_w_lua(void **target_p) {
   return target_p;
 }
 
-void szc_ptop_w_lua(void **target_p, struct szc_dgs_s *d) { return; }
+void szc_ptop_w_lua(void **target_p, struct szc_dgs_s *d) {
+  szcfree2_w_lua(target_p, d);
+}
 
 int szcyf_w_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d) {
   struct szc_dgsw_lua_s *dd = (struct szc_dgsw_lua_s *)d;
