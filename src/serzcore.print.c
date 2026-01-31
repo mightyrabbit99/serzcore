@@ -41,7 +41,9 @@ szcmode_t szc_get_mode_p(void) {
 }
 
 szcmode2_t szc_get_mode2_p(struct szc_dgs_s *d) {
-  return szcmode2_dynamic;
+  struct szc_dgsp_s *dd = (struct szc_dgsp_s *)d;
+  if (dd->ptyp == szc_ptyp_stream) return szcmode2_dynamic;
+  return szcmode2_static;
 }
 
 struct szc_dgs_s *szc_init_p(void) {
@@ -179,47 +181,23 @@ int szcyy_p_ex(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, st
 }
 
 int szcmlc_p(void **target, size_t sz, struct szc_dgs_s *d) {
-  struct szc_dgsp_s *dd = (struct szc_dgsp_s *)d;
-  if (dd->ptyp == szc_ptyp_struct) return 0;
-  if (sz == 0) {
-    *target = NULL;
-    return 0;
-  }
-  *target = (void *)szc_malloc(sz);
-  if (*target == NULL) return 1;
-  memset(*target, 0, sz);
   return 0;
 }
 
 int szcrealc_p(void **target, size_t sz, struct szc_dgs_s *d) {
-  struct szc_dgsp_s *dd = (struct szc_dgsp_s *)d;
-  if (dd->ptyp == szc_ptyp_struct) return 0;
-  if (sz == 0) {
-    *target = NULL;
-    return 0;
-  }
-  *target = (void *)szc_realloc(*target, sz);
-  if (*target == NULL) return 1;
   return 0;
 }
 
 void *szcmemset_p(uint8_t *s, int c, size_t sz, struct szc_dgs_s *d) {
-  struct szc_dgsp_s *dd = (struct szc_dgsp_s *)d;
-  if (dd->ptyp == szc_ptyp_struct) return NULL;
-  return memset(s, c, sz);
+  return NULL;
 }
 
 void szcfree_p(void *target, struct szc_dgs_s *d) {
-  struct szc_dgsp_s *dd = (struct szc_dgsp_s *)d;
-  if (dd->ptyp == szc_ptyp_struct) return;
-  if (target) szc_free(target);
+  return;
 }
 
 void szcfree2_p(void **target_p, struct szc_dgs_s *d) {
-  struct szc_dgsp_s *dd = (struct szc_dgsp_s *)d;
-  if (dd->ptyp == szc_ptyp_struct) return;
-  if (*target_p) szc_free(*target_p);
-  *target_p = NULL;
+  return;
 }
 
 void **szcwrapp_p(void **target_p, struct szc_dgs_s *d) {
