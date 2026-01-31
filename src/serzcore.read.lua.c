@@ -32,6 +32,8 @@ struct szc_dgsr_lua_s {
 
 szcmode_t szc_get_mode_r_lua(void) { return szcmode_read; }
 
+szcmode2_t szc_get_mode2_r_lua(void) { return szcmode2_dynamic; }
+
 struct szc_dgs_s *szc_init_r_lua(void) {
   struct szc_dgsr_lua_s *dd = (struct szc_dgsr_lua_s *)szc_malloc(sizeof(struct szc_dgsr_lua_s));
   if (dd == NULL) return NULL;

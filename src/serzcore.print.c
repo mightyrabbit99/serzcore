@@ -37,6 +37,8 @@ struct szc_dgsp_s {
 
 szcmode_t szc_get_mode_p(void) { return szcmode_print; }
 
+szcmode2_t szc_get_mode2_p(void) { return szcmode2_static; }
+
 struct szc_dgs_s *szc_init_p(void) {
   struct szc_dgsp_s *dd = (struct szc_dgsp_s *)szc_malloc(sizeof(struct szc_dgsp_s));
   if (dd == NULL) return NULL;

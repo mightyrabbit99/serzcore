@@ -38,6 +38,8 @@ struct szc_dgsp_lua_s {
 
 szcmode_t szc_get_mode_p_lua(void) { return szcmode_print; }
 
+szcmode2_t szc_get_mode2_p_lua(void) { return szcmode2_dynamic; }
+
 struct szc_dgs_s *szc_init_p_lua(void) {
   struct szc_dgsp_lua_s *dd = (struct szc_dgsp_lua_s *)szc_malloc(sizeof(struct szc_dgsp_lua_s));
   if (dd == NULL) return NULL;

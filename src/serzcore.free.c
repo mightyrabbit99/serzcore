@@ -31,6 +31,8 @@ struct szc_dgsf_s {
 
 szcmode_t szc_get_mode_f(void) { return szcmode_free; }
 
+szcmode2_t szc_get_mode2_f(void) { return szcmode2_static; }
+
 struct szc_dgs_s *szc_init_f(void) {
   struct szc_dgsf_s *dd = (struct szc_dgsf_s *)szc_malloc(sizeof(struct szc_dgsf_s));
   if (dd == NULL) return NULL;

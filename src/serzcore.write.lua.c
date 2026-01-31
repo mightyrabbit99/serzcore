@@ -30,6 +30,8 @@ struct szc_dgsw_lua_s {
 
 szcmode_t szc_get_mode_w_lua(void) { return szcmode_write; }
 
+szcmode2_t szc_get_mode2_w_lua(void) { return szcmode2_dynamic; }
+
 struct szc_dgs_s *szc_init_w_lua(void) {
   struct szc_dgsw_lua_s *dd = (struct szc_dgsw_lua_s *)szc_malloc(sizeof(struct szc_dgsw_lua_s));
   if (dd == NULL) return NULL;

@@ -29,6 +29,8 @@ struct szc_dgsw_s {
 
 szcmode_t szc_get_mode_w(void) { return szcmode_write; }
 
+szcmode2_t szc_get_mode2_w(void) { return szcmode2_static; }
+
 struct szc_dgs_s *szc_init_w(void) {
   struct szc_dgsw_s *dd = (struct szc_dgsw_s *)szc_malloc(sizeof(struct szc_dgsw_s));
   if (dd == NULL) return NULL;

@@ -21,6 +21,11 @@ typedef enum {
 } szcmode_t;
 
 typedef enum {
+  szcmode2_static,
+  szcmode2_dynamic,
+} szcmode2_t;
+
+typedef enum {
   szc_dtyp_o,
   szc_dtyp_o2,
   szc_dtyp_o3,
@@ -72,6 +77,7 @@ typedef int (*szc_ff_t)(const struct szc_dga_s *, _target_ex, struct szc_dgs_s *
 /////
 #if defined(SERZCORE_LUA)
 szcmode_t szc_get_mode_r_lua(void);
+szcmode2_t szc_get_mode2_r_lua(void);
 struct szc_dgs_s *szc_init_r_lua(void);
 size_t szc_get_len_r_lua(struct szc_dgs_s *d);
 void szc_set_maxlen_r_lua(struct szc_dgs_s *d, size_t maxlen);
@@ -101,6 +107,7 @@ int szcyff_r_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d);
 int szcyff_r_ex_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, const char *name, int arr_i);
 
 szcmode_t szc_get_mode_w_lua(void);
+szcmode2_t szc_get_mode2_w_lua(void);
 struct szc_dgs_s *szc_init_w_lua(void);
 size_t szc_get_len_w_lua(struct szc_dgs_s *d);
 void szc_set_maxlen_w_lua(struct szc_dgs_s *d, size_t maxlen);
@@ -130,6 +137,7 @@ int szcyff_w_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d);
 int szcyff_w_ex_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, const char *name, int arr_i);
 
 szcmode_t szc_get_mode_p_lua(void);
+szcmode2_t szc_get_mode2_p_lua(void);
 struct szc_dgs_s *szc_init_p_lua(void);
 size_t szc_get_len_p_lua(struct szc_dgs_s *d);
 void szc_set_maxlen_p_lua(struct szc_dgs_s *d, size_t maxlen);
@@ -161,6 +169,7 @@ int szcyff_p_ex_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, const
 #else
 
 szcmode_t szc_get_mode_r(void);
+szcmode2_t szc_get_mode2_r(void);
 struct szc_dgs_s *szc_init_r(void);
 size_t szc_get_len_r(struct szc_dgs_s *d);
 void szc_set_maxlen_r(struct szc_dgs_s *d, size_t maxlen);
@@ -190,6 +199,7 @@ int szcyff_r(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d);
 int szcyff_r_ex(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, const char *name, int arr_i);
 
 szcmode_t szc_get_mode_w(void);
+szcmode2_t szc_get_mode2_w(void);
 struct szc_dgs_s *szc_init_w(void);
 size_t szc_get_len_w(struct szc_dgs_s *d);
 void szc_set_maxlen_w(struct szc_dgs_s *d, size_t maxlen);
@@ -219,6 +229,7 @@ int szcyff_w(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d);
 int szcyff_w_ex(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, const char *name, int arr_i);
 
 szcmode_t szc_get_mode_p(void);
+szcmode2_t szc_get_mode2_p(void);
 struct szc_dgs_s *szc_init_p(void);
 size_t szc_get_len_p(struct szc_dgs_s *d);
 void szc_set_maxlen_p(struct szc_dgs_s *d, size_t maxlen);
@@ -248,6 +259,7 @@ int szcyff_p(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d);
 int szcyff_p_ex(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, const char *name, int arr_i);
 
 szcmode_t szc_get_mode_f(void);
+szcmode2_t szc_get_mode2_f(void);
 struct szc_dgs_s *szc_init_f(void);
 size_t szc_get_len_f(struct szc_dgs_s *d);
 void szc_set_maxlen_f(struct szc_dgs_s *d, size_t maxlen);
@@ -284,6 +296,7 @@ void szc_set_mem_functions(void *(*malloc_fn)(size_t), void *(*realloc_fn)(void 
 
 struct szc_dga_s {
   szcmode_t (*szc_get_mode)(void);
+  szcmode2_t (*szc_get_mode2)(void);
   struct szc_dgs_s *(*szc_init)(void);
   size_t (*szc_get_len)(struct szc_dgs_s *);
   void (*szc_set_maxlen)(struct szc_dgs_s *, size_t);
@@ -316,6 +329,7 @@ struct szc_dga_s {
 #if defined(SERZCORE_LUA)
 static struct szc_dga_s szca_r = (struct szc_dga_s){
     .szc_get_mode = szc_get_mode_r_lua,
+    .szc_get_mode2 = szc_get_mode2_r_lua,
     .szc_init = szc_init_r_lua,
     .szc_get_len = szc_get_len_r_lua,
     .szc_set_maxlen = szc_set_maxlen_r_lua,
@@ -347,6 +361,7 @@ static struct szc_dga_s szca_r = (struct szc_dga_s){
 
 static struct szc_dga_s szca_w = (struct szc_dga_s){
     .szc_get_mode = szc_get_mode_w_lua,
+    .szc_get_mode2 = szc_get_mode2_w_lua,
     .szc_init = szc_init_w_lua,
     .szc_get_len = szc_get_len_w_lua,
     .szc_set_maxlen = szc_set_maxlen_w_lua,
@@ -378,6 +393,7 @@ static struct szc_dga_s szca_w = (struct szc_dga_s){
 
 static struct szc_dga_s szca_p = (struct szc_dga_s){
     .szc_get_mode = szc_get_mode_p_lua,
+    .szc_get_mode2 = szc_get_mode2_p_lua,
     .szc_init = szc_init_p_lua,
     .szc_get_len = szc_get_len_p_lua,
     .szc_set_maxlen = szc_set_maxlen_p_lua,
@@ -411,6 +427,7 @@ static struct szc_dga_s szca_p = (struct szc_dga_s){
 
 static struct szc_dga_s szca_r = (struct szc_dga_s){
     .szc_get_mode = szc_get_mode_r,
+    .szc_get_mode2 = szc_get_mode2_r,
     .szc_init = szc_init_r,
     .szc_get_len = szc_get_len_r,
     .szc_set_maxlen = szc_set_maxlen_r,
@@ -442,6 +459,7 @@ static struct szc_dga_s szca_r = (struct szc_dga_s){
 
 static struct szc_dga_s szca_w = (struct szc_dga_s){
     .szc_get_mode = szc_get_mode_w,
+    .szc_get_mode2 = szc_get_mode2_w,
     .szc_init = szc_init_w,
     .szc_get_len = szc_get_len_w,
     .szc_set_maxlen = szc_set_maxlen_w,
@@ -473,6 +491,7 @@ static struct szc_dga_s szca_w = (struct szc_dga_s){
 
 static struct szc_dga_s szca_p = (struct szc_dga_s){
     .szc_get_mode = szc_get_mode_p,
+    .szc_get_mode2 = szc_get_mode2_p,
     .szc_init = szc_init_p,
     .szc_get_len = szc_get_len_p,
     .szc_set_maxlen = szc_set_maxlen_p,
@@ -504,6 +523,7 @@ static struct szc_dga_s szca_p = (struct szc_dga_s){
 
 static struct szc_dga_s szca_f = (struct szc_dga_s){
     .szc_get_mode = szc_get_mode_f,
+    .szc_get_mode2 = szc_get_mode2_f,
     .szc_init = szc_init_f,
     .szc_get_len = szc_get_len_f,
     .szc_set_maxlen = szc_set_maxlen_f,
