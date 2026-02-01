@@ -8,17 +8,17 @@ SZFDECL_STATIC(struct, null_s, p) {
 }
 
 SZFDECL_STATIC(struct, car_s, p) {
-  szcyy(szc_dtyp_o, sizeof(p->brand), p->brand);
-  szcyy(szc_dtyp_o, sizeof(p->plate), p->plate);
-  szcyy(szc_dtyp_o, sizeof(p->passengers), &p->passengers);
-  szcmlcyy(szc_dtyp_o, sizeof(*p->secret), p->secret);
+  szcv(szc_dtyp_o, p->brand);
+  szcv(szc_dtyp_o, p->plate);
+  szcv(szc_dtyp_o, p->passengers);
+  szcmlcv(szc_dtyp_o, p->secret);
   return 0;
 }
 
 SZFDECL_STATIC(struct, ship_s, p) {
-  szcyy(szc_dtyp_o, sizeof(p->name), p->name);
+  szcv(szc_dtyp_o, p->name);
   szclvstr(szc_dtyp_o, 100, p->manufacturer);
-  szcyy(szc_dtyp_o, sizeof(p->tonnage), &p->tonnage);
+  szcv(szc_dtyp_o, p->tonnage);
   szclvp(szc_dtyp_o, p->data_len, 200, p->data);
   return 0;
 }
@@ -54,7 +54,7 @@ SZFDECL_STATIC(struct, traffic_s, p) {
   for (i = 0;;) {
     szcrealcl((void **)&p->vehicle_arr, sizeof(struct vehicle_s) * (i + 1));
     szcmemset((uint8_t *)&p->vehicle_arr[i], 0, sizeof(struct vehicle_s));
-    szcyy(szc_dtyp_o, sizeof(vetyp_t), &p->vehicle_arr[i].typ);
+    szcv(szc_dtyp_o, p->vehicle_arr[i].typ);
     szc_ff_t ff = get_vehicle_dgf(p->vehicle_arr[i].typ);
     if (ff == NULL) return 1;
     void *tgt = get_vehicle_dgtg(&p->vehicle_arr[i].v, p->vehicle_arr[i].typ);

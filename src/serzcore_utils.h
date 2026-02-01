@@ -113,6 +113,7 @@ static inline uint8_t szc_get_ctnsz(register unsigned long long val) {
     else                                                                \
       _szcy_exec(szcyy, typ, count, NULL, SZC_DST_NAME);                \
   } while (0);
+#define szcv(typ, target) szcyy(typ, szc_typ_is_octal(typ) ? sizeof(target) : (sizeof(target) << 3), &target)
 // #define szcf(ff, p) ff(SZC_SZCA_NAME, p, SZC_DST_NAME)
 #define szcf(ff, p)                               \
   do {                                            \
@@ -199,6 +200,11 @@ static inline uint8_t szc_get_ctnsz(register unsigned long long val) {
     szcmlcl(&(ptr), len);              \
     szcyy(typ, len, (uint8_t *)(ptr)); \
   } while (0)
+#define szcmlcv(typ, ptr)                       \
+  do {                                          \
+    szcmlcl(&(ptr), sizeof(*ptr));              \
+    szcyy(typ, sizeof(*ptr), (uint8_t *)(ptr)); \
+  } while (0)
 #define szclvp(typ, len, maxlen, ptr)                                                                     \
   do {                                                                                                    \
     if (len > maxlen) return 1;                                                                           \
@@ -263,6 +269,7 @@ static inline uint8_t szc_get_ctnsz(register unsigned long long val) {
     else                                                                                      \
       _szcy_exec(szcyy_ex, typ, count, NULL, SZC_DST_NAME, name, __VA_ARGS__);                \
   } while (0)
+#define szcv_ex(typ, target, name, ...) szcyy_ex(typ, szc_typ_is_octal(typ) ? sizeof(target) : (sizeof(target) << 3), &target, name, __VA_ARGS__)
 
 #define szcf_ex(ff, p, name, ...)                                               \
   do {                                                                          \
@@ -277,6 +284,11 @@ static inline uint8_t szc_get_ctnsz(register unsigned long long val) {
   do {                                                       \
     szcmlcl(&(ptr), len);                                    \
     szcyy_ex(typ, len, (uint8_t *)(ptr), name, __VA_ARGS__); \
+  } while (0)
+#define szcmlcv_ex(typ, ptr, name, ...)                               \
+  do {                                                                \
+    szcmlcl(&(ptr), sizeof(*ptr));                                    \
+    szcyy_ex(typ, sizeof(*ptr), (uint8_t *)(ptr), name, __VA_ARGS__); \
   } while (0)
 #define szclvstr_ex(typ, maxlen, ptr, name, ...)                                                                                                 \
   do {                                                                                                                                           \
