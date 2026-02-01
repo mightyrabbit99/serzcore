@@ -113,6 +113,7 @@ static inline uint8_t szc_get_ctnsz(register unsigned long long val) {
     else                                                                \
       _szcy_exec(szcyy, typ, count, NULL, SZC_DST_NAME);                \
   } while (0);
+#define szcx(typ, target) szcy(typ, szc_typ_is_octal(typ) ? sizeof(target) : (sizeof(target) << 3), &target)
 #define szcv(typ, target) szcyy(typ, szc_typ_is_octal(typ) ? sizeof(target) : (sizeof(target) << 3), &target)
 // #define szcf(ff, p) ff(SZC_SZCA_NAME, p, SZC_DST_NAME)
 #define szcf(ff, p)                               \
@@ -269,6 +270,7 @@ static inline uint8_t szc_get_ctnsz(register unsigned long long val) {
     else                                                                                      \
       _szcy_exec(szcyy_ex, typ, count, NULL, SZC_DST_NAME, name, __VA_ARGS__);                \
   } while (0)
+#define szcx_ex(typ, target, name, ...) szcy_ex(typ, szc_typ_is_octal(typ) ? sizeof(target) : (sizeof(target) << 3), &target, name, __VA_ARGS__)
 #define szcv_ex(typ, target, name, ...) szcyy_ex(typ, szc_typ_is_octal(typ) ? sizeof(target) : (sizeof(target) << 3), &target, name, __VA_ARGS__)
 
 #define szcf_ex(ff, p, name, ...)                                               \
