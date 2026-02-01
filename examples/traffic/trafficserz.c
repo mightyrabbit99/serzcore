@@ -79,3 +79,8 @@ ssize_t traffic_serialize(struct traffic_s *p, uint8_t *buf, size_t bufsz) {
   SZFWRITE(traffic_s, ll, p, buf, bufsz);
   return ll;
 }
+
+int traffic_destroy(struct traffic_s *p) {
+  SZFFREE(traffic_s, p);
+  return 0;
+}

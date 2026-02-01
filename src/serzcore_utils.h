@@ -151,6 +151,7 @@ static inline uint8_t szc_get_ctnsz(register unsigned long long val) {
     else                                          \
       SZC_SZCA_NAME->szcfree(NULL, SZC_DST_NAME); \
   } while (0)
+#define szcwrapp(target_p) SZC_SZCA_NAME->szcwrapp(target_p, SZC_DST_NAME)
 
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
 #define szcyx(typ, count, bbcnt, target) szcy(typ, count, (target) + ((bbcnt) - szc_count_oct(typ, count)))
@@ -180,15 +181,18 @@ static inline uint8_t szc_get_ctnsz(register unsigned long long val) {
       szc_cvector_push_back(*SZC_DGARR_NAME, (void **)(ptr)); \
     }                                                         \
   } while (0)
-#define szcrealcl(ptr, len)                                     \
-  do {                                                          \
-    if (szc_get_mode2() == szcmode2_static) {                   \
-      void *ptr_orig__ = *(ptr);                                \
-      szcrealc((void **)(ptr), len);                            \
-      if (ptr_orig__ == NULL) {                                 \
-        szc_cvector_push_back(*SZC_DGARR_NAME, (void **)(ptr)); \
-      }                                                         \
-    }                                                           \
+#define szcrealcl(ptr, len)                                       \
+  do {                                                            \
+    if (szc_get_mode2() == szcmode2_static) {                     \
+      void *ptr_orig__ = *(ptr);                                  \
+      szcrealc((void **)(ptr), len);                              \
+      if (szc_get_mode() == szcmode_free || ptr_orig__ == NULL) { \
+        void **pp = szcwrapp((void **)(ptr));                     \
+        if (pp) {                                                 \
+          szc_cvector_push_back(*SZC_DGARR_NAME, pp);             \
+        }                                                         \
+      }                                                           \
+    }                                                             \
   } while (0)
 #define szcmlcyy(typ, len, ptr)        \
   do {                                 \
@@ -453,10 +457,10 @@ static inline uint8_t szc_get_ctnsz(register unsigned long long val) {
     struct szc_dgs_s *d__ = szca_f.szc_init(); \
     if (d__ == NULL) return -1;                \
     if (SZFNAME(struname)(&szca_f, p, d__)) {  \
-      szca_p.szc_destruct(d__);                \
+      szca_f.szc_destruct(d__);                \
       return -1;                               \
     }                                          \
-    szca_p.szc_destruct(d__);                  \
+    szca_f.szc_destruct(d__);                  \
   } while (0)
 #endif
 #define SZFOUTEXEC(t__, struname, f, ctx1)         \

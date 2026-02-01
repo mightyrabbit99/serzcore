@@ -9,5 +9,6 @@
 
 ssize_t traffic_deserialize(struct traffic_s *p, uint8_t *data, size_t datasz);
 ssize_t traffic_serialize(struct traffic_s *p, uint8_t *buf, size_t bufsz);
+int traffic_destroy(struct traffic_s *p);
 
 #endif  // TRAFFICSERZ_H
