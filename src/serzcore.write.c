@@ -113,7 +113,7 @@ int szc_get_fieldlen_w_ex(szc_dtyp_t typ, unsigned long long int count, uint8_t 
   size_t sz = 0;
   if (extyp2 == szc_extyp_string) {
     sz = strnlen(target, maxlen);
-    _szcpy(typ, target, (uint8_t *)&sz, count, szc_typ_is_octal(typ) ? 0 : dd->bitlen % 8);
+    _szcpy_w(typ, target, (uint8_t *)&sz, count, szc_typ_is_octal(typ) ? 0 : dd->bitlen % 8);
   }
   return 0;
 }
@@ -134,7 +134,7 @@ int szcy_w(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct
   val_p = szc_realloc(dd->val, end);
   if (val_p == NULL) return 1;
   dd->val = val_p;
-  _szcpy(typ, dd->val + start, target, count, szc_typ_is_octal(typ) ? 0 : dd->bitlen % 8);
+  _szcpy_w(typ, dd->val + start, target, count, szc_typ_is_octal(typ) ? 0 : dd->bitlen % 8);
   dd->bitlen += szc_count_bit(typ, count);
 
   return 0;

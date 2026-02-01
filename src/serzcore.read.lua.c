@@ -128,7 +128,7 @@ int szcyy_r_lua(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, s
   else
     end = ((dd->bitlen + count) >> 3) + ((dd->bitlen + count) % 8 == 0 ? 0 : 1);
   if (end > dd->maxlen) return 1;
-  _szcpy(typ, target, dd->val + start, count, szc_typ_is_octal(typ) ? 0 : dd->bitlen % 8);
+  _szcpy_r(typ, target, dd->val + start, count, szc_typ_is_octal(typ) ? 0 : dd->bitlen % 8);
   dd->bitlen += szc_count_bit(typ, count);
   return 0;
 }
@@ -147,7 +147,7 @@ static inline int _szcyv_r_ex_lua(szc_dtyp_t typ, unsigned long long int count, 
   if (end > dd->maxlen) return 1;
 
   uint8_t target2[szc_count_oct(typ, count)];
-  _szcpy(typ, target2, dd->val + start, count, szc_typ_is_octal(typ) ? 0 : dd->bitlen % 8);
+  _szcpy_r(typ, target2, dd->val + start, count, szc_typ_is_octal(typ) ? 0 : dd->bitlen % 8);
   int res = _szclua_r(dd->L, extyp, extyp_va, name, target2, sizeof(target2));
   if (res) return res;
   dd->bitlen += szc_count_bit(typ, count);

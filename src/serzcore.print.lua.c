@@ -121,7 +121,7 @@ static inline int _szcv_get_fieldlen_pw_ex_lua(szc_dtyp_t typ, unsigned long lon
   ssize_t res = _szclua_w_get_fieldlen(dd->L, extyp2, name);
   if (res < 0) return 1;
   sz = MIN(maxlen, (size_t)res);
-  _szcpy(typ, target, (uint8_t *)&sz, count, szc_typ_is_octal(typ) ? 0 : dd->bitlen % 8);
+  _szcpy_r(typ, target, (uint8_t *)&sz, count, szc_typ_is_octal(typ) ? 0 : dd->bitlen % 8);
   return 0;
 }
 
@@ -167,7 +167,7 @@ int szcyy_p_lua(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, s
   else
     end = ((dd->bitlen + count) >> 3) + ((dd->bitlen + count) % 8 == 0 ? 0 : 1);
   if (end > dd->maxlen) return 1;
-  _szcpy(typ, target, dd->val + start, count, szc_typ_is_octal(typ) ? 0 : dd->bitlen % 8);
+  _szcpy_r(typ, target, dd->val + start, count, szc_typ_is_octal(typ) ? 0 : dd->bitlen % 8);
   dd->bitlen += szc_count_bit(typ, count);
   return 0;
 }

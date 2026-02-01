@@ -81,7 +81,9 @@ const uint8_t byte_rev_table[256] = {
 };
 // clang-format on
 
-static inline uint8_t bb_rev8(uint8_t byte) { return byte_rev_table[byte]; }
+static inline uint8_t bb_rev8(uint8_t byte) {
+  return byte_rev_table[byte];
+}
 
 static inline uint8_t bb_mask(uint8_t target, char p1, char p2, char off1) {
   if (off1 >= 8) return (uint8_t)0;
@@ -97,7 +99,7 @@ static inline uint8_t bb_mask2(uint8_t target, char p1, char p2, char off1) {
   return off1 > 0 ? (target & a) << off1 : (target & a) >> (-off1);
 }
 
-static inline void _szcpy(szc_dtyp_t typ, uint8_t *dst, const uint8_t *src, unsigned long long int count, uint8_t pos_bb) {
+static inline void _szcpy_w(szc_dtyp_t typ, uint8_t *dst, const uint8_t *src, unsigned long long int count, uint8_t pos_bb) {
   uint8_t pos_ba = count % 8;
   uint8_t ba_left = 8 - pos_ba, bb_left = 8 - pos_bb;
   uint8_t x1 = MIN(bb_left, pos_ba), x2 = pos_ba - x1;
@@ -162,17 +164,67 @@ static inline void _szcpy(szc_dtyp_t typ, uint8_t *dst, const uint8_t *src, unsi
   }
 }
 
+static inline void _szcpy_r(szc_dtyp_t typ, uint8_t *dst, const uint8_t *src, unsigned long long int count, uint8_t pos_bb) {
+  uint8_t pos_ba = count % 8, pos_bc = (pos_bb + pos_ba) % 8;
+  uint8_t ba_left = 8 - pos_ba, bb_left = 8 - pos_bb, bc_left = 8 - pos_bc;
+  uint8_t x1 = MIN(bb_left, pos_ba), x2 = pos_ba - x1;
+  size_t i, cnt = (count + pos_bb) >> 3, cnt2 = count >> 3;
+  switch (typ) {
+    case szc_dtyp_o:
+      for (i = 0; i < count; i++) dst[i] = src[i];
+      break;
+    case szc_dtyp_o2:
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+      for (i = 0; i < count; i++) dst[i] = src[i];
+#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+      for (i = 0; i < count; i++) dst[i] = src[count - i - 1];
+#else
+#error byte order not defined
+#endif
+      break;
+    case szc_dtyp_o3:
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+      for (i = 0; i < count; i++) dst[i] = src[i];
+#elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+      for (i = 0; i < count; i++) dst[i] = src[count - i - 1];
+#else
+#error byte order not defined
+#endif
+      break;
+    case szc_dtyp_b:
+      for (i = 0; i < cnt2; i++) {
+        dst[i] |= bb_mask(src[i], pos_bb, 8, -pos_bb);
+        dst[i] |= bb_mask(src[i + 1], 0, pos_bb, bb_left);
+      }
+      dst[i] |= bb_mask(src[i], pos_bb, pos_bb + x1, -pos_bb);
+      if (pos_ba > bb_left)
+        dst[i] |= bb_mask(src[i + 1], 0, pos_ba - bb_left, pos_ba);
+      break;
+    case szc_dtyp_b2:
+      if (pos_bc > 0)
+        dst[0] |= bb_mask2(bb_rev8(src[cnt]), 0, pos_bc, bc_left);
+      for (i = 0; i < cnt2 - 1; i++) {
+        dst[i] |= bb_mask(bb_rev8(src[cnt - i - 1]), 0, bc_left, pos_bc);
+        dst[i + 1] |= bb_mask(bb_rev8(src[cnt - i - 1]), 0, bc_left, pos_bc);
+      }
+      dst[i] |= bb_mask(bb_rev8(src[0]), 0, MIN(bb_left, bc_left), pos_bc);
+      if (bc_left < bb_left)
+        dst[i + 1] |= bb_mask2(bb_rev8(src[0]), bb_left, pos_bc, bc_left);
+      break;
+  }
+}
+
 static inline int _szcmp(szc_dtyp_t typ, uint8_t *dst, const uint8_t *src, unsigned long long int count, uint8_t pos_bb) {
   uint8_t data[szc_count_oct(typ, count)];
   memset(data, 0, sizeof(data));
-  _szcpy(typ, data, src, count, pos_bb);
-  return memcmp(data, dst);
+  _szcpy_r(typ, data, src, count, pos_bb);
+  return memcmp(data, dst, szc_count_oct(typ, count));
 }
 
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-#define _szcpy2(typ, dst, src, count, bbcnt) _szcpy(typ, (dst) + ((bbcnt) - szc_count_oct(typ, count)), src, count, 0)
+#define _szcpy2(typ, dst, src, count, bbcnt) _szcpy_r(typ, (dst) + ((bbcnt) - szc_count_oct(typ, count)), src, count, 0)
 #elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-#define _szcpy2(typ, dst, src, count, bbcnt) _szcpy(typ, dst, src, count, 0)
+#define _szcpy2(typ, dst, src, count, bbcnt) _szcpy_r(typ, dst, src, count, 0)
 #else
 #error byte order not defined
 #endif
@@ -245,8 +297,10 @@ static inline void _szcprint(void (*f)(void *, const char *format, ...), void *a
   f(arg, "%s", name);
   if (arr_i != -1) f(arg, "[%d]", arr_i);
   if (extyp2 == szc_extyp_data) {
-    if (szc_typ_is_octal(typ)) f(arg, " (hex)");
-    else f(arg, " (bin)");
+    if (szc_typ_is_octal(typ))
+      f(arg, " (hex)");
+    else
+      f(arg, " (bin)");
   }
   f(arg, ": ");
 
@@ -382,7 +436,7 @@ static inline int _szclua_w_do(struct _szclua_w_param_s param, lua_State *L, szc
       if (param.mode == szcmode_print)
         _szcprint(param.f, param.arg, typ, (uint8_t *)&target2_int, count, szc_typ_is_octal(typ) ? 0 : (*bitlen) % 8, name, extyp, extyp_va);
       else
-        _szcpy(typ, val2 + (*bitlen >> 3), (uint8_t *)&target2_int, count, szc_typ_is_octal(typ) ? 0 : (*bitlen) % 8);
+        _szcpy_w(typ, val2 + (*bitlen >> 3), (uint8_t *)&target2_int, count, szc_typ_is_octal(typ) ? 0 : (*bitlen) % 8);
       *bitlen += szc_count_bit(typ, count);
       break;
     case szc_extyp_arrlen:
@@ -393,7 +447,7 @@ static inline int _szclua_w_do(struct _szclua_w_param_s param, lua_State *L, szc
       if (param.mode == szcmode_print)
         _szcprint(param.f, param.arg, typ, (uint8_t *)&target2_len, count, szc_typ_is_octal(typ) ? 0 : (*bitlen) % 8, name, extyp, extyp_va);
       else
-        _szcpy(typ, val2 + (*bitlen >> 3), (uint8_t *)&target2_len, count, szc_typ_is_octal(typ) ? 0 : (*bitlen) % 8);
+        _szcpy_w(typ, val2 + (*bitlen >> 3), (uint8_t *)&target2_len, count, szc_typ_is_octal(typ) ? 0 : (*bitlen) % 8);
       *bitlen += szc_count_bit(typ, count);
       break;
     case szc_extyp_data:
@@ -407,7 +461,7 @@ static inline int _szclua_w_do(struct _szclua_w_param_s param, lua_State *L, szc
         val2 = szc_realloc(*valp, end);
         if (val2 == NULL) goto fail;
         *valp = val2;
-        _szcpy(typ, val2 + (*bitlen >> 3), target2_str, target2_len, szc_typ_is_octal(typ) ? 0 : (*bitlen) % 8);
+        _szcpy_w(typ, val2 + (*bitlen >> 3), target2_str, target2_len, szc_typ_is_octal(typ) ? 0 : (*bitlen) % 8);
       }
       *bitlen += (target2_len << 3);
       break;
