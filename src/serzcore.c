@@ -162,6 +162,13 @@ static inline void _szcpy(szc_dtyp_t typ, uint8_t *dst, const uint8_t *src, unsi
   }
 }
 
+static inline int _szcmp(szc_dtyp_t typ, uint8_t *dst, const uint8_t *src, unsigned long long int count, uint8_t pos_bb) {
+  uint8_t data[szc_count_oct(typ, count)];
+  memset(data, 0, sizeof(data));
+  _szcpy(typ, data, src, count, pos_bb);
+  return memcmp(data, dst);
+}
+
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
 #define _szcpy2(typ, dst, src, count, bbcnt) _szcpy(typ, (dst) + ((bbcnt) - szc_count_oct(typ, count)), src, count, 0)
 #elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__

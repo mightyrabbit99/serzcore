@@ -100,17 +100,22 @@ int szc_get_fieldlen_r_ex(szc_dtyp_t typ, unsigned long long int count, uint8_t 
 }
 
 int szcy_r(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d) {
-  if (count == 0) return 1;
+  if (count == 0) return 0;
   if (typ >= _szc_dtyp_max) return 1;
   struct szc_dgsr_s *dd = (struct szc_dgsr_s *)d;
-  if (szc_typ_is_octal(typ)) {
-    if (((dd->bitlen >> 3) + (dd->bitlen % 8 == 0 ? 0 : 1) + count) > dd->maxlen) return 1;
-    dd->bitlen += dd->bitlen % 8 == 0 ? 0 : (8 - (dd->bitlen % 8));
-    dd->bitlen += count << 3;
-  } else {
-    if (((dd->bitlen + count) >> 3) > dd->maxlen) return 1;
-    dd->bitlen += count;
+  if (szc_typ_is_octal(typ)) dd->bitlen += dd->bitlen % 8 == 0 ? 0 : (8 - (dd->bitlen % 8));
+  size_t start = dd->bitlen >> 3;
+  size_t end;
+  if (szc_typ_is_octal(typ))
+    end = start + count;
+  else
+    end = ((dd->bitlen + count) >> 3) + ((dd->bitlen + count) % 8 == 0 ? 0 : 1);
+  if (end > dd->maxlen) return 1;
+
+  if (_szcmp(typ, target, dd->val + start, count, szc_typ_is_octal(typ) ? 0 : dd->bitlen % 8)) {
+    return 1;
   }
+  dd->bitlen += szc_count_bit(typ, count);
   return 0;
 }
 
