@@ -98,6 +98,7 @@ static inline uint8_t szc_get_ctnsz(register unsigned long long val) {
 #define szcdelete(pt) SZC_SZCA_NAME->szcfree(pt, SZC_DST_NAME)
 #define szcwrapp(ppt) SZC_SZCA_NAME->szcwrapp(ppt, SZC_DST_NAME)
 #define szc_get_mode() SZC_SZCA_NAME->szc_get_mode()
+#define szc_get_mode2() SZC_SZCA_NAME->szc_get_mode2(SZC_DST_NAME)
 
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
 #define szcyx(typ, count, bbcnt, target) szcy(typ, count, (target) + ((bbcnt) - szc_count_oct(typ, count)))

@@ -29,9 +29,13 @@ struct szc_dgsf_s {
   hashset_t hs;
 };
 
-szcmode_t szc_get_mode_f(void) { return szcmode_free; }
+szcmode_t szc_get_mode_f(void) {
+  return szcmode_free;
+}
 
-szcmode2_t szc_get_mode2_f(void) { return szcmode2_static; }
+szcmode2_t szc_get_mode2_f(struct szc_dgs_s *d) {
+  return szcmode2_static;
+}
 
 struct szc_dgs_s *szc_init_f(void) {
   struct szc_dgsf_s *dd = (struct szc_dgsf_s *)szc_malloc(sizeof(struct szc_dgsf_s));
@@ -46,9 +50,12 @@ fail:
   return NULL;
 }
 
-void szc_fprint_f(FILE *stream, struct szc_dgs_s *d) {}
+void szc_fprint_f(FILE *stream, struct szc_dgs_s *d) {
+}
 
-size_t szc_get_len_f(struct szc_dgs_s *d) { return 0; }
+size_t szc_get_len_f(struct szc_dgs_s *d) {
+  return 0;
+}
 
 void szc_set_maxlen_f(struct szc_dgs_s *d, size_t maxlen) {
   struct szc_dgsf_s *dd = (struct szc_dgsf_s *)d;
@@ -60,11 +67,16 @@ size_t szc_get_maxlen_f(struct szc_dgs_s *d) {
   return dd->maxlen;
 }
 
-size_t szc_get_val_f(struct szc_dgs_s *d, size_t len, uint8_t *val_ptr) { return 0; }
+size_t szc_get_val_f(struct szc_dgs_s *d, size_t len, uint8_t *val_ptr) {
+  return 0;
+}
 
-const uint8_t *szc_retrieve_val_f(struct szc_dgs_s *d, size_t *len) { return NULL; }
+const uint8_t *szc_retrieve_val_f(struct szc_dgs_s *d, size_t *len) {
+  return NULL;
+}
 
-void szc_set_val_f(struct szc_dgs_s *d, size_t len, uint8_t *val) {}
+void szc_set_val_f(struct szc_dgs_s *d, size_t len, uint8_t *val) {
+}
 
 void szc_destruct_f(struct szc_dgs_s *d) {
   struct szc_dgsf_s *dd = (struct szc_dgsf_s *)d;
@@ -72,27 +84,49 @@ void szc_destruct_f(struct szc_dgs_s *d) {
   szc_free(d);
 }
 
-void szc_set_ctx_f_ex(struct szc_dgs_s *d, void *ctx1, ...) { return; }
+void szc_set_ctx_f_ex(struct szc_dgs_s *d, void *ctx1, ...) {
+  return;
+}
 
-int szc_get_fieldlen_f_ex(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, size_t maxlen, struct szc_dgs_s *d, const char *name, szc_extyp_t extyp, ...) { return 0; }
+int szc_get_fieldlen_f_ex(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, size_t maxlen, struct szc_dgs_s *d, const char *name, szc_extyp_t extyp, ...) {
+  return 0;
+}
 
-int szcy_f(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d) { return 0; }
+int szcy_f(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d) {
+  return 0;
+}
 
-int szcyy_f(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d) { return 0; }
+int szcyy_f(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d) {
+  return 0;
+}
 
-int szcy_f_ex(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d, const char *name, szc_extyp_t extyp, ...) { return 0; }
+int szcy_f_ex(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d, const char *name, szc_extyp_t extyp, ...) {
+  return 0;
+}
 
-int szcyy_f_ex(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d, const char *name, szc_extyp_t extyp, ...) { return 0; }
+int szcyy_f_ex(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d, const char *name, szc_extyp_t extyp, ...) {
+  return 0;
+}
 
-int szcmlc_f(void **target, size_t sz, struct szc_dgs_s *d) { return 0; }
+int szcmlc_f(void **target, size_t sz, struct szc_dgs_s *d) {
+  return 0;
+}
 
-int szcrealc_f(void **target, size_t sz, struct szc_dgs_s *d) { return 0; }
+int szcrealc_f(void **target, size_t sz, struct szc_dgs_s *d) {
+  return 0;
+}
 
-void *szcmemset_f(uint8_t *s, int c, size_t sz, struct szc_dgs_s *d) { return NULL; }
+void *szcmemset_f(uint8_t *s, int c, size_t sz, struct szc_dgs_s *d) {
+  return NULL;
+}
 
-void szcfree_f(void *target, struct szc_dgs_s *d) { szc_free(target); }
+void szcfree_f(void *target, struct szc_dgs_s *d) {
+  szc_free(target);
+}
 
-void szcfree2_f(void **target_p, struct szc_dgs_s *d) { szc_free(*target_p); }
+void szcfree2_f(void **target_p, struct szc_dgs_s *d) {
+  szc_free(*target_p);
+}
 
 void **szcwrapp_f(void **target_p, struct szc_dgs_s *d) {
   struct szc_dgsf_s *dd = (struct szc_dgsf_s *)d;
@@ -122,11 +156,15 @@ int szcys_val_f(struct szc_dgs_s *target, struct szc_dgs_s *d) {
   return ans;
 }
 
-int szcys_val_f_ex(struct szc_dgs_s *target, struct szc_dgs_s *d, const char *name, int arr_i) { return szcys_val_f(target, d); }
+int szcys_val_f_ex(struct szc_dgs_s *target, struct szc_dgs_s *d, const char *name, int arr_i) {
+  return szcys_val_f(target, d);
+}
 
 int szcyff_f(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d) {
   struct szc_dgsf_s *dd = (struct szc_dgsf_s *)d;
   return f(dd->dga1, target_ex, d);
 }
 
-int szcyff_f_ex(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, const char *name, int arr_i) { return szcyff_f(f, target_ex, d); }
+int szcyff_f_ex(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, const char *name, int arr_i) {
+  return szcyff_f(f, target_ex, d);
+}

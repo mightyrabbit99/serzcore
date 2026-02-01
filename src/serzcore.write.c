@@ -27,9 +27,13 @@ struct szc_dgsw_s {
   uint8_t *val;
 };
 
-szcmode_t szc_get_mode_w(void) { return szcmode_write; }
+szcmode_t szc_get_mode_w(void) {
+  return szcmode_write;
+}
 
-szcmode2_t szc_get_mode2_w(void) { return szcmode2_static; }
+szcmode2_t szc_get_mode2_w(struct szc_dgs_s *d) {
+  return szcmode2_static;
+}
 
 struct szc_dgs_s *szc_init_w(void) {
   struct szc_dgsw_s *dd = (struct szc_dgsw_s *)szc_malloc(sizeof(struct szc_dgsw_s));
@@ -136,7 +140,9 @@ int szcy_w(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct
   return 0;
 }
 
-int szcyy_w(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d) { return szcy_w(typ, count, target, d); }
+int szcyy_w(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d) {
+  return szcy_w(typ, count, target, d);
+}
 
 int szcy_w_ex(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d, const char *name, szc_extyp_t extyp, ...) {
   return szcy_w(typ, count, target, d);
@@ -146,21 +152,33 @@ int szcyy_w_ex(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, st
   return szcyy_w(typ, count, target, d);
 }
 
-int szcmlc_w(void **target, size_t sz, struct szc_dgs_s *d) { return 0; }
+int szcmlc_w(void **target, size_t sz, struct szc_dgs_s *d) {
+  return 0;
+}
 
-int szcrealc_w(void **target, size_t sz, struct szc_dgs_s *d) { return 0; }
+int szcrealc_w(void **target, size_t sz, struct szc_dgs_s *d) {
+  return 0;
+}
 
-void *szcmemset_w(uint8_t *s, int c, size_t sz, struct szc_dgs_s *d) { return s; }
+void *szcmemset_w(uint8_t *s, int c, size_t sz, struct szc_dgs_s *d) {
+  return s;
+}
 
-void szcfree_w(void *target, struct szc_dgs_s *d) { return; }
+void szcfree_w(void *target, struct szc_dgs_s *d) {
+  return;
+}
 
-void szcfree2_w(void **target_p, struct szc_dgs_s *d) { return; }
+void szcfree2_w(void **target_p, struct szc_dgs_s *d) {
+  return;
+}
 
 void **szcwrapp_w(void **target_p, struct szc_dgs_s *d) {
   return target_p;
 }
 
-void szc_ptop_w(void **target_p, struct szc_dgs_s *d) { return; }
+void szc_ptop_w(void **target_p, struct szc_dgs_s *d) {
+  return;
+}
 
 int szcyf_w(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d) {
   struct szc_dgsw_s *dd = (struct szc_dgsw_s *)d;

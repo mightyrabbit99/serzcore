@@ -31,13 +31,18 @@ struct szc_dgsp_s {
   uint8_t indent;
 };
 
-#define _print_indent(dd) do {\
-  for (uint8_t i = 0; i < dd->indent; i++) printf("  ");\
-} while (0)
+#define _print_indent(dd)                                  \
+  do {                                                     \
+    for (uint8_t i = 0; i < dd->indent; i++) printf("  "); \
+  } while (0)
 
-szcmode_t szc_get_mode_p(void) { return szcmode_print; }
+szcmode_t szc_get_mode_p(void) {
+  return szcmode_print;
+}
 
-szcmode2_t szc_get_mode2_p(void) { return szcmode2_static; }
+szcmode2_t szc_get_mode2_p(struct szc_dgs_s *d) {
+  return szcmode2_dynamic;
+}
 
 struct szc_dgs_s *szc_init_p(void) {
   struct szc_dgsp_s *dd = (struct szc_dgsp_s *)szc_malloc(sizeof(struct szc_dgsp_s));
@@ -89,7 +94,9 @@ void szc_set_val_p(struct szc_dgs_s *d, size_t len, uint8_t *val) {
   dd->val = val;
 }
 
-void szc_destruct_p(struct szc_dgs_s *d) { szc_free(d); }
+void szc_destruct_p(struct szc_dgs_s *d) {
+  szc_free(d);
+}
 
 void szc_set_ctx_p_ex(struct szc_dgs_s *d, void *ctx1, ...) {
   struct szc_dgsp_s *dd = (struct szc_dgsp_s *)d;
@@ -219,7 +226,9 @@ void **szcwrapp_p(void **target_p, struct szc_dgs_s *d) {
   return target_p;
 }
 
-void szc_ptop_p(void **target_p, struct szc_dgs_s *d) { return; }
+void szc_ptop_p(void **target_p, struct szc_dgs_s *d) {
+  return;
+}
 
 int szcyf_p(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d) {
   struct szc_dgsp_s *dd = (struct szc_dgsp_s *)d;

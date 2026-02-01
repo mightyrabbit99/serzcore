@@ -32,13 +32,18 @@ struct szc_dgsp_lua_s {
   lua_State *L;
 };
 
-#define _print_indent(dd) do {\
-  for (uint8_t i = 0; i < dd->indent; i++) printf("  ");\
-} while (0)
+#define _print_indent(dd)                                  \
+  do {                                                     \
+    for (uint8_t i = 0; i < dd->indent; i++) printf("  "); \
+  } while (0)
 
-szcmode_t szc_get_mode_p_lua(void) { return szcmode_print; }
+szcmode_t szc_get_mode_p_lua(void) {
+  return szcmode_print;
+}
 
-szcmode2_t szc_get_mode2_p_lua(void) { return szcmode2_dynamic; }
+szcmode2_t szc_get_mode2_p_lua(struct szc_dgs_s *d) {
+  return szcmode2_dynamic;
+}
 
 struct szc_dgs_s *szc_init_p_lua(void) {
   struct szc_dgsp_lua_s *dd = (struct szc_dgsp_lua_s *)szc_malloc(sizeof(struct szc_dgsp_lua_s));
@@ -90,7 +95,9 @@ void szc_set_val_p_lua(struct szc_dgs_s *d, size_t len, uint8_t *val) {
   dd->val = val;
 }
 
-void szc_destruct_p_lua(struct szc_dgs_s *d) { szc_free(d); }
+void szc_destruct_p_lua(struct szc_dgs_s *d) {
+  szc_free(d);
+}
 
 void szc_set_ctx_p_ex_lua(struct szc_dgs_s *d, void *ctx1, ...) {
   struct szc_dgsp_lua_s *dd = (struct szc_dgsp_lua_s *)d;
@@ -101,7 +108,8 @@ void szc_set_ctx_p_ex_lua(struct szc_dgs_s *d, void *ctx1, ...) {
   va_end(argp);
 }
 
-static inline int _szcv_get_fieldlen_pw_ex_lua(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, size_t maxlen, struct szc_dgs_s *d, const char *name, szc_extyp_t extyp, va_list extyp_va) {
+static inline int _szcv_get_fieldlen_pw_ex_lua(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, size_t maxlen, struct szc_dgs_s *d, const char *name, szc_extyp_t extyp,
+                                               va_list extyp_va) {
   struct szc_dgsw_lua_s *dd = (struct szc_dgsw_lua_s *)d;
   size_t sz = 0;
   szc_extyp_t extyp2;

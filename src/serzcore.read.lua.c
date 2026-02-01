@@ -30,9 +30,13 @@ struct szc_dgsr_lua_s {
   lua_State *L;
 };
 
-szcmode_t szc_get_mode_r_lua(void) { return szcmode_read; }
+szcmode_t szc_get_mode_r_lua(void) {
+  return szcmode_read;
+}
 
-szcmode2_t szc_get_mode2_r_lua(void) { return szcmode2_dynamic; }
+szcmode2_t szc_get_mode2_r_lua(struct szc_dgs_s *d) {
+  return szcmode2_dynamic;
+}
 
 struct szc_dgs_s *szc_init_r_lua(void) {
   struct szc_dgsr_lua_s *dd = (struct szc_dgsr_lua_s *)szc_malloc(sizeof(struct szc_dgsr_lua_s));
@@ -84,7 +88,9 @@ void szc_set_val_r_lua(struct szc_dgs_s *d, size_t len, uint8_t *val) {
   dd->val = val;
 }
 
-void szc_destruct_r_lua(struct szc_dgs_s *d) { szc_free(d); }
+void szc_destruct_r_lua(struct szc_dgs_s *d) {
+  szc_free(d);
+}
 
 void szc_set_ctx_r_ex_lua(struct szc_dgs_s *d, void *ctx1, ...) {
   struct szc_dgsr_lua_s *dd = (struct szc_dgsr_lua_s *)d;
@@ -127,7 +133,6 @@ int szcyy_r_lua(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, s
   return 0;
 }
 
-
 static inline int _szcyv_r_ex_lua(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d, const char *name, szc_extyp_t extyp, va_list extyp_va) {
   if (count == 0) return 0;
   if (typ >= _szc_dtyp_max) return 1;
@@ -140,7 +145,7 @@ static inline int _szcyv_r_ex_lua(szc_dtyp_t typ, unsigned long long int count, 
   else
     end = ((dd->bitlen + count) >> 3) + ((dd->bitlen + count) % 8 == 0 ? 0 : 1);
   if (end > dd->maxlen) return 1;
-  
+
   uint8_t target2[szc_count_oct(typ, count)];
   _szcpy(typ, target2, dd->val + start, count, szc_typ_is_octal(typ) ? 0 : dd->bitlen % 8);
   int res = _szclua_r(dd->L, extyp, extyp_va, name, target2, sizeof(target2));
@@ -186,7 +191,9 @@ int szcrealc_r_lua(void **target, size_t sz, struct szc_dgs_s *d) {
   return 0;
 }
 
-void *szcmemset_r_lua(uint8_t *s, int c, size_t sz, struct szc_dgs_s *d) { return memset(s, c, sz); }
+void *szcmemset_r_lua(uint8_t *s, int c, size_t sz, struct szc_dgs_s *d) {
+  return memset(s, c, sz);
+}
 
 void szcfree_r_lua(void *target, struct szc_dgs_s *d) {
   if (target) szc_free(target);

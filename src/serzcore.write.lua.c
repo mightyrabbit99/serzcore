@@ -28,9 +28,13 @@ struct szc_dgsw_lua_s {
   lua_State *L;
 };
 
-szcmode_t szc_get_mode_w_lua(void) { return szcmode_write; }
+szcmode_t szc_get_mode_w_lua(void) {
+  return szcmode_write;
+}
 
-szcmode2_t szc_get_mode2_w_lua(void) { return szcmode2_dynamic; }
+szcmode2_t szc_get_mode2_w_lua(struct szc_dgs_s *d) {
+  return szcmode2_dynamic;
+}
 
 struct szc_dgs_s *szc_init_w_lua(void) {
   struct szc_dgsw_lua_s *dd = (struct szc_dgsw_lua_s *)szc_malloc(sizeof(struct szc_dgsw_lua_s));
@@ -138,7 +142,9 @@ int szcy_w_lua(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, st
   return 0;
 }
 
-int szcyy_w_lua(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d) { return szcy_w_lua(typ, count, target, d); }
+int szcyy_w_lua(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d) {
+  return szcy_w_lua(typ, count, target, d);
+}
 
 static inline int _szcyv_w_ex_lua(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d, const char *name, szc_extyp_t extyp, va_list extyp_va) {
   if (count == 0) return 0;
@@ -184,7 +190,9 @@ int szcrealc_w_lua(void **target, size_t sz, struct szc_dgs_s *d) {
   return 0;
 }
 
-void *szcmemset_w_lua(uint8_t *s, int c, size_t sz, struct szc_dgs_s *d) { return NULL; }
+void *szcmemset_w_lua(uint8_t *s, int c, size_t sz, struct szc_dgs_s *d) {
+  return NULL;
+}
 
 void szcfree_w_lua(void *target, struct szc_dgs_s *d) {
   if (target) szc_free(target);
@@ -217,7 +225,9 @@ int szcys_val_w_ex_lua(struct szc_dgs_s *target, struct szc_dgs_s *d, const char
   return szcys_val_w_lua(target, d);
 }
 
-int szcyff_w_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d) { return 0; }
+int szcyff_w_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d) {
+  return 0;
+}
 
 int szcyff_w_ex_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, const char *name, int arr_i) {
   struct szc_dgsw_lua_s *dd = (struct szc_dgsw_lua_s *)d;

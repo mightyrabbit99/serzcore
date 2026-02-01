@@ -29,9 +29,13 @@ struct szc_dgsr_s {
   uint8_t *val;
 };
 
-szcmode_t szc_get_mode_r(void) { return szcmode_read; }
+szcmode_t szc_get_mode_r(void) {
+  return szcmode_read;
+}
 
-szcmode2_t szc_get_mode2_r(void) { return szcmode2_static; }
+szcmode2_t szc_get_mode2_r(struct szc_dgs_s *d) {
+  return szcmode2_static;
+}
 
 struct szc_dgs_s *szc_init_r(void) {
   struct szc_dgsr_s *dd = (struct szc_dgsr_s *)szc_malloc(sizeof(struct szc_dgsr_s));
@@ -83,7 +87,9 @@ void szc_set_val_r(struct szc_dgs_s *d, size_t len, uint8_t *val) {
   dd->val = val;
 }
 
-void szc_destruct_r(struct szc_dgs_s *d) { szc_free(d); }
+void szc_destruct_r(struct szc_dgs_s *d) {
+  szc_free(d);
+}
 
 void szc_set_ctx_r_ex(struct szc_dgs_s *d, void *ctx1, ...) {
   return;
@@ -154,7 +160,9 @@ int szcrealc_r(void **target, size_t sz, struct szc_dgs_s *d) {
   return 0;
 }
 
-void *szcmemset_r(uint8_t *s, int c, size_t sz, struct szc_dgs_s *d) { return memset(s, c, sz); }
+void *szcmemset_r(uint8_t *s, int c, size_t sz, struct szc_dgs_s *d) {
+  return memset(s, c, sz);
+}
 
 void szcfree_r(void *target, struct szc_dgs_s *d) {
   if (target) szc_free(target);
@@ -169,7 +177,9 @@ void **szcwrapp_r(void **target_p, struct szc_dgs_s *d) {
   return target_p;
 }
 
-void szc_ptop_r(void **target_p, struct szc_dgs_s *d) { return; }
+void szc_ptop_r(void **target_p, struct szc_dgs_s *d) {
+  return;
+}
 
 int szcyf_r(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d) {
   struct szc_dgsr_s *dd = (struct szc_dgsr_s *)d;
