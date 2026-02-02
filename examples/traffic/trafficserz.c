@@ -28,11 +28,11 @@ SZFDECL_STATIC(struct, ship_s, p) {
 static szc_ff_t get_vehicle_dgf(vetyp_t typ) {
   switch (typ) {
     case vetyp_null:
-      return SZFNAME(null_s);
+      return SZFFUNCP(null_s);
     case vetyp_car:
-      return SZFNAME(car_s);
+      return SZFFUNCP(car_s);
     case vetyp_ship:
-      return SZFNAME(ship_s);
+      return SZFFUNCP(ship_s);
     default:
       return NULL;
   }

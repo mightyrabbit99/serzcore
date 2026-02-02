@@ -28,6 +28,7 @@ struct szc_dgsr_lua_s {
   size_t maxlen;
   uint8_t *val;
   lua_State *L;
+  void *f_ctx;
 };
 
 szcmode_t szc_get_mode_r_lua(void) {
@@ -198,7 +199,7 @@ void szc_ptop_r_lua(void **target_p, struct szc_dgs_s *d) {
   szcfree2_r_lua(target_p, d);
 }
 
-int szcyf_r_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d) {
+int szcyf_r_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, void *ctx) {
   struct szc_dgsr_lua_s *dd = (struct szc_dgsr_lua_s *)d;
   dd->f = f;
   dd->target_ex = target_ex;
@@ -212,29 +213,29 @@ int szcys_val_r_lua(struct szc_dgs_s *target, struct szc_dgs_s *d) {
   if (dd_t->maxlen > 0) {
     if (dd_t->maxlen > dd->maxlen - (dd->bitlen >> 3)) return 1;
     szc_set_val_r_lua(target, dd_t->maxlen, &dd->val[dd->bitlen >> 3]);
-    ans = dd_t->f(dd_t->dga1, dd_t->target_ex, target);
+    ans = dd_t->f(dd_t->dga1, dd_t->target_ex, target, dd_t->f_ctx);
     if (ans) return ans;
     dd->bitlen += dd_t->bitlen;
   } else {
-    ans = dd_t->f(dd_t->dga1, dd_t->target_ex, d);
+    ans = dd_t->f(dd_t->dga1, dd_t->target_ex, d, dd_t->f_ctx);
     if (ans) return ans;
   }
   return 0;
 }
 
-int szcyff_r_ex_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, const char *name, int arr_i);
+int szcyff_r_ex_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, void *ctx, const char *name, int arr_i);
 int szcys_val_r_ex_lua(struct szc_dgs_s *target, struct szc_dgs_s *d, const char *name, int arr_i) {
   struct szc_dgsr_lua_s *dd = (struct szc_dgsr_lua_s *)d;
   struct szc_dgsr_lua_s *dd_t = (struct szc_dgsr_lua_s *)target;
   szc_set_val_r_lua(target, dd_t->maxlen, &dd->val[dd->bitlen >> 3]);
-  return szcyff_r_ex_lua(dd_t->f, dd_t->target_ex, target, name, arr_i);
+  return szcyff_r_ex_lua(dd_t->f, dd_t->target_ex, target, dd_t->f_ctx, name, arr_i);
 }
 
-int szcyff_r_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d) {
+int szcyff_r_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, void *ctx) {
   return 0;
 }
 
-int szcyff_r_ex_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, const char *name, int arr_i) {
+int szcyff_r_ex_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, void *ctx, const char *name, int arr_i) {
   struct szc_dgsr_lua_s *dd = (struct szc_dgsr_lua_s *)d;
   if (!lua_istable(dd->L, -1)) return 1;
   if (arr_i == -1) {
@@ -254,7 +255,7 @@ int szcyff_r_ex_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, const
     lua_settable(dd->L, -3);
     lua_rawgeti(dd->L, -1, arr_i + 1);
   }
-  if (f(dd->dga1, target_ex, d)) {
+  if (f(dd->dga1, target_ex, d, ctx)) {
     lua_pop(dd->L, 2);
     return 1;
   }

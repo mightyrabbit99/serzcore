@@ -21,9 +21,12 @@
 static const unsigned int prime_1 = 73;
 static const unsigned int prime_2 = 5009;
 
+static void *(*hashset_calloc)(size_t, size_t) = calloc;
+static void(*hashset_free)(void *) = free;
+
 hashset_t hashset_create()
 {
-    hashset_t set = calloc(1, sizeof(struct hashset_st));
+    hashset_t set = hashset_calloc(1, sizeof(struct hashset_st));
 
     if (set == NULL) {
         return NULL;
@@ -31,7 +34,7 @@ hashset_t hashset_create()
     set->nbits = 3;
     set->capacity = (size_t)(1 << set->nbits);
     set->mask = set->capacity - 1;
-    set->items = calloc(set->capacity, sizeof(size_t));
+    set->items = hashset_calloc(set->capacity, sizeof(size_t));
     if (set->items == NULL) {
         hashset_destroy(set);
         return NULL;
@@ -49,9 +52,9 @@ size_t hashset_num_items(hashset_t set)
 void hashset_destroy(hashset_t set)
 {
     if (set) {
-        free(set->items);
+        hashset_free(set->items);
     }
-    free(set);
+    hashset_free(set);
 }
 
 static int hashset_add_member(hashset_t set, void *item)
@@ -93,14 +96,14 @@ static void maybe_rehash(hashset_t set)
         set->nbits++;
         set->capacity = (size_t)(1 << set->nbits);
         set->mask = set->capacity - 1;
-        set->items = calloc(set->capacity, sizeof(size_t));
+        set->items = hashset_calloc(set->capacity, sizeof(size_t));
         set->nitems = 0;
         set->n_deleted_items = 0;
         assert(set->items);
         for (ii = 0; ii < old_capacity; ii++) {
             hashset_add_member(set, (void *)old_items[ii]);
         }
-        free(old_items);
+        hashset_free(old_items);
     }
 }
 
@@ -142,4 +145,10 @@ int hashset_is_member(hashset_t set, void *item)
         }
     }
     return 0;
+}
+
+void hashset_set_mem_functions(void *(*_calloc)(size_t, size_t), void(*_free)(void *))
+{
+    hashset_calloc = _calloc;
+    hashset_free = _free;
 }

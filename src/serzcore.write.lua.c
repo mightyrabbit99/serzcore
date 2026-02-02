@@ -198,9 +198,9 @@ void szc_ptop_w_lua(void **target_p, struct szc_dgs_s *d) {
   szcfree2_w_lua(target_p, d);
 }
 
-int szcyf_w_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d) {
+int szcyf_w_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, void* ctx) {
   struct szc_dgsw_lua_s *dd = (struct szc_dgsw_lua_s *)d;
-  return f(dd->dga1, target_ex, d);
+  return f(dd->dga1, target_ex, d, ctx);
 }
 
 int szcys_val_w_lua(struct szc_dgs_s *target, struct szc_dgs_s *d) {
@@ -212,17 +212,17 @@ int szcys_val_w_ex_lua(struct szc_dgs_s *target, struct szc_dgs_s *d, const char
   return szcys_val_w_lua(target, d);
 }
 
-int szcyff_w_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d) {
+int szcyff_w_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, void* ctx) {
   return 0;
 }
 
-int szcyff_w_ex_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, const char *name, int arr_i) {
+int szcyff_w_ex_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, void* ctx, const char *name, int arr_i) {
   struct szc_dgsw_lua_s *dd = (struct szc_dgsw_lua_s *)d;
   int ans;
   if (!lua_istable(dd->L, -1)) return 1;
   lua_getfield(dd->L, -1, name);
   if (!lua_istable(dd->L, -1)) return 1;
-  ans = f(dd->dga1, target_ex, d);
+  ans = f(dd->dga1, target_ex, d, ctx);
   lua_pop(dd->L, 1);
   return ans;
 }

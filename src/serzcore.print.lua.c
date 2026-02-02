@@ -30,6 +30,7 @@ struct szc_dgsp_lua_s {
   uint8_t ptyp;
   uint8_t indent;
   lua_State *L;
+  void *f_ctx;
 };
 
 #define _print_indent(dd)                                  \
@@ -255,10 +256,11 @@ void szc_ptop_p_lua(void **target_p, struct szc_dgs_s *d) {
   return;
 }
 
-int szcyf_p_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d) {
+int szcyf_p_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, void *ctx) {
   struct szc_dgsp_lua_s *dd = (struct szc_dgsp_lua_s *)d;
   dd->f = f;
   dd->target_ex = target_ex;
+  dd->f_ctx = ctx;
   return 0;
 }
 
@@ -269,45 +271,45 @@ int szcys_val_p_lua(struct szc_dgs_s *target, struct szc_dgs_s *d) {
   if (dd_t->maxlen > 0) {
     if (dd_t->maxlen > dd->maxlen - (dd->bitlen >> 3)) return 1;
     szc_set_val_p_lua(target, dd_t->maxlen, &dd->val[dd->bitlen >> 3]);
-    ans = dd_t->f(dd_t->dga1, dd_t->target_ex, target);
+    ans = dd_t->f(dd_t->dga1, dd_t->target_ex, target, dd_t->f_ctx);
     if (ans) return ans;
     dd->bitlen += dd_t->bitlen;
   } else {
-    ans = dd_t->f(dd_t->dga1, dd_t->target_ex, d);
+    ans = dd_t->f(dd_t->dga1, dd_t->target_ex, d, dd_t->f_ctx);
     if (ans) return ans;
   }
   return 0;
 }
 
-int szcyff_p_ex_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, const char *name, int arr_i);
+int szcyff_p_ex_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, void *ctx, const char *name, int arr_i);
 int szcys_val_p_ex_lua(struct szc_dgs_s *target, struct szc_dgs_s *d, const char *name, int arr_i) {
   struct szc_dgsp_lua_s *dd = (struct szc_dgsp_lua_s *)d;
   struct szc_dgsp_lua_s *dd_t = (struct szc_dgsp_lua_s *)target;
   szc_set_val_p_lua(target, dd_t->maxlen, &dd->val[dd->bitlen >> 3]);
-  return szcyff_p_ex_lua(dd_t->f, dd_t->target_ex, target, name, arr_i);
+  return szcyff_p_ex_lua(dd_t->f, dd_t->target_ex, target, dd_t->f_ctx, name, arr_i);
 }
 
-int szcyff_p_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d) {
+int szcyff_p_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, void *ctx) {
   return 0;
 }
 
-static inline int _szcff_pw_ex_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, const char *name, int arr_i) {
+static inline int _szcff_pw_ex_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, void *ctx, const char *name, int arr_i) {
   struct szc_dgsp_lua_s *dd = (struct szc_dgsp_lua_s *)d;
   int ans;
   if (!lua_istable(dd->L, -1)) return 1;
   lua_getfield(dd->L, -1, name);
   if (!lua_istable(dd->L, -1)) return 1;
-  ans = f(dd->dga1, target_ex, d);
+  ans = f(dd->dga1, target_ex, d, ctx);
   lua_pop(dd->L, 1);
   return ans;
 }
 
-static inline int _szcff_pr_ex_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, const char *name, int arr_i) {
+static inline int _szcff_pr_ex_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, void *ctx, const char *name, int arr_i) {
   struct szc_dgsp_lua_s *dd = (struct szc_dgsp_lua_s *)d;
-  return f(dd->dga1, target_ex, d);
+  return f(dd->dga1, target_ex, d, ctx);
 }
 
-int szcyff_p_ex_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, const char *name, int arr_i) {
+int szcyff_p_ex_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, void *ctx, const char *name, int arr_i) {
   struct szc_dgsp_lua_s *dd = (struct szc_dgsp_lua_s *)d;
   int ans;
   _print_indent(dd);
@@ -316,9 +318,9 @@ int szcyff_p_ex_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, const
   printf("::\n");
   dd->indent++;
   if (dd->ptyp == szc_ptyp_struct) {
-    ans = _szcff_pw_ex_lua(f, target_ex, d, name, arr_i);
+    ans = _szcff_pw_ex_lua(f, target_ex, d, ctx, name, arr_i);
   } else {
-    ans = _szcff_pr_ex_lua(f, target_ex, d, name, arr_i);
+    ans = _szcff_pr_ex_lua(f, target_ex, d, ctx, name, arr_i);
   }
   dd->indent--;
   if (ans == 0) {

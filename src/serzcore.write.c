@@ -180,9 +180,9 @@ void szc_ptop_w(void **target_p, struct szc_dgs_s *d) {
   return;
 }
 
-int szcyf_w(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d) {
+int szcyf_w(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, void *ctx) {
   struct szc_dgsw_s *dd = (struct szc_dgsw_s *)d;
-  return f(dd->dga1, target_ex, d);
+  return f(dd->dga1, target_ex, d, ctx);
 }
 
 int szcys_val_w(struct szc_dgs_s *target, struct szc_dgs_s *d) {
@@ -194,11 +194,11 @@ int szcys_val_w_ex(struct szc_dgs_s *target, struct szc_dgs_s *d, const char *na
   return szcys_val_w(target, d);
 }
 
-int szcyff_w(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d) {
+int szcyff_w(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, void *ctx) {
   struct szc_dgsw_s *dd = (struct szc_dgsw_s *)d;
-  return f(dd->dga1, target_ex, d);
+  return f(dd->dga1, target_ex, d, ctx);
 }
 
-int szcyff_w_ex(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, const char *name, int arr_i) {
-  return szcyff_w(f, target_ex, d);
+int szcyff_w_ex(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, void *ctx, const char *name, int arr_i) {
+  return szcyff_w(f, target_ex, d, ctx);
 }

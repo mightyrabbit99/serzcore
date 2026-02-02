@@ -27,6 +27,7 @@ struct szc_dgsf_s {
   unsigned long long int bitlen;
   size_t maxlen;
   hashset_t hs;
+  void *f_ctx;
 };
 
 szcmode_t szc_get_mode_f(void) {
@@ -121,30 +122,38 @@ void *szcmemset_f(uint8_t *s, int c, size_t sz, struct szc_dgs_s *d) {
 }
 
 void szcfree_f(void *target, struct szc_dgs_s *d) {
-  szc_free(target);
+  if (target) szc_free(target);
 }
 
 void szcfree2_f(void **target_p, struct szc_dgs_s *d) {
+  struct szc_dgsf_s *dd = (struct szc_dgsf_s *)d;
   szc_free(*target_p);
+  if (hashset_is_member(dd->hs, *target_p)) {
+    hashset_remove(dd->hs, *target_p);
+    szc_free(target_p);
+  } else {
+    *target_p = NULL;
+  }
 }
 
 void **szcwrapp_f(void **target_p, struct szc_dgs_s *d) {
   struct szc_dgsf_s *dd = (struct szc_dgsf_s *)d;
   if (hashset_is_member(dd->hs, *target_p)) return NULL;
-  hashset_add(dd->hs, *target_p);
-  return target_p;
+  void **ptp = (void **)szc_malloc(sizeof(void *));
+  *ptp = *target_p;
+  hashset_add(dd->hs, *ptp);
+  return ptp;
 }
 
 void szc_ptop_f(void **target_p, struct szc_dgs_s *d) {
-  struct szc_dgsf_s *dd = (struct szc_dgsf_s *)d;
-  hashset_remove(dd->hs, *target_p);
   szcfree2_f(target_p, d);
 }
 
-int szcyf_f(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d) {
+int szcyf_f(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, void *ctx) {
   struct szc_dgsf_s *dd = (struct szc_dgsf_s *)d;
   dd->f = f;
   dd->target_ex = target_ex;
+  dd->f_ctx = ctx;
   return 0;
 }
 
@@ -152,7 +161,7 @@ int szcys_val_f(struct szc_dgs_s *target, struct szc_dgs_s *d) {
   struct szc_dgsf_s *dd = (struct szc_dgsf_s *)d;
   struct szc_dgsf_s *dd_t = (struct szc_dgsf_s *)target;
   int ans = 0;
-  ans = dd_t->f(dd_t->dga1, dd_t->target_ex, d);
+  ans = dd_t->f(dd_t->dga1, dd_t->target_ex, d, dd_t->f_ctx);
   return ans;
 }
 
@@ -160,11 +169,11 @@ int szcys_val_f_ex(struct szc_dgs_s *target, struct szc_dgs_s *d, const char *na
   return szcys_val_f(target, d);
 }
 
-int szcyff_f(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d) {
+int szcyff_f(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, void *ctx) {
   struct szc_dgsf_s *dd = (struct szc_dgsf_s *)d;
-  return f(dd->dga1, target_ex, d);
+  return f(dd->dga1, target_ex, d, ctx);
 }
 
-int szcyff_f_ex(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, const char *name, int arr_i) {
-  return szcyff_f(f, target_ex, d);
+int szcyff_f_ex(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, void *ctx, const char *name, int arr_i) {
+  return szcyff_f(f, target_ex, d, ctx);
 }

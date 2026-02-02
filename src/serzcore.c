@@ -318,10 +318,18 @@ static inline void _szcprint(void (*f)(void *, const char *format, ...), void *a
   }
 }
 
+static void *szc_calloc(size_t num, size_t size) {
+  if (szc_malloc == malloc) return calloc(num, size);
+  void *ans = szc_malloc(num * size);
+  memset(ans, 0, num * size);
+  return ans;
+}
+
 void szc_set_mem_functions(void *(*malloc_fn)(size_t), void *(*realloc_fn)(void *, size_t), void (*free_fn)(void *)) {
   szc_malloc = malloc_fn;
   szc_realloc = realloc_fn;
   szc_free = free_fn;
+  hashset_set_mem_functions(szc_calloc, szc_free);
 }
 
 #if defined(SERZCORE_LUA)

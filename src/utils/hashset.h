@@ -66,6 +66,8 @@ extern "C" {
      */
     int hashset_is_member(hashset_t set, void *item);
 
+    void hashset_set_mem_functions(void *(*_calloc)(size_t, size_t), void(*_free)(void *));
+
 #ifdef __cplusplus
 }
 #endif

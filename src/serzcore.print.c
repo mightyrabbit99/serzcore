@@ -29,6 +29,7 @@ struct szc_dgsp_s {
   uint8_t *val;
   uint8_t ptyp;
   uint8_t indent;
+  void *f_ctx;
 };
 
 #define _print_indent(dd)                                  \
@@ -209,10 +210,11 @@ void szc_ptop_p(void **target_p, struct szc_dgs_s *d) {
   return;
 }
 
-int szcyf_p(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d) {
+int szcyf_p(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, void *ctx) {
   struct szc_dgsp_s *dd = (struct szc_dgsp_s *)d;
   dd->f = f;
   dd->target_ex = target_ex;
+  dd->f_ctx = ctx;
   return 0;
 }
 
@@ -223,11 +225,11 @@ int szcys_val_p(struct szc_dgs_s *target, struct szc_dgs_s *d) {
   if (dd_t->maxlen > 0) {
     if (dd_t->maxlen > dd->maxlen - (dd->bitlen >> 3)) return 1;
     szc_set_val_p(target, dd_t->maxlen, &dd->val[dd->bitlen >> 3]);
-    ans = dd_t->f(dd_t->dga1, dd_t->target_ex, target);
+    ans = dd_t->f(dd_t->dga1, dd_t->target_ex, target, dd_t->f_ctx);
     if (ans) return ans;
     dd->bitlen += dd_t->bitlen;
   } else {
-    ans = dd_t->f(dd_t->dga1, dd_t->target_ex, d);
+    ans = dd_t->f(dd_t->dga1, dd_t->target_ex, d, dd_t->f_ctx);
     if (ans) return ans;
   }
   return 0;
@@ -251,19 +253,19 @@ int szcys_val_p_ex(struct szc_dgs_s *target, struct szc_dgs_s *d, const char *na
   return ans;
 }
 
-int szcyff_p(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d) {
+int szcyff_p(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, void *ctx) {
   struct szc_dgsp_s *dd = (struct szc_dgsp_s *)d;
-  return f(dd->dga1, target_ex, d);
+  return f(dd->dga1, target_ex, d, ctx);
 }
 
-int szcyff_p_ex(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, const char *name, int arr_i) {
+int szcyff_p_ex(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, void *ctx, const char *name, int arr_i) {
   struct szc_dgsp_s *dd = (struct szc_dgsp_s *)d;
   _print_indent(dd);
   printf("::%s", name);
   if (arr_i != -1) printf("[%d]", arr_i);
   printf("::\n");
   dd->indent++;
-  int ans = szcyff_p(f, target_ex, d);
+  int ans = szcyff_p(f, target_ex, d, ctx);
   dd->indent--;
   if (ans == 0) {
     _print_indent(dd);

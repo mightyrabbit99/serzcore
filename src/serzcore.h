@@ -72,7 +72,7 @@ static inline int szc_typ_is_octal(szc_dtyp_t typ) {
 struct szc_dga_s;
 struct szc_dgs_s;
 
-typedef int (*szc_ff_t)(const struct szc_dga_s *, _target_ex, struct szc_dgs_s *);
+typedef int (*szc_ff_t)(const struct szc_dga_s *, _target_ex, struct szc_dgs_s *, void ****);
 
 /////
 #if defined(SERZCORE_LUA)
@@ -100,11 +100,11 @@ void szcfree_r_lua(void *target, struct szc_dgs_s *d);
 void szcfree2_r_lua(void **target_p, struct szc_dgs_s *d);
 void **szcwrapp_r_lua(void **target_p, struct szc_dgs_s *d);
 void szc_ptop_r_lua(void **target_p, struct szc_dgs_s *d);
-int szcyf_r_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d);
+int szcyf_r_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, void *ctx);
 int szcys_val_r_lua(struct szc_dgs_s *target, struct szc_dgs_s *d);
 int szcys_val_r_ex_lua(struct szc_dgs_s *target, struct szc_dgs_s *d, const char *name, int arr_i);
-int szcyff_r_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d);
-int szcyff_r_ex_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, const char *name, int arr_i);
+int szcyff_r_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, void *ctx);
+int szcyff_r_ex_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, void *ctx, const char *name, int arr_i);
 
 szcmode_t szc_get_mode_w_lua(void);
 szcmode2_t szc_get_mode2_w_lua(struct szc_dgs_s *d);
@@ -130,11 +130,11 @@ void szcfree_w_lua(void *target, struct szc_dgs_s *d);
 void szcfree2_w_lua(void **target_p, struct szc_dgs_s *d);
 void **szcwrapp_w_lua(void **target_p, struct szc_dgs_s *d);
 void szc_ptop_w_lua(void **target_p, struct szc_dgs_s *d);
-int szcyf_w_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d);
+int szcyf_w_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, void *ctx);
 int szcys_val_w_lua(struct szc_dgs_s *target, struct szc_dgs_s *d);
 int szcys_val_w_ex_lua(struct szc_dgs_s *target, struct szc_dgs_s *d, const char *name, int arr_i);
-int szcyff_w_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d);
-int szcyff_w_ex_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, const char *name, int arr_i);
+int szcyff_w_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, void *ctx);
+int szcyff_w_ex_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, void *ctx, const char *name, int arr_i);
 
 szcmode_t szc_get_mode_p_lua(void);
 szcmode2_t szc_get_mode2_p_lua(struct szc_dgs_s *d);
@@ -160,11 +160,11 @@ void szcfree_p_lua(void *target, struct szc_dgs_s *d);
 void szcfree2_p_lua(void **target_p, struct szc_dgs_s *d);
 void **szcwrapp_p_lua(void **target_p, struct szc_dgs_s *d);
 void szc_ptop_p_lua(void **target_p, struct szc_dgs_s *d);
-int szcyf_p_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d);
+int szcyf_p_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, void *ctx);
 int szcys_val_p_lua(struct szc_dgs_s *target, struct szc_dgs_s *d);
 int szcys_val_p_ex_lua(struct szc_dgs_s *target, struct szc_dgs_s *d, const char *name, int arr_i);
-int szcyff_p_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d);
-int szcyff_p_ex_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, const char *name, int arr_i);
+int szcyff_p_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, void *ctx);
+int szcyff_p_ex_lua(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, void *ctx, const char *name, int arr_i);
 
 #else
 
@@ -192,11 +192,11 @@ void szcfree_r(void *target, struct szc_dgs_s *d);
 void szcfree2_r(void **target_p, struct szc_dgs_s *d);
 void **szcwrapp_r(void **target_p, struct szc_dgs_s *d);
 void szc_ptop_r(void **target_p, struct szc_dgs_s *d);
-int szcyf_r(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d);
+int szcyf_r(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, void *ctx);
 int szcys_val_r(struct szc_dgs_s *target, struct szc_dgs_s *d);
 int szcys_val_r_ex(struct szc_dgs_s *target, struct szc_dgs_s *d, const char *name, int arr_i);
-int szcyff_r(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d);
-int szcyff_r_ex(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, const char *name, int arr_i);
+int szcyff_r(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, void *ctx);
+int szcyff_r_ex(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, void *ctx, const char *name, int arr_i);
 
 szcmode_t szc_get_mode_w(void);
 szcmode2_t szc_get_mode2_w(struct szc_dgs_s *d);
@@ -222,11 +222,11 @@ void szcfree_w(void *target, struct szc_dgs_s *d);
 void szcfree2_w(void **target_p, struct szc_dgs_s *d);
 void **szcwrapp_w(void **target_p, struct szc_dgs_s *d);
 void szc_ptop_w(void **target_p, struct szc_dgs_s *d);
-int szcyf_w(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d);
+int szcyf_w(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, void *ctx);
 int szcys_val_w(struct szc_dgs_s *target, struct szc_dgs_s *d);
 int szcys_val_w_ex(struct szc_dgs_s *target, struct szc_dgs_s *d, const char *name, int arr_i);
-int szcyff_w(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d);
-int szcyff_w_ex(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, const char *name, int arr_i);
+int szcyff_w(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, void *ctx);
+int szcyff_w_ex(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, void *ctx, const char *name, int arr_i);
 
 szcmode_t szc_get_mode_p(void);
 szcmode2_t szc_get_mode2_p(struct szc_dgs_s *d);
@@ -252,11 +252,11 @@ void szcfree_p(void *target, struct szc_dgs_s *d);
 void szcfree2_p(void **target_p, struct szc_dgs_s *d);
 void **szcwrapp_p(void **target_p, struct szc_dgs_s *d);
 void szc_ptop_p(void **target_p, struct szc_dgs_s *d);
-int szcyf_p(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d);
+int szcyf_p(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, void *ctx);
 int szcys_val_p(struct szc_dgs_s *target, struct szc_dgs_s *d);
 int szcys_val_p_ex(struct szc_dgs_s *target, struct szc_dgs_s *d, const char *name, int arr_i);
-int szcyff_p(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d);
-int szcyff_p_ex(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, const char *name, int arr_i);
+int szcyff_p(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, void *ctx);
+int szcyff_p_ex(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, void *ctx, const char *name, int arr_i);
 
 szcmode_t szc_get_mode_f(void);
 szcmode2_t szc_get_mode2_f(struct szc_dgs_s *d);
@@ -282,11 +282,11 @@ void szcfree_f(void *target, struct szc_dgs_s *d);
 void szcfree2_f(void **target_p, struct szc_dgs_s *d);
 void **szcwrapp_f(void **target_p, struct szc_dgs_s *d);
 void szc_ptop_f(void **target_p, struct szc_dgs_s *d);
-int szcyf_f(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d);
+int szcyf_f(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, void *ctx);
 int szcys_val_f(struct szc_dgs_s *target, struct szc_dgs_s *d);
 int szcys_val_f_ex(struct szc_dgs_s *target, struct szc_dgs_s *d, const char *name, int arr_i);
-int szcyff_f(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d);
-int szcyff_f_ex(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, const char *name, int arr_i);
+int szcyff_f(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, void *ctx);
+int szcyff_f_ex(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, void *ctx, const char *name, int arr_i);
 
 #endif // SERZCORE_LUA
 
@@ -319,11 +319,11 @@ struct szc_dga_s {
   void (*szcfree2)(void **, struct szc_dgs_s *);
   void **(*szcwrapp)(void **, struct szc_dgs_s *);
   void (*szc_ptop)(void **, struct szc_dgs_s *);
-  int (*szcyf)(szc_ff_t, _target_ex, struct szc_dgs_s *);
+  int (*szcyf)(szc_ff_t, _target_ex, struct szc_dgs_s *, void *);
   int (*szcys_val)(struct szc_dgs_s *, struct szc_dgs_s *);
   int (*szcys_val_ex)(struct szc_dgs_s *, struct szc_dgs_s *, const char *, int);
-  int (*szcyff)(szc_ff_t, _target_ex, struct szc_dgs_s *);
-  int (*szcyff_ex)(szc_ff_t, _target_ex, struct szc_dgs_s *, const char *, int);
+  int (*szcyff)(szc_ff_t, _target_ex, struct szc_dgs_s *, void *);
+  int (*szcyff_ex)(szc_ff_t, _target_ex, struct szc_dgs_s *, void *, const char *, int);
 };
 
 #if defined(SERZCORE_LUA)

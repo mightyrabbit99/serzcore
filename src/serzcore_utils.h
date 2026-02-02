@@ -90,13 +90,13 @@ static inline uint8_t szc_get_ctnsz(register unsigned long long val) {
     int ans__;                                                \
     if (ans__ = SZC_SZCA_NAME->f1(__VA_ARGS__)) return ans__; \
   } while (0)
-#define szcys_val(target, d) _szcy_exec(szcys_val, target, d)
-#define szcyf(f, target_ex, d)              \
-  do {                                      \
-    if (szc_get_mode2() == szcmode2_static) \
-      _szcy_exec(szcyf, f, target_ex, d);   \
-    else                                    \
-      _szcy_exec(szcyf, f, NULL, d);        \
+#define szcysv(target, d) _szcy_exec(szcys_val, target, d)
+#define szcyf(f, target_ex, d)                            \
+  do {                                                    \
+    if (szc_get_mode2() == szcmode2_static)               \
+      _szcy_exec(szcyf, f, target_ex, d, SZC_DGARR_NAME); \
+    else                                                  \
+      _szcy_exec(szcyf, f, NULL, d, SZC_DGARR_NAME);      \
   } while (0)
 
 #define szcy(typ, count, target)                                       \
@@ -116,14 +116,14 @@ static inline uint8_t szc_get_ctnsz(register unsigned long long val) {
 #define szcx(typ, target) szcy(typ, szc_typ_is_octal(typ) ? sizeof(target) : (sizeof(target) << 3), &target)
 #define szcv(typ, target) szcyy(typ, szc_typ_is_octal(typ) ? sizeof(target) : (sizeof(target) << 3), &target)
 // #define szcf(ff, p) ff(SZC_SZCA_NAME, p, SZC_DST_NAME)
-#define szcf(ff, p)                               \
-  do {                                            \
-    if (szc_get_mode2() == szcmode2_static)       \
-      _szcy_exec(szcyff, ff, p, SZC_DST_NAME);    \
-    else                                          \
-      _szcy_exec(szcyff, ff, NULL, SZC_DST_NAME); \
+#define szcf(ff, p)                                               \
+  do {                                                            \
+    if (szc_get_mode2() == szcmode2_static)                       \
+      _szcy_exec(szcyff, ff, p, SZC_DST_NAME, SZC_DGARR_NAME);    \
+    else                                                          \
+      _szcy_exec(szcyff, ff, NULL, SZC_DST_NAME, SZC_DGARR_NAME); \
   } while (0)
-#define szcfn(struname, p) szcf(SZFNAME(struname), p)
+#define szcfn(struname, p) szcf(SZFFUNCP(struname), p)
 
 #define szcmlc(target, sz)                          \
   do {                                              \
@@ -176,12 +176,15 @@ static inline uint8_t szc_get_ctnsz(register unsigned long long val) {
     if (szc_conv_1(typ, sizeof(valtyp)) < count) count2__ = szc_conv_1(typ, sizeof(valtyp)); \
     szcyx(typ, count2__, szc_conv_1(typ, sizeof(valtyp)), &target__);                        \
   } while (0)
-#define szcmlcl(ptr, len)                                     \
-  do {                                                        \
-    if (szc_get_mode2() == szcmode2_static) {                 \
-      szcmlc((void **)(ptr), len);                            \
-      szc_cvector_push_back(*SZC_DGARR_NAME, (void **)(ptr)); \
-    }                                                         \
+#define szcmlcl(ptr, len)                             \
+  do {                                                \
+    if (szc_get_mode2() == szcmode2_static) {         \
+      szcmlc((void **)(ptr), len);                    \
+      void **pp__ = szcwrapp((void **)(ptr));         \
+      if (pp__) {                                     \
+        szc_cvector_push_back(*SZC_DGARR_NAME, pp__); \
+      }                                               \
+    }                                                 \
   } while (0)
 #define szcrealcl(ptr, len)                                       \
   do {                                                            \
@@ -189,10 +192,7 @@ static inline uint8_t szc_get_ctnsz(register unsigned long long val) {
       void *ptr_orig__ = *(ptr);                                  \
       szcrealc((void **)(ptr), len);                              \
       if (szc_get_mode() == szcmode_free || ptr_orig__ == NULL) { \
-        void **pp = szcwrapp((void **)(ptr));                     \
-        if (pp) {                                                 \
-          szc_cvector_push_back(*SZC_DGARR_NAME, pp);             \
-        }                                                         \
+        szc_cvector_push_back(*SZC_DGARR_NAME, (void **)(ptr));   \
       }                                                           \
     }                                                             \
   } while (0)
@@ -221,14 +221,19 @@ static inline uint8_t szc_get_ctnsz(register unsigned long long val) {
   } while (0)
 #define szclvrcrse(typ, tlv_len_t, ff, target)            \
   do {                                                    \
+    int ret__;                                            \
     struct szc_dgs_s *d2__ = SZC_SZCA_NAME->szc_init();   \
     if (d2__ == NULL) return 1;                           \
     szcyf(ff, target, d2__);                              \
     tlv_len_t len__ = SZC_SZCA_NAME->szc_get_len(d2__);   \
-    szcyy(typ, sizeof(len__), &len__);                    \
+    szcv(typ, len__);                                     \
     SZC_SZCA_NAME->szc_set_maxlen(d2__, len__);           \
     size_t l1 = SZC_SZCA_NAME->szc_get_len(SZC_DST_NAME); \
-    szcys_val(d2__, SZC_DST_NAME);                        \
+    ret__ = SZC_SZCA_NAME->szcys_val(d2__, SZC_DST_NAME); \
+    if (ret__) {                                          \
+      SZC_SZCA_NAME->szc_destruct(d2__);                  \
+      return ret__;                                       \
+    }                                                     \
     size_t l2 = SZC_SZCA_NAME->szc_get_len(SZC_DST_NAME); \
     SZC_SZCA_NAME->szc_destruct(d2__);                    \
     d2__ = NULL;                                          \
@@ -273,15 +278,15 @@ static inline uint8_t szc_get_ctnsz(register unsigned long long val) {
 #define szcx_ex(typ, target, name, ...) szcy_ex(typ, szc_typ_is_octal(typ) ? sizeof(target) : (sizeof(target) << 3), &target, name, __VA_ARGS__)
 #define szcv_ex(typ, target, name, ...) szcyy_ex(typ, szc_typ_is_octal(typ) ? sizeof(target) : (sizeof(target) << 3), &target, name, __VA_ARGS__)
 
-#define szcf_ex(ff, p, name, ...)                                               \
-  do {                                                                          \
-    if (szc_get_mode2() == szcmode2_static)                                     \
-      _szcy_exec(szcyff_ex, ff, p, SZC_DST_NAME, name, (-1, ##__VA_ARGS__));    \
-    else                                                                        \
-      _szcy_exec(szcyff_ex, ff, NULL, SZC_DST_NAME, name, (-1, ##__VA_ARGS__)); \
+#define szcf_ex(ff, p, name, ...)                                                               \
+  do {                                                                                          \
+    if (szc_get_mode2() == szcmode2_static)                                                     \
+      _szcy_exec(szcyff_ex, ff, p, SZC_DST_NAME, SZC_DGARR_NAME, name, (-1, ##__VA_ARGS__));    \
+    else                                                                                        \
+      _szcy_exec(szcyff_ex, ff, NULL, SZC_DST_NAME, SZC_DGARR_NAME, name, (-1, ##__VA_ARGS__)); \
   } while (0)
-#define szcfn_ex(struname, p, name, ...) szcf_ex(SZFNAME(struname), p, name, ##__VA_ARGS__)
-#define szcys_val_ex(target, d, name, ...) _szcy_exec(szcys_val, target, d, name, (-1, ##__VA_ARGS__))
+#define szcfn_ex(struname, p, name, ...) szcf_ex(SZFFUNCP(struname), p, name, ##__VA_ARGS__)
+#define szcysv_ex(target, d, name, ...) _szcy_exec(szcys_val_ex, target, d, name, (-1, ##__VA_ARGS__))
 #define szcmlcyy_ex(typ, len, ptr, name, ...)                \
   do {                                                       \
     szcmlcl(&(ptr), len);                                    \
@@ -314,25 +319,31 @@ static inline uint8_t szc_get_ctnsz(register unsigned long long val) {
     else                                                                                                  \
       szcmlcyy_ex(typ, 0, ptr, name, __VA_ARGS__);                                                        \
   } while (0)
-#define szclvrcrse_ex(typ, tlv_len_t, ff, target, name, ...) \
-  do {                                                       \
-    struct szc_dgs_s *d2__ = SZC_SZCA_NAME->szc_init();      \
-    if (d2__ == NULL) return 1;                              \
-    szcyf(ff, target, d2__);                                 \
-    tlv_len_t len__ = SZC_SZCA_NAME->szc_get_len(d2__);      \
-    szcyy(typ, sizeof(len__), &len__);                       \
-    SZC_SZCA_NAME->szc_set_maxlen(d2__, len__);              \
-    size_t l1 = SZC_SZCA_NAME->szc_get_len(SZC_DST_NAME);    \
-    szcys_val_ex(d2__, SZC_DST_NAME, name, __VA_ARGS__);     \
-    size_t l2 = SZC_SZCA_NAME->szc_get_len(SZC_DST_NAME);    \
-    SZC_SZCA_NAME->szc_destruct(d2__);                       \
-    d2__ = NULL;                                             \
-    if (l2 - l1 != len__) return 1;                          \
+#define szclvrcrse_ex(typ, tlv_len_t, ff, target, name, ...)                    \
+  do {                                                                          \
+    int ret__;                                                                  \
+    struct szc_dgs_s *d2__ = SZC_SZCA_NAME->szc_init();                         \
+    if (d2__ == NULL) return 1;                                                 \
+    szcyf(ff, target, d2__);                                                    \
+    tlv_len_t len__ = SZC_SZCA_NAME->szc_get_len(d2__);                         \
+    szcv(typ, len__);                                                           \
+    SZC_SZCA_NAME->szc_set_maxlen(d2__, len__);                                 \
+    size_t l1 = SZC_SZCA_NAME->szc_get_len(SZC_DST_NAME);                       \
+    ret__ = SZC_SZCA_NAME->szcys_val_ex(d2__, SZC_DST_NAME, name, __VA_ARGS__); \
+    if (ret__) {                                                                \
+      SZC_SZCA_NAME->szc_destruct(d2__);                                        \
+      return ret__;                                                             \
+    }                                                                           \
+    size_t l2 = SZC_SZCA_NAME->szc_get_len(SZC_DST_NAME);                       \
+    SZC_SZCA_NAME->szc_destruct(d2__);                                          \
+    d2__ = NULL;                                                                \
+    if (l2 - l1 != len__) return 1;                                             \
   } while (0)
 
 #define SZF_NAME_PREFIX2 SZC_CONCAT(SZF_NAME_PREFIX, inner)
 #define SZFNAME(struname) SZC_CONCAT(SZF_NAME_PREFIX, struname)
 #define SZFNAME2(struname) SZC_CONCAT(SZF_NAME_PREFIX2, struname)
+#define SZFFUNCP(struname) ((szc_ff_t)SZFNAME2(struname))
 #define SZFDECL2(t__, struname, p, dst) int SZFNAME(struname)(const struct szc_dga_s *szca, void *p, struct szc_dgs_s *dst)
 #define SZFDECL(t__, struname, p)                                                                                                                        \
   static inline int SZFNAME2(struname)(const struct szc_dga_s *SZC_SZCA_NAME, t__ struname *p, struct szc_dgs_s *SZC_DST_NAME, void ****SZC_DGARR_NAME); \

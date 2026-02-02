@@ -27,6 +27,8 @@ struct szc_dgsr_s {
   unsigned long long int bitlen;
   size_t maxlen;
   uint8_t *val;
+  void *f_ctx;
+  hashset_t hs;
 };
 
 szcmode_t szc_get_mode_r(void) {
@@ -42,6 +44,7 @@ struct szc_dgs_s *szc_init_r(void) {
   if (dd == NULL) return NULL;
   *dd = (struct szc_dgsr_s){0};
   dd->dga1 = &szca_r;
+  dd->hs = hashset_create();
   return (struct szc_dgs_s *)dd;
 }
 
@@ -88,6 +91,8 @@ void szc_set_val_r(struct szc_dgs_s *d, size_t len, uint8_t *val) {
 }
 
 void szc_destruct_r(struct szc_dgs_s *d) {
+  struct szc_dgsr_s *dd = (struct szc_dgsr_s *)d;
+  hashset_destroy(dd->hs);
   szc_free(d);
 }
 
@@ -174,22 +179,38 @@ void szcfree_r(void *target, struct szc_dgs_s *d) {
 }
 
 void szcfree2_r(void **target_p, struct szc_dgs_s *d) {
-  if (*target_p) szc_free(*target_p);
-  *target_p = NULL;
+  struct szc_dgsr_s *dd = (struct szc_dgsr_s *)d;
+  szc_free(*target_p);
+  if (hashset_is_member(dd->hs, *target_p)) {
+    hashset_remove(dd->hs, *target_p);
+    szc_free(target_p);
+  } else {
+    *target_p = NULL;
+  }
 }
 
 void **szcwrapp_r(void **target_p, struct szc_dgs_s *d) {
-  return target_p;
+  struct szc_dgsr_s *dd = (struct szc_dgsr_s *)d;
+  if (hashset_is_member(dd->hs, *target_p)) return NULL;
+  void **ptp = (void **)szc_malloc(sizeof(void *));
+  *ptp = *target_p;
+  hashset_add(dd->hs, *ptp);
+  return ptp;
 }
 
 void szc_ptop_r(void **target_p, struct szc_dgs_s *d) {
-  return;
+  struct szc_dgsr_s *dd = (struct szc_dgsr_s *)d;
+  if (hashset_is_member(dd->hs, *target_p)) {
+    hashset_remove(dd->hs, *target_p);
+    szc_free(target_p);
+  }
 }
 
-int szcyf_r(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d) {
+int szcyf_r(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, void *ctx) {
   struct szc_dgsr_s *dd = (struct szc_dgsr_s *)d;
   dd->f = f;
   dd->target_ex = target_ex;
+  dd->f_ctx = ctx;
   return 0;
 }
 
@@ -200,11 +221,11 @@ int szcys_val_r(struct szc_dgs_s *target, struct szc_dgs_s *d) {
   if (dd_t->maxlen > 0) {
     if (dd_t->maxlen > dd->maxlen - (dd->bitlen >> 3)) return 1;
     szc_set_val_r(target, dd_t->maxlen, &dd->val[dd->bitlen >> 3]);
-    ans = dd_t->f(dd_t->dga1, dd_t->target_ex, target);
+    ans = dd_t->f(dd_t->dga1, dd_t->target_ex, d, dd_t->f_ctx);
     if (ans) return ans;
     dd->bitlen += dd_t->bitlen;
   } else {
-    ans = dd_t->f(dd_t->dga1, dd_t->target_ex, d);
+    ans = dd_t->f(dd_t->dga1, dd_t->target_ex, d, dd_t->f_ctx);
     if (ans) return ans;
   }
   return 0;
@@ -214,11 +235,11 @@ int szcys_val_r_ex(struct szc_dgs_s *target, struct szc_dgs_s *d, const char *na
   return szcys_val_r(target, d);
 }
 
-int szcyff_r(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d) {
+int szcyff_r(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, void *ctx) {
   struct szc_dgsr_s *dd = (struct szc_dgsr_s *)d;
-  return f(dd->dga1, target_ex, d);
+  return f(dd->dga1, target_ex, d, ctx);
 }
 
-int szcyff_r_ex(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, const char *name, int arr_i) {
-  return szcyff_r(f, target_ex, d);
+int szcyff_r_ex(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, void *ctx, const char *name, int arr_i) {
+  return szcyff_r(f, target_ex, d, ctx);
 }
