@@ -22,6 +22,13 @@
 #define SZF_NAME_PREFIX __szcf
 #endif  // SZF_NAME_PREFIX
 
+#ifndef SZCMALLOC
+#define SZCMALLOC malloc
+#endif  // SZCMALLOC
+#ifndef SZCREALLOC
+#define SZCREALLOC realloc
+#endif  // SZCREALLOC
+
 #define SZC_ELEVENTH_ARGUMENT(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, ...) a11
 #define SZC_VAARGC(...) SZC_ELEVENTH_ARGUMENT(dummy, ##__VA_ARGS__, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)
 
@@ -51,14 +58,14 @@ static inline uint8_t szc_get_ctnsz(register unsigned long long val) {
       free(&((size_t *)vec)[-1]); \
     }                             \
   } while (0)
-#define szc_cvector_grow(vec, count)                                                      \
-  do {                                                                                    \
-    const size_t cv_sz__ = sizeof(size_t) + (count) * sizeof(*(vec));                     \
-    if ((vec) == NULL) {                                                                  \
-      (vec) = (void *)&((size_t *)malloc(cv_sz__))[1];                                    \
-      szc_cvector_set_size((vec), 0);                                                     \
-    } else                                                                                \
-      (vec) = (void *)&((size_t *)realloc(((void *)(vec)) - sizeof(size_t), cv_sz__))[1]; \
+#define szc_cvector_grow(vec, count)                                                         \
+  do {                                                                                       \
+    const size_t cv_sz__ = sizeof(size_t) + (count) * sizeof(*(vec));                        \
+    if ((vec) == NULL) {                                                                     \
+      (vec) = (void *)&((size_t *)SZCMALLOC(cv_sz__))[1];                                    \
+      szc_cvector_set_size((vec), 0);                                                        \
+    } else                                                                                   \
+      (vec) = (void *)&((size_t *)SZCREALLOC(((void *)(vec)) - sizeof(size_t), cv_sz__))[1]; \
   } while (0)
 #define szc_cvector_push_back(vec, value)                   \
   do {                                                      \
