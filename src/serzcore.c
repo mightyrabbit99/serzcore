@@ -204,11 +204,11 @@ static inline void _szcpy_r(szc_dtyp_t typ, uint8_t *dst, const uint8_t *src, un
     case szc_dtyp_b2:
       if (pos_bc > 0)
         dst[0] |= bb_mask2(bb_rev8(src[cnt]), 0, pos_bc, bc_left);
-      for (i = 0; i < cnt2 - 1; i++) {
+      for (i = 0; i < cnt2; i++) {
         dst[i] |= bb_mask(bb_rev8(src[cnt - i - 1]), 0, bc_left, pos_bc);
-        dst[i + 1] |= bb_mask(bb_rev8(src[cnt - i - 1]), 0, bc_left, pos_bc);
+        dst[i + 1] |= bb_mask2(bb_rev8(src[cnt - i - 1]), 0, pos_bc, bc_left);
       }
-      dst[i] |= bb_mask(bb_rev8(src[0]), 0, MIN(bb_left, bc_left), pos_bc);
+      dst[i] |= bb_mask(bb_rev8(src[0]), 0, MIN(bb_left, zz8(bc_left)), pos_bc);
       if (bc_left < bb_left)
         dst[i + 1] |= bb_mask2(bb_rev8(src[0]), bb_left, pos_bc, bc_left);
       break;
