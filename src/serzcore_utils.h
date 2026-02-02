@@ -176,6 +176,12 @@ static inline uint8_t szc_get_ctnsz(register unsigned long long val) {
     if (szc_conv_1(typ, sizeof(valtyp)) < count) count2__ = szc_conv_1(typ, sizeof(valtyp)); \
     szcyx(typ, count2__, szc_conv_1(typ, sizeof(valtyp)), &target__);                        \
   } while (0)
+#define szcset(typ, count, c)                     \
+  do {                                            \
+    uint8_t data__[szc_count_oct(typ, count)];    \
+    memset(data__, c, szc_count_oct(typ, count)); \
+    szcy(typ, count, data__);                     \
+  } while (0)
 #define szcmlcl(ptr, len)                             \
   do {                                                \
     if (szc_get_mode2() == szcmode2_static) {         \
@@ -267,6 +273,12 @@ static inline uint8_t szc_get_ctnsz(register unsigned long long val) {
     unsigned long long int count2__ = count;                                                 \
     if (szc_conv_1(typ, sizeof(valtyp)) < count) count2__ = szc_conv_1(typ, sizeof(valtyp)); \
     szcyx_ex(typ, count2__, szc_conv_1(typ, sizeof(valtyp)), &target__, name, __VA_ARGS__);  \
+  } while (0)
+#define szcset_ex(typ, count, c, name, ...)         \
+  do {                                              \
+    uint8_t data__[szc_count_oct(typ, count)];      \
+    memset(data__, c, szc_count_oct(typ, count));   \
+    szcy_ex(typ, count, data__, name, __VA_ARGS__); \
   } while (0)
 #define szcyy_ex(typ, count, target, name, ...)                                               \
   do {                                                                                        \

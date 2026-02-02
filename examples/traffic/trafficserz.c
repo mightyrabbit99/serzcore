@@ -3,9 +3,12 @@
 #include "serzcore_utils.h"
 
 SZFDECL_STATIC(struct, null_s, p) {
-  //szcval(szc_dtyp_o, 3, uint64_t, 0);
-  uint8_t zero_arr[3] = {0, 0, 0};
-  szcx(szc_dtyp_o, zero_arr);
+  // szcval(szc_dtyp_o, 3, uint64_t, 0);
+
+  // uint8_t zero_arr[3] = {0, 0, 0};
+  // szcx(szc_dtyp_o, zero_arr);
+
+  szcset(szc_dtyp_o, 3, 0);
   return 0;
 }
 
