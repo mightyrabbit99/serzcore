@@ -217,15 +217,15 @@ static inline uint8_t szc_get_ctnsz(register unsigned long long val) {
   } while (0)
 #define szclvp(typ, len, maxlen, ptr)                                                                     \
   do {                                                                                                    \
-    if (len > maxlen) return 1;                                                                           \
     szcyyx(typ, szc_conv_1(typ, szc_get_ctnsz(maxlen)), szc_conv_1(typ, sizeof(len)), (uint8_t *)&(len)); \
+    if (len > maxlen) return 1;                                                                           \
     szcmlcyy(typ, szc_conv_1(typ, (len) * sizeof(*(ptr))), ptr);                                          \
   } while (0)
 #define szclvstr(typ, maxlen, ptr)                                                               \
   do {                                                                                           \
     size_t len__ = (ptr) == NULL ? 0 : (strnlen(ptr, maxlen) + 1);                               \
-    if (len__ > maxlen) return 1;                                                                \
     szcyyx(typ, szc_conv_1(typ, szc_get_ctnsz(maxlen)), szc_conv_1(typ, sizeof(len__)), &len__); \
+    if (len__ > maxlen) return 1;                                                                \
     szcmlcyy(typ, szc_conv_1(typ, len__), ptr);                                                  \
   } while (0)
 #define szclvrcrse(typ, tlv_len_t, ff, target)            \
@@ -320,6 +320,7 @@ static inline uint8_t szc_get_ctnsz(register unsigned long long val) {
     else                                                                                                                                         \
       szc_get_fieldlen_ex(typ, szc_conv_1(typ, sizeof(len__)), (uint8_t *)&(len__), maxlen, name, szc_extyp_arr, szc_extyp_string, __VA_ARGS__); \
     szcyyx(typ, szc_get_ctnsz(maxlen), sizeof(len__), &len__);                                                                                   \
+    if (szc_get_mode2() == szcmode2_static && len__ > maxlen) return 1;                                                                          \
     if (SZC_VAARGC(__VA_ARGS__) == 0)                                                                                                            \
       szcmlcyy_ex(typ, len__, ptr, name, szc_extyp_string);                                                                                      \
     else                                                                                                                                         \
@@ -329,6 +330,7 @@ static inline uint8_t szc_get_ctnsz(register unsigned long long val) {
   do {                                                                                                    \
     szc_get_fieldlen_ex(typ, szc_conv_1(typ, sizeof(len)), (uint8_t *)&(len), maxlen, name, __VA_ARGS__); \
     szcyyx(typ, szc_conv_1(typ, szc_get_ctnsz(maxlen)), szc_conv_1(typ, sizeof(len)), (uint8_t *)&(len)); \
+    if (szc_get_mode2() == szcmode2_static && len > maxlen) return 1;                                     \
     if (szc_get_mode2() == szcmode2_static)                                                               \
       szcmlcyy_ex(typ, szc_conv_1(typ, (len) * sizeof(*(ptr))), ptr, name, __VA_ARGS__);                  \
     else                                                                                                  \
