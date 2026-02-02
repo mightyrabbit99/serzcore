@@ -1,9 +1,12 @@
+add_compile_definitions(__HASHMAP_REMOVABLE)
+
 add_library(serzcore STATIC)
 set_target_properties(serzcore PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
 target_sources(serzcore
   PRIVATE
     serzcore.c
     utils/hashset.c
+    utils/map.c
   PUBLIC
     serzcore.h
     serzcore_utils.h
@@ -35,6 +38,7 @@ target_sources(serzcore-lua
   PRIVATE
     serzcore.c
     utils/hashset.c
+    utils/map.c
   PUBLIC
     serzcore.h
     serzcore_utils.h

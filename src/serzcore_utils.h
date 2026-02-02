@@ -198,7 +198,10 @@ static inline uint8_t szc_get_ctnsz(register unsigned long long val) {
       void *ptr_orig__ = *(ptr);                                  \
       szcrealc((void **)(ptr), len);                              \
       if (szc_get_mode() == szcmode_free || ptr_orig__ == NULL) { \
-        szc_cvector_push_back(*SZC_DGARR_NAME, (void **)(ptr));   \
+        void **pp__ = szcwrapp((void **)(ptr));                   \
+        if (pp__) {                                               \
+          szc_cvector_push_back(*SZC_DGARR_NAME, pp__);           \
+        }                                                         \
       }                                                           \
     }                                                             \
   } while (0)

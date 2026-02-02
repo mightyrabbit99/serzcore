@@ -28,7 +28,7 @@ struct szc_dgsr_s {
   size_t maxlen;
   uint8_t *val;
   void *f_ctx;
-  hashset_t hs;
+  hashmap *m_pt_ptp;
 };
 
 szcmode_t szc_get_mode_r(void) {
@@ -44,7 +44,7 @@ struct szc_dgs_s *szc_init_r(void) {
   if (dd == NULL) return NULL;
   *dd = (struct szc_dgsr_s){0};
   dd->dga1 = &szca_r;
-  dd->hs = hashset_create();
+  dd->m_pt_ptp = hashmap_create();
   return (struct szc_dgs_s *)dd;
 }
 
@@ -92,7 +92,7 @@ void szc_set_val_r(struct szc_dgs_s *d, size_t len, uint8_t *val) {
 
 void szc_destruct_r(struct szc_dgs_s *d) {
   struct szc_dgsr_s *dd = (struct szc_dgsr_s *)d;
-  hashset_destroy(dd->hs);
+  hashmap_free(dd->m_pt_ptp);
   szc_free(d);
 }
 
@@ -161,12 +161,22 @@ int szcmlc_r(void **target, size_t sz, struct szc_dgs_s *d) {
 }
 
 int szcrealc_r(void **target, size_t sz, struct szc_dgs_s *d) {
+  struct szc_dgsr_s *dd = (struct szc_dgsr_s *)d;
   if (sz == 0) {
     *target = NULL;
     return 0;
   }
+  void *pt_old = *target;
   *target = (void *)szc_realloc(*target, sz);
   if (*target == NULL) return 1;
+
+  void **ptp;
+  if (hashmap_get(dd->m_pt_ptp, &pt_old, sizeof(void *), (uintptr_t *)&ptp)) {
+    *ptp = *target;
+    hashmap_remove(dd->m_pt_ptp, &pt_old, sizeof(void *));
+    hashmap_set(dd->m_pt_ptp, target, sizeof(void *), (uintptr_t)ptp);
+  }
+
   return 0;
 }
 
@@ -181,29 +191,22 @@ void szcfree_r(void *target, struct szc_dgs_s *d) {
 void szcfree2_r(void **target_p, struct szc_dgs_s *d) {
   struct szc_dgsr_s *dd = (struct szc_dgsr_s *)d;
   szc_free(*target_p);
-  if (hashset_is_member(dd->hs, *target_p)) {
-    hashset_remove(dd->hs, *target_p);
-    szc_free(target_p);
-  } else {
-    *target_p = NULL;
-  }
+  szc_free(target_p);
 }
 
 void **szcwrapp_r(void **target_p, struct szc_dgs_s *d) {
   struct szc_dgsr_s *dd = (struct szc_dgsr_s *)d;
-  if (hashset_is_member(dd->hs, *target_p)) return NULL;
-  void **ptp = (void **)szc_malloc(sizeof(void *));
+  void **ptp;
+  if (hashmap_get(dd->m_pt_ptp, target_p, sizeof(void *), (uintptr_t *)&ptp)) return NULL;
+  ptp = (void **)szc_malloc(sizeof(void *));
   *ptp = *target_p;
-  hashset_add(dd->hs, *ptp);
+  hashmap_set(dd->m_pt_ptp, target_p, sizeof(void *), (uintptr_t)ptp);
   return ptp;
 }
 
 void szc_ptop_r(void **target_p, struct szc_dgs_s *d) {
   struct szc_dgsr_s *dd = (struct szc_dgsr_s *)d;
-  if (hashset_is_member(dd->hs, *target_p)) {
-    hashset_remove(dd->hs, *target_p);
-    szc_free(target_p);
-  }
+  szc_free(target_p);
 }
 
 int szcyf_r(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, void *ctx) {
