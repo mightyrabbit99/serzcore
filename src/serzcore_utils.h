@@ -89,8 +89,8 @@ static inline uint8_t szc_get_ctnsz(register unsigned long long val) {
 #define SZC_PASTER(x, y) x##_##y
 #define SZC_CONCAT(x, y) SZC_PASTER(x, y)
 
-#define szc_get_mode() SZC_SZCA_NAME->szc_get_mode()
-#define szc_get_mode2() SZC_SZCA_NAME->szc_get_mode2(SZC_DST_NAME)
+#define szc_getmode() SZC_SZCA_NAME->szc_get_mode()
+#define _szc_get_mode2() SZC_SZCA_NAME->szc_get_mode2(SZC_DST_NAME)
 
 #define _szcy_exec(f1, ...)                                   \
   do {                                                        \
@@ -100,7 +100,7 @@ static inline uint8_t szc_get_ctnsz(register unsigned long long val) {
 #define szcysv(target, d) _szcy_exec(szcys_val, target, d)
 #define szcyf(f, target_ex, d)                            \
   do {                                                    \
-    if (szc_get_mode2() == szcmode2_static)               \
+    if (_szc_get_mode2() == szcmode2_static)              \
       _szcy_exec(szcyf, f, target_ex, d, SZC_DGARR_NAME); \
     else                                                  \
       _szcy_exec(szcyf, f, NULL, d, SZC_DGARR_NAME);      \
@@ -108,14 +108,14 @@ static inline uint8_t szc_get_ctnsz(register unsigned long long val) {
 
 #define szcy(typ, count, target)                                       \
   do {                                                                 \
-    if (szc_get_mode2() == szcmode2_static)                            \
+    if (_szc_get_mode2() == szcmode2_static)                           \
       _szcy_exec(szcy, typ, count, (uint8_t *)(target), SZC_DST_NAME); \
     else                                                               \
       _szcy_exec(szcy, typ, count, NULL, SZC_DST_NAME);                \
   } while (0);
 #define szcyy(typ, count, target)                                       \
   do {                                                                  \
-    if (szc_get_mode2() == szcmode2_static)                             \
+    if (_szc_get_mode2() == szcmode2_static)                            \
       _szcy_exec(szcyy, typ, count, (uint8_t *)(target), SZC_DST_NAME); \
     else                                                                \
       _szcy_exec(szcyy, typ, count, NULL, SZC_DST_NAME);                \
@@ -125,7 +125,7 @@ static inline uint8_t szc_get_ctnsz(register unsigned long long val) {
 // #define szcf(ff, p) ff(SZC_SZCA_NAME, p, SZC_DST_NAME)
 #define szcf(ff, p)                                               \
   do {                                                            \
-    if (szc_get_mode2() == szcmode2_static)                       \
+    if (_szc_get_mode2() == szcmode2_static)                      \
       _szcy_exec(szcyff, ff, p, SZC_DST_NAME, SZC_DGARR_NAME);    \
     else                                                          \
       _szcy_exec(szcyff, ff, NULL, SZC_DST_NAME, SZC_DGARR_NAME); \
@@ -134,28 +134,28 @@ static inline uint8_t szc_get_ctnsz(register unsigned long long val) {
 
 #define szcmlc(target, sz)                          \
   do {                                              \
-    if (szc_get_mode2() == szcmode2_static)         \
+    if (_szc_get_mode2() == szcmode2_static)        \
       _szcy_exec(szcmlc, target, sz, SZC_DST_NAME); \
     else                                            \
       _szcy_exec(szcmlc, NULL, sz, SZC_DST_NAME);   \
   } while (0)
 #define szcrealc(target, sz)                          \
   do {                                                \
-    if (szc_get_mode2() == szcmode2_static)           \
+    if (_szc_get_mode2() == szcmode2_static)          \
       _szcy_exec(szcrealc, target, sz, SZC_DST_NAME); \
     else                                              \
       _szcy_exec(szcrealc, NULL, sz, SZC_DST_NAME);   \
   } while (0)
 #define szcmemset(s, c, sz)                                \
   do {                                                     \
-    if (szc_get_mode2() == szcmode2_static)                \
+    if (_szc_get_mode2() == szcmode2_static)               \
       SZC_SZCA_NAME->szcmemset(s, c, sz, SZC_DST_NAME);    \
     else                                                   \
       SZC_SZCA_NAME->szcmemset(NULL, c, sz, SZC_DST_NAME); \
   } while (0)
 #define szcdelete(pt)                             \
   do {                                            \
-    if (szc_get_mode2() == szcmode2_static)       \
+    if (_szc_get_mode2() == szcmode2_static)      \
       SZC_SZCA_NAME->szcfree(pt, SZC_DST_NAME);   \
     else                                          \
       SZC_SZCA_NAME->szcfree(NULL, SZC_DST_NAME); \
@@ -191,7 +191,7 @@ static inline uint8_t szc_get_ctnsz(register unsigned long long val) {
   } while (0)
 #define szcmlcl(ptr, len)                             \
   do {                                                \
-    if (szc_get_mode2() == szcmode2_static) {         \
+    if (_szc_get_mode2() == szcmode2_static) {        \
       szcmlc((void **)(ptr), len);                    \
       void **pp__ = szcwrapp((void **)(ptr));         \
       if (pp__) {                                     \
@@ -199,18 +199,18 @@ static inline uint8_t szc_get_ctnsz(register unsigned long long val) {
       }                                               \
     }                                                 \
   } while (0)
-#define szcrealcl(ptr, len)                                       \
-  do {                                                            \
-    if (szc_get_mode2() == szcmode2_static) {                     \
-      void *ptr_orig__ = *(ptr);                                  \
-      szcrealc((void **)(ptr), len);                              \
-      if (szc_get_mode() == szcmode_free || ptr_orig__ == NULL) { \
-        void **pp__ = szcwrapp((void **)(ptr));                   \
-        if (pp__) {                                               \
-          szc_cvector_push_back(*SZC_DGARR_NAME, pp__);           \
-        }                                                         \
-      }                                                           \
-    }                                                             \
+#define szcrealcl(ptr, len)                                      \
+  do {                                                           \
+    if (_szc_get_mode2() == szcmode2_static) {                   \
+      void *ptr_orig__ = *(ptr);                                 \
+      szcrealc((void **)(ptr), len);                             \
+      if (szc_getmode() == szcmode_free || ptr_orig__ == NULL) { \
+        void **pp__ = szcwrapp((void **)(ptr));                  \
+        if (pp__) {                                              \
+          szc_cvector_push_back(*SZC_DGARR_NAME, pp__);          \
+        }                                                        \
+      }                                                          \
+    }                                                            \
   } while (0)
 #define szcmlcyy(typ, len, ptr)        \
   do {                                 \
@@ -258,7 +258,7 @@ static inline uint8_t szc_get_ctnsz(register unsigned long long val) {
 
 #define szcy_ex(typ, count, target, name, ...)                                               \
   do {                                                                                       \
-    if (szc_get_mode2() == szcmode2_static)                                                  \
+    if (_szc_get_mode2() == szcmode2_static)                                                 \
       _szcy_exec(szcy_ex, typ, count, (uint8_t *)(target), SZC_DST_NAME, name, __VA_ARGS__); \
     else                                                                                     \
       _szcy_exec(szcy_ex, typ, count, NULL, SZC_DST_NAME, name, __VA_ARGS__);                \
@@ -272,7 +272,7 @@ static inline uint8_t szc_get_ctnsz(register unsigned long long val) {
 #endif
 #define szc_get_fieldlen_ex(typ, count, target, maxlen, name, ...)                                               \
   do {                                                                                                           \
-    if (szc_get_mode2() == szcmode2_static)                                                                      \
+    if (_szc_get_mode2() == szcmode2_static)                                                                     \
       _szcy_exec(szc_get_fieldlen_ex, typ, count, (uint8_t *)(target), maxlen, SZC_DST_NAME, name, __VA_ARGS__); \
     else                                                                                                         \
       _szcy_exec(szc_get_fieldlen_ex, typ, count, NULL, maxlen, SZC_DST_NAME, name, __VA_ARGS__);                \
@@ -292,7 +292,7 @@ static inline uint8_t szc_get_ctnsz(register unsigned long long val) {
   } while (0)
 #define szcyy_ex(typ, count, target, name, ...)                                               \
   do {                                                                                        \
-    if (szc_get_mode2() == szcmode2_static)                                                   \
+    if (_szc_get_mode2() == szcmode2_static)                                                  \
       _szcy_exec(szcyy_ex, typ, count, (uint8_t *)(target), SZC_DST_NAME, name, __VA_ARGS__); \
     else                                                                                      \
       _szcy_exec(szcyy_ex, typ, count, NULL, SZC_DST_NAME, name, __VA_ARGS__);                \
@@ -302,7 +302,7 @@ static inline uint8_t szc_get_ctnsz(register unsigned long long val) {
 
 #define szcf_ex(ff, p, name, ...)                                                               \
   do {                                                                                          \
-    if (szc_get_mode2() == szcmode2_static)                                                     \
+    if (_szc_get_mode2() == szcmode2_static)                                                    \
       _szcy_exec(szcyff_ex, ff, p, SZC_DST_NAME, SZC_DGARR_NAME, name, (-1, ##__VA_ARGS__));    \
     else                                                                                        \
       _szcy_exec(szcyff_ex, ff, NULL, SZC_DST_NAME, SZC_DGARR_NAME, name, (-1, ##__VA_ARGS__)); \
@@ -327,7 +327,7 @@ static inline uint8_t szc_get_ctnsz(register unsigned long long val) {
     else                                                                                                                                         \
       szc_get_fieldlen_ex(typ, szc_conv_1(typ, sizeof(len__)), (uint8_t *)&(len__), maxlen, name, szc_extyp_arr, szc_extyp_string, __VA_ARGS__); \
     szcyyx(typ, szc_get_ctnsz(maxlen), sizeof(len__), &len__);                                                                                   \
-    if (szc_get_mode2() == szcmode2_static && len__ > maxlen) return 1;                                                                          \
+    if (_szc_get_mode2() == szcmode2_static && len__ > maxlen) return 1;                                                                         \
     if (SZC_VAARGC(__VA_ARGS__) == 0)                                                                                                            \
       szcmlcyy_ex(typ, len__, ptr, name, szc_extyp_string);                                                                                      \
     else                                                                                                                                         \
@@ -337,8 +337,8 @@ static inline uint8_t szc_get_ctnsz(register unsigned long long val) {
   do {                                                                                                    \
     szc_get_fieldlen_ex(typ, szc_conv_1(typ, sizeof(len)), (uint8_t *)&(len), maxlen, name, __VA_ARGS__); \
     szcyyx(typ, szc_conv_1(typ, szc_get_ctnsz(maxlen)), szc_conv_1(typ, sizeof(len)), (uint8_t *)&(len)); \
-    if (szc_get_mode2() == szcmode2_static && len > maxlen) return 1;                                     \
-    if (szc_get_mode2() == szcmode2_static)                                                               \
+    if (_szc_get_mode2() == szcmode2_static && len > maxlen) return 1;                                    \
+    if (_szc_get_mode2() == szcmode2_static)                                                              \
       szcmlcyy_ex(typ, szc_conv_1(typ, (len) * sizeof(*(ptr))), ptr, name, __VA_ARGS__);                  \
     else                                                                                                  \
       szcmlcyy_ex(typ, 0, ptr, name, __VA_ARGS__);                                                        \
@@ -374,9 +374,12 @@ static inline uint8_t szc_get_ctnsz(register unsigned long long val) {
   SZFDECL2(t__, struname, p, dst) {                                                                                                                      \
     void ***ptrs = NULL;                                                                                                                                 \
     int ans = SZFNAME2(struname)(szca, (t__ struname *)p, dst, &ptrs);                                                                                   \
-    if (ans != 0)                                                                                                                                        \
+    if (ans != 0) {                                                                                                                                      \
       szc_cvector_for_each(ptrs, szca->szcfree2, dst);                                                                                                   \
-    else                                                                                                                                                 \
+      if (szca->szc_get_mode2(dst) == szcmode2_static && szca->szc_get_mode() == szcmode_read) {                                                         \
+        *(t__ struname *)p = (t__ struname){0};                                                                                                          \
+      }                                                                                                                                                  \
+    } else                                                                                                                                               \
       szc_cvector_for_each(ptrs, szca->szc_ptop, dst);                                                                                                   \
     szc_cvector_free(ptrs);                                                                                                                              \
     return ans;                                                                                                                                          \
@@ -387,9 +390,12 @@ static inline uint8_t szc_get_ctnsz(register unsigned long long val) {
   static SZFDECL2(t__, struname, p, dst) {                                                                                                               \
     void ***ptrs = NULL;                                                                                                                                 \
     int ans = SZFNAME2(struname)(szca, (t__ struname *)p, dst, &ptrs);                                                                                   \
-    if (ans != 0)                                                                                                                                        \
+    if (ans != 0) {                                                                                                                                      \
       szc_cvector_for_each(ptrs, szca->szcfree2, dst);                                                                                                   \
-    else                                                                                                                                                 \
+      if (szca->szc_get_mode2(dst) == szcmode2_static && szca->szc_get_mode() == szcmode_read) {                                                         \
+        *(t__ struname *)p = (t__ struname){0};                                                                                                          \
+      }                                                                                                                                                  \
+    } else                                                                                                                                               \
       szc_cvector_for_each(ptrs, szca->szc_ptop, dst);                                                                                                   \
     szc_cvector_free(ptrs);                                                                                                                              \
     return ans;                                                                                                                                          \

@@ -5,8 +5,7 @@
 SZFDECL_STATIC(struct, null_s, p) {
   // szcval(szc_dtyp_o, 3, uint64_t, 0);
 
-  // uint8_t zero_arr[3] = {0, 0, 0};
-  // szcx(szc_dtyp_o, zero_arr);
+  // szcx(szc_dtyp_o, p->zero_arr);
 
   szcset(szc_dtyp_o, 3, 0);
   return 0;
@@ -67,7 +66,7 @@ SZFDECL_STATIC(struct, traffic_s, p) {
     szclvrcrse(szc_dtyp_o, uint8_t, ff, tgt);
     if (p->vehicle_arr[i++].typ == vetyp_null) break;
   }
-  if (szc_get_mode() == szcmode_read) p->num_of_vehicles = i;
+  if (szc_getmode() == szcmode_read) p->num_of_vehicles = i;
   if (i == 0) szcdelete(p->vehicle_arr);
 
   return 0;

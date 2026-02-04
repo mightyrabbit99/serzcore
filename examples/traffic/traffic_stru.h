@@ -13,7 +13,9 @@ enum vehicle_typ_e {
   vetyp_ship,
 };
 
-struct null_s {};
+struct null_s {
+  uint8_t zero_arr[3];
+};
 
 struct car_s {
   char brand[10];
