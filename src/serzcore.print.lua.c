@@ -236,7 +236,7 @@ int szcrealc_p_lua(void **target, size_t sz, struct szc_dgs_s *d) {
   return 0;
 }
 
-void *szcmemset_p_lua(uint8_t *s, int c, size_t sz, struct szc_dgs_s *d) {
+void *szc_memset_p_lua(uint8_t *s, int c, size_t sz, struct szc_dgs_s *d) {
   return NULL;
 }
 

@@ -117,7 +117,7 @@ int szcrealc_f(void **target, size_t sz, struct szc_dgs_s *d) {
   return 0;
 }
 
-void *szcmemset_f(uint8_t *s, int c, size_t sz, struct szc_dgs_s *d) {
+void *szc_memset_f(uint8_t *s, int c, size_t sz, struct szc_dgs_s *d) {
   return NULL;
 }
 

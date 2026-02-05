@@ -95,7 +95,7 @@ int szcy_r_ex_lua(szc_dtyp_t typ, unsigned long long int count, uint8_t *target,
 int szcyy_r_ex_lua(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d, const char *name, szc_extyp_t extyp, ...);
 int szcmlc_r_lua(void **target, size_t sz, struct szc_dgs_s *d);
 int szcrealc_r_lua(void **target, size_t sz, struct szc_dgs_s *d);
-void *szcmemset_r_lua(uint8_t *s, int c, size_t sz, struct szc_dgs_s *d);
+void *szc_memset_r_lua(uint8_t *s, int c, size_t sz, struct szc_dgs_s *d);
 void szcfree_r_lua(void *target, struct szc_dgs_s *d);
 void szcfree2_r_lua(void **target_p, struct szc_dgs_s *d);
 void **szcwrapp_r_lua(void **target_p, struct szc_dgs_s *d);
@@ -125,7 +125,7 @@ int szcy_w_ex_lua(szc_dtyp_t typ, unsigned long long int count, uint8_t *target,
 int szcyy_w_ex_lua(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d, const char *name, szc_extyp_t extyp, ...);
 int szcmlc_w_lua(void **target, size_t sz, struct szc_dgs_s *d);
 int szcrealc_w_lua(void **target, size_t sz, struct szc_dgs_s *d);
-void *szcmemset_w_lua(uint8_t *s, int c, size_t sz, struct szc_dgs_s *d);
+void *szc_memset_w_lua(uint8_t *s, int c, size_t sz, struct szc_dgs_s *d);
 void szcfree_w_lua(void *target, struct szc_dgs_s *d);
 void szcfree2_w_lua(void **target_p, struct szc_dgs_s *d);
 void **szcwrapp_w_lua(void **target_p, struct szc_dgs_s *d);
@@ -155,7 +155,7 @@ int szcy_p_ex_lua(szc_dtyp_t typ, unsigned long long int count, uint8_t *target,
 int szcyy_p_ex_lua(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d, const char *name, szc_extyp_t extyp, ...);
 int szcmlc_p_lua(void **target, size_t sz, struct szc_dgs_s *d);
 int szcrealc_p_lua(void **target, size_t sz, struct szc_dgs_s *d);
-void *szcmemset_p_lua(uint8_t *s, int c, size_t sz, struct szc_dgs_s *d);
+void *szc_memset_p_lua(uint8_t *s, int c, size_t sz, struct szc_dgs_s *d);
 void szcfree_p_lua(void *target, struct szc_dgs_s *d);
 void szcfree2_p_lua(void **target_p, struct szc_dgs_s *d);
 void **szcwrapp_p_lua(void **target_p, struct szc_dgs_s *d);
@@ -187,7 +187,7 @@ int szcy_r_ex(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, str
 int szcyy_r_ex(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d, const char *name, szc_extyp_t extyp, ...);
 int szcmlc_r(void **target, size_t sz, struct szc_dgs_s *d);
 int szcrealc_r(void **target, size_t sz, struct szc_dgs_s *d);
-void *szcmemset_r(uint8_t *s, int c, size_t sz, struct szc_dgs_s *d);
+void *szc_memset_r(uint8_t *s, int c, size_t sz, struct szc_dgs_s *d);
 void szcfree_r(void *target, struct szc_dgs_s *d);
 void szcfree2_r(void **target_p, struct szc_dgs_s *d);
 void **szcwrapp_r(void **target_p, struct szc_dgs_s *d);
@@ -217,7 +217,7 @@ int szcy_w_ex(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, str
 int szcyy_w_ex(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d, const char *name, szc_extyp_t extyp, ...);
 int szcmlc_w(void **target, size_t sz, struct szc_dgs_s *d);
 int szcrealc_w(void **target, size_t sz, struct szc_dgs_s *d);
-void *szcmemset_w(uint8_t *s, int c, size_t sz, struct szc_dgs_s *d);
+void *szc_memset_w(uint8_t *s, int c, size_t sz, struct szc_dgs_s *d);
 void szcfree_w(void *target, struct szc_dgs_s *d);
 void szcfree2_w(void **target_p, struct szc_dgs_s *d);
 void **szcwrapp_w(void **target_p, struct szc_dgs_s *d);
@@ -247,7 +247,7 @@ int szcy_p_ex(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, str
 int szcyy_p_ex(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d, const char *name, szc_extyp_t extyp, ...);
 int szcmlc_p(void **target, size_t sz, struct szc_dgs_s *d);
 int szcrealc_p(void **target, size_t sz, struct szc_dgs_s *d);
-void *szcmemset_p(uint8_t *s, int c, size_t sz, struct szc_dgs_s *d);
+void *szc_memset_p(uint8_t *s, int c, size_t sz, struct szc_dgs_s *d);
 void szcfree_p(void *target, struct szc_dgs_s *d);
 void szcfree2_p(void **target_p, struct szc_dgs_s *d);
 void **szcwrapp_p(void **target_p, struct szc_dgs_s *d);
@@ -277,7 +277,7 @@ int szcy_f_ex(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, str
 int szcyy_f_ex(szc_dtyp_t typ, unsigned long long int count, uint8_t *target, struct szc_dgs_s *d, const char *name, szc_extyp_t extyp, ...);
 int szcmlc_f(void **target, size_t sz, struct szc_dgs_s *d);
 int szcrealc_f(void **target, size_t sz, struct szc_dgs_s *d);
-void *szcmemset_f(uint8_t *s, int c, size_t sz, struct szc_dgs_s *d);
+void *szc_memset_f(uint8_t *s, int c, size_t sz, struct szc_dgs_s *d);
 void szcfree_f(void *target, struct szc_dgs_s *d);
 void szcfree2_f(void **target_p, struct szc_dgs_s *d);
 void **szcwrapp_f(void **target_p, struct szc_dgs_s *d);
@@ -288,7 +288,7 @@ int szcys_val_f_ex(struct szc_dgs_s *target, struct szc_dgs_s *d, const char *na
 int szcyff_f(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, void *ctx);
 int szcyff_f_ex(szc_ff_t f, _target_ex target_ex, struct szc_dgs_s *d, void *ctx, const char *name, int arr_i);
 
-#endif // SERZCORE_LUA
+#endif  // SERZCORE_LUA
 
 void szc_set_mem_functions(void *(*malloc_fn)(size_t), void *(*realloc_fn)(void *, size_t), void (*free_fn)(void *));
 
@@ -314,7 +314,7 @@ struct szc_dga_s {
   int (*szcyy_ex)(szc_dtyp_t, unsigned long long int, uint8_t *, struct szc_dgs_s *, const char *, szc_extyp_t, ...);
   int (*szcmlc)(void **, size_t, struct szc_dgs_s *);
   int (*szcrealc)(void **, size_t, struct szc_dgs_s *);
-  void *(*szcmemset)(uint8_t *, int, size_t, struct szc_dgs_s *);
+  void *(*szc_memset)(uint8_t *, int, size_t, struct szc_dgs_s *);
   void (*szcfree)(void *, struct szc_dgs_s *);
   void (*szcfree2)(void **, struct szc_dgs_s *);
   void **(*szcwrapp)(void **, struct szc_dgs_s *);
@@ -347,7 +347,7 @@ static struct szc_dga_s szca_r = (struct szc_dga_s){
     .szcyy_ex = szcyy_r_ex_lua,
     .szcmlc = szcmlc_r_lua,
     .szcrealc = szcrealc_r_lua,
-    .szcmemset = szcmemset_r_lua,
+    .szc_memset = szc_memset_r_lua,
     .szcfree = szcfree_r_lua,
     .szcfree2 = szcfree2_r_lua,
     .szcwrapp = szcwrapp_r_lua,
@@ -379,7 +379,7 @@ static struct szc_dga_s szca_w = (struct szc_dga_s){
     .szcyy_ex = szcyy_w_ex_lua,
     .szcmlc = szcmlc_w_lua,
     .szcrealc = szcrealc_w_lua,
-    .szcmemset = szcmemset_w_lua,
+    .szc_memset = szc_memset_w_lua,
     .szcfree = szcfree_w_lua,
     .szcfree2 = szcfree2_w_lua,
     .szcwrapp = szcwrapp_w_lua,
@@ -411,7 +411,7 @@ static struct szc_dga_s szca_p = (struct szc_dga_s){
     .szcyy_ex = szcyy_p_ex_lua,
     .szcmlc = szcmlc_p_lua,
     .szcrealc = szcrealc_p_lua,
-    .szcmemset = szcmemset_p_lua,
+    .szc_memset = szc_memset_p_lua,
     .szcfree = szcfree_p_lua,
     .szcfree2 = szcfree2_p_lua,
     .szcwrapp = szcwrapp_p_lua,
@@ -445,7 +445,7 @@ static struct szc_dga_s szca_r = (struct szc_dga_s){
     .szcyy_ex = szcyy_r_ex,
     .szcmlc = szcmlc_r,
     .szcrealc = szcrealc_r,
-    .szcmemset = szcmemset_r,
+    .szc_memset = szc_memset_r,
     .szcfree = szcfree_r,
     .szcfree2 = szcfree2_r,
     .szcwrapp = szcwrapp_r,
@@ -477,7 +477,7 @@ static struct szc_dga_s szca_w = (struct szc_dga_s){
     .szcyy_ex = szcyy_w_ex,
     .szcmlc = szcmlc_w,
     .szcrealc = szcrealc_w,
-    .szcmemset = szcmemset_w,
+    .szc_memset = szc_memset_w,
     .szcfree = szcfree_w,
     .szcfree2 = szcfree2_w,
     .szcwrapp = szcwrapp_w,
@@ -509,7 +509,7 @@ static struct szc_dga_s szca_p = (struct szc_dga_s){
     .szcyy_ex = szcyy_p_ex,
     .szcmlc = szcmlc_p,
     .szcrealc = szcrealc_p,
-    .szcmemset = szcmemset_p,
+    .szc_memset = szc_memset_p,
     .szcfree = szcfree_p,
     .szcfree2 = szcfree2_p,
     .szcwrapp = szcwrapp_p,
@@ -541,7 +541,7 @@ static struct szc_dga_s szca_f = (struct szc_dga_s){
     .szcyy_ex = szcyy_f_ex,
     .szcmlc = szcmlc_f,
     .szcrealc = szcrealc_f,
-    .szcmemset = szcmemset_f,
+    .szc_memset = szc_memset_f,
     .szcfree = szcfree_f,
     .szcfree2 = szcfree2_f,
     .szcwrapp = szcwrapp_f,
