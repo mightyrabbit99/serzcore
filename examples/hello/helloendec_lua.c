@@ -21,7 +21,7 @@ int hello_decode_lua(lua_State *L) {
 }
 
 int hello_encode_lua(lua_State *L) {
-  SZFOUTEXEC(struct, hello_s, lua_pushlstring, L);
+  SZFOUTEXEC2(struct, hello_s, lua_pushlstring, L);
   return 1;
 }
 
