@@ -189,6 +189,7 @@ static inline void _szcpy_r(szc_dtyp_t typ, uint8_t *dst, const uint8_t *src, un
   uint8_t ba_left = 8 - pos_ba, bb_left = 8 - pos_bb, bc_left = 8 - pos_bc;
   uint8_t x1 = MIN(bb_left, pos_ba), x2 = pos_ba - x1;
   size_t i, cnt = (count + pos_bb) >> 3, cnt2 = count >> 3;
+  size_t cnt3 = cnt - (pos_bb == 0 ? 0 : 1);
   switch (typ) {
     case szc_dtyp_o:
       for (i = 0; i < count; i++) dst[i] = src[i];
@@ -230,9 +231,13 @@ static inline void _szcpy_r(szc_dtyp_t typ, uint8_t *dst, const uint8_t *src, un
         dst[i] |= bb_rev8(bb_mask(src[i + 1], 0, pos_ba - bb_left, pos_ba));
       break;
     case 101:
+      if (pos_bb + count < 8) {
+        dst[0] |= bb_mask2(bb_rev8(src[0]), pos_bb, pos_bc, bc_left);
+        break;
+      }
       if (pos_bc > 0)
         dst[0] |= bb_mask2(bb_rev8(src[cnt]), 0, pos_bc, bc_left);
-      for (i = 0; i < cnt2; i++) {
+      for (i = 0; i < cnt3; i++) {
         dst[i] |= bb_mask(bb_rev8(src[cnt - i - 1]), 0, bc_left, pos_bc);
         dst[i + 1] |= bb_mask2(bb_rev8(src[cnt - i - 1]), 0, pos_bc, bc_left);
       }
