@@ -147,6 +147,25 @@ static inline void _szcpy_w(szc_dtyp_t typ, uint8_t *dst, const uint8_t *src, un
       }
       break;
     case szc_dtyp_b2:
+      for (i = 0; i < cnt2; i++) {
+        dst[i] &= bb_mask(255, 0, pos_bb, 0);
+        dst[i] |= bb_mask(bb_rev8(src[i]), 0, bb_left, pos_bb);
+        if (bb_left < 8) {
+          dst[i + 1] = 0;
+          dst[i + 1] |= bb_mask(bb_rev8(src[i]), bb_left, 8, -bb_left);
+        }
+      }
+      if (pos_bb > 0) {
+        dst[i] &= bb_mask(255, 0, pos_bb, 0);
+        dst[i] |= bb_mask(bb_rev8(src[i]), 0, x1, pos_bb);
+      }
+
+      if (x2 > 0) {
+        dst[i + 1] = 0;
+        dst[i + 1] |= bb_mask(bb_rev8(src[i]), x1, x1 + x2, -bb_left);
+      }
+      break;
+    case 101:
       cnt2 -= (pos_ba == 0 ? 1 : 0);
       dst[0] &= bb_mask2(255, bb_left, 8, 0);
       for (i = 0; i <= cnt2; i++) {
@@ -202,6 +221,15 @@ static inline void _szcpy_r(szc_dtyp_t typ, uint8_t *dst, const uint8_t *src, un
         dst[i] |= bb_mask(src[i + 1], 0, pos_ba - bb_left, pos_ba);
       break;
     case szc_dtyp_b2:
+      for (i = 0; i < cnt2; i++) {
+        dst[i] |= bb_rev8(bb_mask(src[i], pos_bb, 8, -pos_bb));
+        dst[i] |= bb_rev8(bb_mask(src[i + 1], 0, pos_bb, bb_left));
+      }
+      dst[i] |= bb_rev8(bb_mask(src[i], pos_bb, pos_bb + x1, -pos_bb));
+      if (pos_ba > bb_left)
+        dst[i] |= bb_rev8(bb_mask(src[i + 1], 0, pos_ba - bb_left, pos_ba));
+      break;
+    case 101:
       if (pos_bc > 0)
         dst[0] |= bb_mask2(bb_rev8(src[cnt]), 0, pos_bc, bc_left);
       for (i = 0; i < cnt2; i++) {
