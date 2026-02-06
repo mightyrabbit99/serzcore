@@ -8,6 +8,9 @@
 #ifndef SERZCORE_UTILS_H
 #define SERZCORE_UTILS_H
 #include "serzcore.h"
+#if !defined(SZCMALLOC) && !defined(SZCREALLOC) && !defined(SZCFREE)
+#include <stdlib.h>
+#endif
 
 #ifndef SZC_DST_NAME
 #define SZC_DST_NAME szc_dst__
@@ -28,6 +31,9 @@
 #ifndef SZCREALLOC
 #define SZCREALLOC realloc
 #endif  // SZCREALLOC
+#ifndef SZCFREE
+#define SZCFREE free
+#endif  // SZCFREE
 
 #define SZC_ELEVENTH_ARGUMENT(a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, ...) a11
 #define SZC_VAARGC(...) SZC_ELEVENTH_ARGUMENT(dummy, ##__VA_ARGS__, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)
@@ -52,11 +58,11 @@ static inline uint8_t szc_get_ctnsz(register unsigned long long val) {
       ((size_t *)(vec))[-1] = (size);   \
     }                                   \
   } while (0)
-#define szc_cvector_free(vec)     \
-  do {                            \
-    if ((vec)) {                  \
-      free(&((size_t *)vec)[-1]); \
-    }                             \
+#define szc_cvector_free(vec)        \
+  do {                               \
+    if ((vec)) {                     \
+      SZCFREE(&((size_t *)vec)[-1]); \
+    }                                \
   } while (0)
 #define szc_cvector_grow(vec, count)                                                         \
   do {                                                                                       \
