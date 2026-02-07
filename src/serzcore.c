@@ -214,36 +214,45 @@ static inline void _szcpy_r(szc_dtyp_t typ, uint8_t *dst, const uint8_t *src, un
       break;
     case szc_dtyp_b:
       for (i = 0; i < cnt2; i++) {
+        dst[i] = 0;
         dst[i] |= bb_mask(src[i], pos_bb, 8, -pos_bb);
         dst[i] |= bb_mask(src[i + 1], 0, pos_bb, bb_left);
       }
+      dst[i] = 0;
       dst[i] |= bb_mask(src[i], pos_bb, pos_bb + x1, -pos_bb);
       if (pos_ba > bb_left)
         dst[i] |= bb_mask(src[i + 1], 0, pos_ba - bb_left, pos_ba);
       break;
     case szc_dtyp_b2:
       for (i = 0; i < cnt2; i++) {
+        dst[i] = 0;
         dst[i] |= bb_rev8(bb_mask(src[i], pos_bb, 8, -pos_bb));
         dst[i] |= bb_rev8(bb_mask(src[i + 1], 0, pos_bb, bb_left));
       }
+      dst[i] = 0;
       dst[i] |= bb_rev8(bb_mask(src[i], pos_bb, pos_bb + x1, -pos_bb));
       if (pos_ba > bb_left)
         dst[i] |= bb_rev8(bb_mask(src[i + 1], 0, pos_ba - bb_left, pos_ba));
       break;
     case 101:
       if (pos_bb + count < 8) {
+        dst[0] = 0;
         dst[0] |= bb_mask2(bb_rev8(src[0]), pos_bb, pos_bc, bc_left);
         break;
       }
+      dst[0] = 0;
       if (pos_bc > 0)
         dst[0] |= bb_mask2(bb_rev8(src[cnt]), 0, pos_bc, bc_left);
       for (i = 0; i < cnt3; i++) {
         dst[i] |= bb_mask(bb_rev8(src[cnt - i - 1]), 0, bc_left, pos_bc);
+        dst[i + 1] = 0;
         dst[i + 1] |= bb_mask2(bb_rev8(src[cnt - i - 1]), 0, pos_bc, bc_left);
       }
       dst[i] |= bb_mask(bb_rev8(src[0]), 0, MIN(bb_left, zz8(bc_left)), pos_bc);
-      if (bc_left < bb_left)
+      if (bc_left < bb_left) {
+        dst[i + 1] = 0;
         dst[i + 1] |= bb_mask2(bb_rev8(src[0]), bb_left, pos_bc, bc_left);
+      }
       break;
   }
 }
