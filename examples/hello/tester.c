@@ -36,7 +36,7 @@ static inline int test1() {
   ssize_t res1;
   size_t len;
   struct hello_s *h1 = createdummy_hello_s();
-  struct hello_s h2 = (struct hello_s){0};
+  struct hello_s h2;
   uint8_t buf[100];
   printstru_hello_s(h1, _fprintf, stdout, "h1->");
   printf("serializing data...\n");

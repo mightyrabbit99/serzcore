@@ -15,7 +15,6 @@
 #include <string.h>
 #endif
 
-
 #ifndef SZC_DST_NAME
 #define SZC_DST_NAME szc_dst__
 #endif  // SZC_DST_NAME
@@ -386,11 +385,14 @@ static inline uint8_t szc_get_ctnsz(register unsigned long long val) {
   static inline int SZFNAME2(struname)(const struct szc_dga_s *SZC_SZCA_NAME, t__ struname *p, struct szc_dgs_s *SZC_DST_NAME, void ****SZC_DGARR_NAME); \
   SZFDECL2(t__, struname, p, dst) {                                                                                                                      \
     void ***ptrs = NULL;                                                                                                                                 \
+    if (szca->szc_get_mode2(dst) == szcmode2_static && szca->szc_get_mode() == szcmode_read) {                                                           \
+      SZCMEMSET((void *)p, 0, sizeof(t__ struname));                                                                                                     \
+    }                                                                                                                                                    \
     int ans = SZFNAME2(struname)(szca, (t__ struname *)p, dst, &ptrs);                                                                                   \
     if (ans != 0) {                                                                                                                                      \
       szc_cvector_for_each(ptrs, szca->szcfree2, dst);                                                                                                   \
       if (szca->szc_get_mode2(dst) == szcmode2_static && szca->szc_get_mode() == szcmode_read) {                                                         \
-        szca->szc_memset((void *)p, 0, sizeof(t__ struname), dst);                                                                                       \
+        SZCMEMSET((void *)p, 0, sizeof(t__ struname));                                                                                                   \
       }                                                                                                                                                  \
     } else                                                                                                                                               \
       szc_cvector_for_each(ptrs, szca->szc_ptop, dst);                                                                                                   \
@@ -402,11 +404,14 @@ static inline uint8_t szc_get_ctnsz(register unsigned long long val) {
   static inline int SZFNAME2(struname)(const struct szc_dga_s *SZC_SZCA_NAME, t__ struname *p, struct szc_dgs_s *SZC_DST_NAME, void ****SZC_DGARR_NAME); \
   static SZFDECL2(t__, struname, p, dst) {                                                                                                               \
     void ***ptrs = NULL;                                                                                                                                 \
+    if (szca->szc_get_mode2(dst) == szcmode2_static && szca->szc_get_mode() == szcmode_read) {                                                           \
+      SZCMEMSET((void *)p, 0, sizeof(t__ struname));                                                                                                     \
+    }                                                                                                                                                    \
     int ans = SZFNAME2(struname)(szca, (t__ struname *)p, dst, &ptrs);                                                                                   \
     if (ans != 0) {                                                                                                                                      \
       szc_cvector_for_each(ptrs, szca->szcfree2, dst);                                                                                                   \
       if (szca->szc_get_mode2(dst) == szcmode2_static && szca->szc_get_mode() == szcmode_read) {                                                         \
-        szca->szc_memset((void *)p, 0, sizeof(t__ struname), dst);                                                                                       \
+        SZCMEMSET((void *)p, 0, sizeof(t__ struname));                                                                                                   \
       }                                                                                                                                                  \
     } else                                                                                                                                               \
       szc_cvector_for_each(ptrs, szca->szc_ptop, dst);                                                                                                   \

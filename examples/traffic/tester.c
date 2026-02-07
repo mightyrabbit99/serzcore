@@ -45,7 +45,7 @@ static void _testtemplate_writeread_1(size_t tlvt_nr, vetyp_t *tlvts) {
   traffic_s_delete(p);
 
   // read
-  struct traffic_s p2 = {0};
+  struct traffic_s p2;
   printf("deserializing data...\n");
   l = traffic_deserialize(&p2, buffer, l);
   if (l == -1) {
