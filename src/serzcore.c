@@ -264,6 +264,31 @@ static inline int _szcmp(szc_dtyp_t typ, uint8_t *dst, const uint8_t *src, unsig
   return memcmp(data, dst, szc_count_oct(typ, count));
 }
 
+static inline void _szcmask(uint8_t *dst, size_t count, unsigned long long int mask) {
+  uint8_t pos_bb;
+  size_t cnt2;
+  size_t i;
+  pos_bb = mask % 8;
+  cnt2 = count - (mask >> 3) - (pos_bb == 0 ? 0 : 1);
+  for (i = 0; i < cnt2; i++) {
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+    dst[count - i - 1] = 0;
+#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+    dst[i] = 0;
+#else
+#error byte order not defined
+#endif
+  }
+  if (pos_bb > 0)
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+    dst[count - i - 1] &= (1 << pos_bb) - 1;
+#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+    dst[i] &= (1 << pos_bb) - 1;
+#else
+#error byte order not defined
+#endif
+}
+
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
 #define _szcpy2(typ, dst, src, count, bbcnt) _szcpy_r(typ, (dst) + ((bbcnt) - szc_count_oct(typ, count)), src, count, 0)
 #elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
